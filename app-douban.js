@@ -86,7 +86,7 @@ var options = {
 	ca: [fs.readFileSync('./keys/ca.crt')],
 	cert: fs.readFileSync('./keys/server.crt')
 };
-https.createServer(options, app).listen(3000, function(req, res){
+https.createServer(options, app).listen(3389, function(req, res){
     // res.writeHead(200);
-    console.log('server is running on port 3000');
+    console.log('server is running on port 3389');
 });
