@@ -85,7 +85,7 @@ var options = {
 	key: fs.readFileSync('./keys/214248838510598.key'),
 	cert: fs.readFileSync('./keys/214248838510598.pem')
 };
-https.createServer(options, app).listen(3389, function(req, res){
+https.createServer(options, app).listen(80, function(req, res){
     // res.writeHead(200);
-    console.log('server is running on port 3389');
+    console.log('server is running on port 80');
 });
