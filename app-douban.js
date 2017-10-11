@@ -8,6 +8,7 @@ var https = require('https');
 var fs = require('fs');
 
 var baseUrl = 'http://www.dbmeinv.com';
+var baseUrl1 = 'https://movie.douban.com';
 const successCode = 0, failCode = -1;
 
 function isEmpty(obj){
@@ -76,6 +77,35 @@ app.get('/girls', function(req, res){
                 thumbSrc : thumbImgSrc,
                 smallSrc : isEmpty(thumbImgSrc) ? "" : thumbImgSrc.replace('bmiddle', 'small'),
             });
+        });
+        res.json({code: successCode, msg: "", data:items});
+    });
+});
+
+app.get('/nowplaying', function(req, res){
+    var city = req.query.city;
+    var route = '/cinema/nowplaying/' + city + '/';
+    res.header("Content-Type", "application/json; charset=utf-8");
+    superagent.get(baseUrl1+route)
+    .charset('utf-8')
+    .end(function (err, sres) {
+        var items = [];
+        if (err) {
+            console.log('ERR: ' + err);
+            res.json({code: failCode, msg: err, sets:items});
+            return;
+        }
+        var $ = cheerio.load(sres.text);
+        $('#nowplaying .lists .list-item').each(function (idx, element) {
+            if(idx < 15) {
+                var $element = $(element),
+                    $poster = $element.find('.poster img');
+                items.push({
+                    img : $poster.attr('src'),
+                    title : $element.data('title'),
+                    rate : $element.data('score')
+                });
+            }
         });
         res.json({code: successCode, msg: "", data:items});
     });
