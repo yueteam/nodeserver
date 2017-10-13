@@ -135,20 +135,22 @@ var insertUser = function(data, db, callback) {
     //获得指定的集合 
     var collection = db.collection('user');
 
-    // var existUser = collection.find({"openid":data.openid}).pretty();
-    // if(existUser && existUser.length>0) {
-    //     return false;
-    // }
+    collection.find({"openid":data.openid}).toArray(function(err, items){        
+        if(items.length>0) {
+            db.close();
+        } else {
 
-    //插入数据
-    collection.insert(data, function(err, result) { 
-        //如果存在错误
-        if(err) {
-            console.log('Error:'+ err);
-            return;
-        } 
-        //调用传入的回调方法，将操作结果返回
-        callback(result);
+            //插入数据
+            collection.insert(data, function(err, result) { 
+                //如果存在错误
+                if(err) {
+                    console.log('Error:'+ err);
+                    return;
+                } 
+                //调用传入的回调方法，将操作结果返回
+                callback(result);
+            });
+        }
     });
 }
 
