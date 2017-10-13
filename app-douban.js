@@ -121,7 +121,7 @@ app.get('/getopenid', function(req, res){
         console.log('headers:', res1.headers);
 
         res1.on('data', (d) => {
-            res.json({code: successCode, msg: "", data: d});
+            res.json({code: successCode, msg: "", data: res1});
         });
 
     }).on('error', (e) => {
