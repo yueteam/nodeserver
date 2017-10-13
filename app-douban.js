@@ -137,7 +137,7 @@ var insertUser = function(data, db, callback) {
 
     collection.find({"openid":data.openid}).toArray(function(err, items){        
         if(items.length>0) {
-            db.close();
+            callback('用户已存在');
         } else {
 
             //插入数据
@@ -155,6 +155,7 @@ var insertUser = function(data, db, callback) {
 }
 
 app.get('/adduser', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
     var userInfo = {
         openid: req.query.openId,
         nickname: req.query.nickName,
@@ -170,7 +171,7 @@ app.get('/adduser', function(req, res){
         //执行插入数据操作，调用自定义方法
         insertUser(userInfo, db, function(result) {
             //显示结果
-            console.log(result);
+            res.json({code: successCode, msg: "", data: result}); 
             //关闭数据库
             db.close();
         });
