@@ -6,6 +6,8 @@ var express = require('express');
 var app = express();
 var https = require('https');
 var fs = require('fs');
+var MongoClient = require('mongodb').MongoClient;
+var DB_CONN_STR = 'mongodb://localhost:27017/yue'; 
 
 var baseUrl = 'http://www.dbmeinv.com';
 var baseUrl1 = 'https://movie.douban.com';
@@ -108,6 +110,62 @@ app.get('/nowplaying', function(req, res){
             }
         });
         res.json({code: successCode, msg: "", data:items});
+    });
+});
+
+app.get('/getopenid', function(req, res){
+    var code = req.query.code;
+
+    https.get('https://api.weixin.qq.com/sns/jscode2session?appid=wx288b9aa48204f09c&secret=7f0d2d16a6d82ddb3fd3ade56bc23712&js_code='+code+'&grant_type=authorization_code', (res1) => {
+        console.log('statusCode:', res1.statusCode);
+        console.log('headers:', res1.headers);
+
+        res1.on('data', (d) => {
+            res.json({code: successCode, msg: "", data: d});
+        });
+
+    }).on('error', (e) => {
+        res.json({code: failCode, msg: e});
+    });
+});
+
+var insertUser = function(data, db, callback) {  
+
+    //获得指定的集合 
+    var collection = db.collection('user');
+
+    //插入数据
+    collection.insert(data, function(err, result) { 
+        //如果存在错误
+        if(err) {
+            console.log('Error:'+ err);
+            return;
+        } 
+        //调用传入的回调方法，将操作结果返回
+        callback(result);
+    });
+}
+
+app.get('/adduser', function(req, res){
+    var userInfo = {
+        openId: req.query.openId,
+        nickName: req.query.nickName,
+        gender: req.query.gender,
+        language: req.query.language,
+        city: req.query.city,
+        province: req.query.province,
+        country: req.query.country,
+        avatarUrl: req.query.avatarUrl
+    };
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("连接成功！");
+        //执行插入数据操作，调用自定义方法
+        insertUser(userInfo, db, function(result) {
+            //显示结果
+            console.log(result);
+            //关闭数据库
+            db.close();
+        });
     });
 });
 
