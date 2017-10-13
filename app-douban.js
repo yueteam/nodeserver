@@ -116,17 +116,28 @@ app.get('/nowplaying', function(req, res){
 app.get('/getopenid', function(req, res){
     var code = req.query.code;
 
-    https.get('https://api.weixin.qq.com/sns/jscode2session?appid=wx288b9aa48204f09c&secret=7f0d2d16a6d82ddb3fd3ade56bc23712&js_code='+code+'&grant_type=authorization_code', (res1) => {
-        console.log('statusCode:', res1.statusCode);
-        console.log('headers:', res1.headers);
+    // https.get('https://api.weixin.qq.com/sns/jscode2session?appid=wx288b9aa48204f09c&secret=7f0d2d16a6d82ddb3fd3ade56bc23712&js_code='+code+'&grant_type=authorization_code', (res1) => {
+    //     console.log('statusCode:', res1.statusCode);
+    //     console.log('headers:', res1.headers);
 
-        res1.on('data', (d) => {
-            res.json({code: successCode, msg: "", data: res1});
-        });
+    //     res1.on('data', (d) => {
+    //         res.json({code: successCode, msg: "", data: res1});
+    //     });
 
-    }).on('error', (e) => {
-        res.json({code: failCode, msg: e});
+    // }).on('error', (e) => {
+    //     res.json({code: failCode, msg: e});
+    // });
+    res.header("Content-Type", "application/json; charset=utf-8");
+    superagent.get('https://api.weixin.qq.com/sns/jscode2session?appid=wx288b9aa48204f09c&secret=7f0d2d16a6d82ddb3fd3ade56bc23712&js_code='+code+'&grant_type=authorization_code')
+    .charset('utf-8')
+    .end(function (err, sres) {
+        if (err) {
+            res.json({code: failCode, msg: err});
+            return;
+        }
+        res.json({code: successCode, msg: "", data: sres.text});        
     });
+
 });
 
 var insertUser = function(data, db, callback) {  
