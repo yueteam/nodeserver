@@ -135,10 +135,10 @@ var insertUser = function(data, db, callback) {
     //获得指定的集合 
     var collection = db.collection('user');
 
-    var existUser = collection.find({"openid":data.openid}).pretty();
-    if(existUser && existUser.length>0) {
-        return false;
-    }
+    // var existUser = collection.find({"openid":data.openid}).pretty();
+    // if(existUser && existUser.length>0) {
+    //     return false;
+    // }
 
     //插入数据
     collection.insert(data, function(err, result) { 
