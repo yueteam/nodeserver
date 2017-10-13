@@ -19,7 +19,7 @@ function isEmpty(obj){
 }
 
 app.get('/', function(req, res){
-    res.send('<h1>girls now!</h1>');
+    res.send('<h1>约吗？</h1>');
 });
 
 app.get('/tags', function(req, res){
