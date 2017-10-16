@@ -135,7 +135,7 @@ var insertUser = function(data, db, callback) {
     //获得指定的集合 
     var collection = db.collection('user');
 
-    collection.find({"openid":data.openid}).toArray(function(err, items){        
+    collection.find({"openId":data.openId}).toArray(function(err, items){        
         if(items.length>0) {
             callback('用户已存在');
         } else {
@@ -157,14 +157,14 @@ var insertUser = function(data, db, callback) {
 app.get('/adduser', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var userInfo = {
-        openid: req.query.openId,
-        nickname: req.query.nickName,
+        openId: req.query.openId,
+        nickName: req.query.nickName,
         gender: req.query.gender,
         language: req.query.language,
         city: req.query.city,
         province: req.query.province,
         country: req.query.country,
-        avatar: req.query.avatarUrl
+        avatarUrl: req.query.avatarUrl
     };
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("连接成功！");
