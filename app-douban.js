@@ -115,7 +115,7 @@ app.get('/nowplaying', function(req, res){
         $('#districts .district-item').each(function (idx, element) {
             var $element = $(element);
             districts.push({
-                id: $element.data('id'),
+                id: $element.attr('id'),
                 name: $element.text()
             });
         });
@@ -140,14 +140,13 @@ app.get('/citys', function(req, res){
         $('#cities-list .city-mod').each(function (idx, element) {
             var $element = $(element);
             var $cityItem = $element.find('.city-item');
-            cityObj.len = $cityItem.length;
             var letter = $element.find('dt').text();
             cityObj[letter] = [];
             $cityItem.each(function (i, ele) {
                 var $ele = $(ele);
                 cityObj[letter].push({
-                    id: $ele.data('id'),
-                    uid: $ele.data('uid'),
+                    id: $ele.attr('id'),
+                    uid: $ele.attr('uid'),
                     name: $ele.text()
                 });
             });
