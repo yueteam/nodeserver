@@ -129,6 +129,12 @@ app.get('/citys', function(req, res){
     superagent.get(baseUrl1+route)
     .charset('utf-8')
     .end(function (err, sres) {
+        if (err) {
+            console.log('ERR: ' + err);
+            res.json({code: failCode, msg: err});
+            return;
+        }
+        var $ = cheerio.load(sres.text);
 
         var cityObj = {};
         $('#cities-list .city-mod').each(function (idx, element) {
