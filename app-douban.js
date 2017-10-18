@@ -99,7 +99,8 @@ app.get('/nowplaying', function(req, res){
         var $ = cheerio.load(sres.text);
         var dataObj = {},
             films = [],
-            districts = [];
+            districts = [],
+            cinemas = [];
         $('#nowplaying .lists .list-item').each(function (idx, element) {
             if(idx < 15) {
                 var $element = $(element),
@@ -112,6 +113,15 @@ app.get('/nowplaying', function(req, res){
             }
         });
         dataObj.filmList = films;
+
+        try{      
+            dataObj.cityInfo = {
+                id: $('#location').data('id'),
+                uid: $('#location').data('uid'),
+                name: $('#hd .page-title').text().split(' - ')[1]
+            }
+        } catch(e){}
+
         $('#districts .district-item').each(function (idx, element) {
             var $element = $(element);
             districts.push({
@@ -120,6 +130,16 @@ app.get('/nowplaying', function(req, res){
             });
         });
         dataObj.districtList = districts;
+
+        $('#default-section .cinema-item').each(function (idx, element) {
+            var $element = $(element);
+            cinemas.push({
+                name: $element.data('name'),
+                address: $element.data('address')
+            });
+        });
+        dataObj.cinemaList = cinemas;
+        
         res.json({code: successCode, msg: "", data: dataObj});
     });
 });
