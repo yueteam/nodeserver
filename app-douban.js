@@ -91,25 +91,52 @@ app.get('/nowplaying', function(req, res){
     superagent.get(baseUrl1+route)
     .charset('utf-8')
     .end(function (err, sres) {
-        var items = [];
         if (err) {
             console.log('ERR: ' + err);
-            res.json({code: failCode, msg: err, sets:items});
+            res.json({code: failCode, msg: err});
             return;
         }
         var $ = cheerio.load(sres.text);
+        var dataObj = {},
+            films = [],
+            districts = [];
         $('#nowplaying .lists .list-item').each(function (idx, element) {
             if(idx < 15) {
                 var $element = $(element),
                     $poster = $element.find('.poster img');
-                items.push({
+                films.push({
                     img : $poster.attr('src'),
                     title : $element.data('title'),
                     rate : $element.data('score')
                 });
             }
         });
-        res.json({code: successCode, msg: "", data:items});
+        dataObj.filmList = films;
+        $('#districts .district-item').each(function (idx, element) {
+            var $element = $(element);
+            districts.push({
+                id: $element.data('id'),
+                name: $element.text()
+            });
+        });
+        dataObj.districtList = districts;
+        var cityObj = {};
+        $('#cities-list .city-mod').each(function (idx, element) {
+            var $element = $(element);
+            var $cityItem = $element.find('city-item');
+            var letter = $element.find('dt').text();
+            cityObj[letter] = [];
+            $cityItem.each(function (i, ele) {
+                var $ele = $(ele);
+                cityObj[letter].push({
+                    id: $ele.data('id'),
+                    uid: $ele.data('uid'),
+                    name: $ele.text()
+                });
+            });
+        });
+        dataObj.citys = cityObj;
+        res.json({code: successCode, msg: "", data: dataObj});
     });
 });
 
