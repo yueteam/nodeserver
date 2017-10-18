@@ -120,10 +120,21 @@ app.get('/nowplaying', function(req, res){
             });
         });
         dataObj.districtList = districts;
+        res.json({code: successCode, msg: "", data: dataObj});
+    });
+});
+app.get('/citys', function(req, res){
+    var route = '';
+    res.header("Content-Type", "application/json; charset=utf-8");
+    superagent.get(baseUrl1+route)
+    .charset('utf-8')
+    .end(function (err, sres) {
+
         var cityObj = {};
         $('#cities-list .city-mod').each(function (idx, element) {
             var $element = $(element);
-            var $cityItem = $element.find('city-item');
+            var $cityItem = $element.find('.city-item');
+            cityObj.len = $cityItem.length;
             var letter = $element.find('dt').text();
             cityObj[letter] = [];
             $cityItem.each(function (i, ele) {
@@ -135,8 +146,7 @@ app.get('/nowplaying', function(req, res){
                 });
             });
         });
-        dataObj.citys = cityObj;
-        res.json({code: successCode, msg: "", data: dataObj});
+        res.json({code: successCode, msg: "", data: cityObj});
     });
 });
 
