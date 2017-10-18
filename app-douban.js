@@ -99,8 +99,7 @@ app.get('/nowplaying', function(req, res){
         var $ = cheerio.load(sres.text);
         var dataObj = {},
             films = [],
-            districts = [],
-            cinemas = [];
+            districts = [];
         $('#nowplaying .lists .list-item').each(function (idx, element) {
             if(idx < 15) {
                 var $element = $(element),
@@ -130,15 +129,6 @@ app.get('/nowplaying', function(req, res){
             });
         });
         dataObj.districtList = districts;
-
-        $('#default-section .cinema-item').each(function (idx, element) {
-            var $element = $(element);
-            cinemas.push({
-                name: $element.data('name'),
-                address: $element.data('address')
-            });
-        });
-        dataObj.cinemaList = cinemas;
         
         res.json({code: successCode, msg: "", data: dataObj});
     });
