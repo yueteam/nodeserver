@@ -105,9 +105,15 @@ app.get('/nowplaying', function(req, res){
                 var $element = $(element),
                     $poster = $element.find('.poster img');
                 films.push({
+                    id: $element.attr('id'),
                     img : $poster.attr('src'),
                     title : $element.data('title'),
-                    rate : $element.data('score')
+                    rate : $element.data('score'),
+                    release: $element.data('release'),
+                    duration: $element.data('duration'),
+                    region: $element.data('region'),
+                    director: $element.data('director'),
+                    actors: $element.data('actors')
                 });
             }
         });
@@ -133,6 +139,25 @@ app.get('/nowplaying', function(req, res){
         res.json({code: successCode, msg: "", data: dataObj});
     });
 });
+
+app.get('/getcinemas', function(req, res){
+    var cityId = req.query.cityId;
+    var districtId = req.query.districtId;
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    superagent.get('https://movie.douban.com/j/cinema/cinemas/?city_id='+cityId+'&district_id='+districtId)
+    .charset('utf-8')
+    .end(function (err, sres) {
+        if (err) {
+            res.json({code: failCode, msg: err});
+            return;
+        }
+        var list = JSON.parse(sres.text);
+        res.json({code: successCode, msg: "", data: list});        
+    });
+
+});
+
 app.get('/citys', function(req, res){
     var route = '';
     res.header("Content-Type", "application/json; charset=utf-8");
