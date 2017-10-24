@@ -263,8 +263,23 @@ app.get('/adduser', function(req, res){
 // });
 app.post('/pubdate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var dateInfo = req.body;
-    dateInfo.createTime = Date.now();
+    var dateInfo = {
+        userId: req.body.userId,
+        nickName: req.body.nickName,
+        gender: req.body.gender,
+        avatarUrl: req.body.avatarUrl,
+        filmId: req.body.filmId,
+        filmName: req.body.filmName,
+        cityId: req.body.cityId,
+        cityName: req.body.cityName,
+        time: req.body.time,
+        districtId: req.body.districtId,
+        districtName: req.body.districtName,
+        cinemaId: req.body.cinemaId,
+        cinemaName: req.body.cinemaName,
+        cinemaAddress: req.body.cinemaAddress,
+        createTime: Date.now().toString()
+    };
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("连接成功！");
         
