@@ -9,8 +9,8 @@ var fs = require('fs');
 // 引入json解析中间件
 var bodyParser = require('body-parser');
 // 添加json解析
-var jsonParser = bodyParser.json();
-var urlencodedParser = bodyParser.urlencoded({extended: false});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 
 var MongoClient = require('mongodb').MongoClient;
 var DB_CONN_STR = 'mongodb://localhost:27017/yue'; 
@@ -261,8 +261,8 @@ app.get('/adduser', function(req, res){
     });
 });
 
-app.post('/pubdate', jsonParser, function(req, res){
-    // res.header("Content-Type", "application/json; charset=utf-8");
+app.post('/pubdate', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
     var dateInfo = {
         userId: req.body.userId,
         nickName: req.body.nickName,
@@ -280,21 +280,22 @@ app.post('/pubdate', jsonParser, function(req, res){
         cinemaAddress: req.body.cinemaAddress,
         createTime: Date.now().toString()
     };
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
-        console.log("连接成功！");
+    res.json({code: successCode, msg: "", data: req.body.userId});
+    // MongoClient.connect(DB_CONN_STR, function(err, db) {
+    //     console.log("连接成功！");
         
-        db.dates.insert(dateInfo, function(err, result) { 
-            //如果存在错误
-            if(err) {
-                console.log('Error:'+ err);
-                // res.json({code: failCode, data: err}); 
-                db.close();
-                return;
-            } 
-            // res.json({code: successCode, msg: "", data: result}); 
-            db.close();
-        });
-    });
+    //     db.dates.insert(dateInfo, function(err, result) { 
+    //         //如果存在错误
+    //         if(err) {
+    //             console.log('Error:'+ err);
+    //             res.json({code: failCode, data: err}); 
+    //             db.close();
+    //             return;
+    //         } 
+    //         res.json({code: successCode, msg: "", data: result}); 
+    //         db.close();
+    //     });
+    // });
 });
 
 var options = {
