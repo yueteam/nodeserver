@@ -281,9 +281,9 @@ app.post('/pubdate', function(req, res){
         createTime: Date.now().toString()
     };
     MongoClient.connect(DB_CONN_STR, function(err, db) {
-        console.log("连接成功！");
-        
-        db.dates.insert(dateInfo, function(err, result) { 
+        console.log("db连接成功！");
+        var collection = db.collection('dates');
+        collection.insert(dateInfo, function(err, result) { 
             //如果存在错误
             if(err) {
                 console.log('Error:'+ err);
