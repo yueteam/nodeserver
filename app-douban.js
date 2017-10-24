@@ -255,7 +255,13 @@ app.get('/adduser', function(req, res){
     });
 });
 
-app.get('/pubdate', function(req, res){
+app.configure(function() {  
+  //默认情况下Express并不知道该如何处理该请求体，因此我们需要增加bodyParser中间件，用于分析  
+  //application/x-www-form-urlencoded和application/json  
+  //请求体，并把变量存入req.body。我们可以像下面的样子来“使用”中间件[这个保证POST能取到请求参数的值]：     
+  app.use(express.bodyParser());  
+});
+app.post('/pubdate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var dateInfo = req.body;
     dateInfo.createTime = Date.now();
