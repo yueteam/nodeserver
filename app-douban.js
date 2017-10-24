@@ -255,6 +255,27 @@ app.get('/adduser', function(req, res){
     });
 });
 
+app.get('/pubdate', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var dateInfo = req.body;
+    dateInfo.createTime = Date.now();
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("连接成功！");
+        
+        db.dates.insert(dateInfo, function(err, result) { 
+            //如果存在错误
+            if(err) {
+                console.log('Error:'+ err);
+                res.json({code: failCode, data: err}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: "", data: result}); 
+            db.close();
+        });
+    });
+});
+
 var options = {
 	key: fs.readFileSync('./keys/214248838510598.key'),
 	cert: fs.readFileSync('./keys/214248838510598.pem')
