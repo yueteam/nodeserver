@@ -6,6 +6,12 @@ var express = require('express');
 var app = express();
 var https = require('https');
 var fs = require('fs');
+// 引入json解析中间件
+var bodyParser = require('body-parser');
+// 添加json解析
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
 var MongoClient = require('mongodb').MongoClient;
 var DB_CONN_STR = 'mongodb://localhost:27017/yue'; 
 
@@ -255,12 +261,6 @@ app.get('/adduser', function(req, res){
     });
 });
 
-// app.configure(function() {  
-//   //默认情况下Express并不知道该如何处理该请求体，因此我们需要增加bodyParser中间件，用于分析  
-//   //application/x-www-form-urlencoded和application/json  
-//   //请求体，并把变量存入req.body。我们可以像下面的样子来“使用”中间件[这个保证POST能取到请求参数的值]：     
-//   app.use(express.bodyParser());  
-// });
 app.post('/pubdate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var dateInfo = {
