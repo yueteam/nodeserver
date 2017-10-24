@@ -280,22 +280,21 @@ app.post('/pubdate', function(req, res){
         cinemaAddress: req.body.cinemaAddress,
         createTime: Date.now().toString()
     };
-    res.json({code: successCode, msg: "", data: req.body.userId});
-    // MongoClient.connect(DB_CONN_STR, function(err, db) {
-    //     console.log("连接成功！");
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("连接成功！");
         
-    //     db.dates.insert(dateInfo, function(err, result) { 
-    //         //如果存在错误
-    //         if(err) {
-    //             console.log('Error:'+ err);
-    //             res.json({code: failCode, data: err}); 
-    //             db.close();
-    //             return;
-    //         } 
-    //         res.json({code: successCode, msg: "", data: result}); 
-    //         db.close();
-    //     });
-    // });
+        db.dates.insert(dateInfo, function(err, result) { 
+            //如果存在错误
+            if(err) {
+                console.log('Error:'+ err);
+                res.json({code: failCode, data: err}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: "", data: result}); 
+            db.close();
+        });
+    });
 });
 
 var options = {
