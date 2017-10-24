@@ -262,7 +262,7 @@ app.get('/adduser', function(req, res){
 });
 
 app.post('/pubdate', jsonParser, function(req, res){
-    res.header("Content-Type", "application/json; charset=utf-8");
+    // res.header("Content-Type", "application/json; charset=utf-8");
     var dateInfo = {
         userId: req.body.userId,
         nickName: req.body.nickName,
@@ -287,11 +287,11 @@ app.post('/pubdate', jsonParser, function(req, res){
             //如果存在错误
             if(err) {
                 console.log('Error:'+ err);
-                res.json({code: failCode, data: err}); 
+                // res.json({code: failCode, data: err}); 
                 db.close();
                 return;
             } 
-            res.json({code: successCode, msg: "", data: result}); 
+            // res.json({code: successCode, msg: "", data: result}); 
             db.close();
         });
     });
