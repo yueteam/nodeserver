@@ -9,8 +9,8 @@ var fs = require('fs');
 // 引入json解析中间件
 var bodyParser = require('body-parser');
 // 添加json解析
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+var jsonParser = bodyParser.json();
+var urlencodedParser = bodyParser.urlencoded({extended: false});
 
 var MongoClient = require('mongodb').MongoClient;
 var DB_CONN_STR = 'mongodb://localhost:27017/yue'; 
@@ -261,7 +261,7 @@ app.get('/adduser', function(req, res){
     });
 });
 
-app.post('/pubdate', function(req, res){
+app.post('/pubdate', jsonParser, function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var dateInfo = {
         userId: req.body.userId,
