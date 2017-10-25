@@ -272,12 +272,14 @@ app.post('/pubdate', function(req, res){
         filmName: req.body.filmName,
         cityId: req.body.cityId,
         cityName: req.body.cityName,
+        day: req.body.day,
         time: req.body.time,
         districtId: req.body.districtId,
         districtName: req.body.districtName,
         cinemaId: req.body.cinemaId,
         cinemaName: req.body.cinemaName,
         cinemaAddress: req.body.cinemaAddress,
+        status: 0, // 0未匹配 1匹配中 2匹配成功
         createTime: Date.now().toString()
     };
     MongoClient.connect(DB_CONN_STR, function(err, db) {
