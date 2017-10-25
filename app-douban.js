@@ -279,6 +279,7 @@ app.post('/pubdate', function(req, res){
         cinemaId: req.body.cinemaId,
         cinemaName: req.body.cinemaName,
         cinemaAddress: req.body.cinemaAddress,
+        words: req.body.words,
         status: 0, // 0未匹配 1匹配中 2匹配成功
         createTime: Date.now().toString()
     };
