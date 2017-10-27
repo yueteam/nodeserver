@@ -260,6 +260,34 @@ app.get('/adduser', function(req, res){
         });
     });
 });
+app.post('/saveuserinfo', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var openId = req.body.openId,
+        updateInfo = {
+            nickName: req.body.nickName,
+            gender: req.body.gender,
+            birthday: req.body.birthday,
+            personality: req.body.personality,  
+            business: req.body.business,  
+            company: req.body.company,  
+            profession: req.body.profession           
+        };
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("db连接成功！");
+        var collection = db.collection('user');
+        collection.update({'openId':openId},{$set:updateInfo}, function(err, result) { 
+            //如果存在错误
+            if(err) {
+                console.log('Error:'+ err);
+                res.json({code: failCode, data: err}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: "", data: result}); 
+            db.close();
+        });
+    });
+});
 
 app.post('/pubdate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
