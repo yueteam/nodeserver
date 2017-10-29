@@ -260,6 +260,22 @@ app.get('/adduser', function(req, res){
         });
     });
 });
+app.get('/finduser', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var openId = req.query.openId;
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("finduser连接成功！");
+        var collection = db.collection('user');
+        collection.find({"openId":openId}).toArray(function(err, items){        
+            if(items.length>0) {
+                res.json({code: successCode, msg: "", data: items[0]});
+            } else {
+                res.json({code: failCode, data: '用户不存在'}); 
+            }
+            db.close();
+        });
+    });
+});
 app.post('/saveuserinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var openId = req.body.openId,
@@ -273,7 +289,7 @@ app.post('/saveuserinfo', function(req, res){
             profession: req.body.profession           
         };
     MongoClient.connect(DB_CONN_STR, function(err, db) {
-        console.log("db连接成功！");
+        console.log("saveuserinfo连接成功！");
         var collection = db.collection('user');
         collection.update({'openId':openId},{$set:updateInfo}, function(err, result) { 
             //如果存在错误
