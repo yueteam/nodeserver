@@ -8,6 +8,14 @@ var https = require('https');
 var fs = require('fs');
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
+var OSS = require('ali-oss');
+var co = require('co');
+var client = new OSS({
+    accessKeyId: '<accessKeyId>',
+    accessKeySecret: '<accessKeySecret>',
+    bucket: '<bucketName>',
+    endpoint: '<endpoint, 例如http://oss-cn-hangzhou.aliyuncs.com>'
+});
 // 引入json解析中间件
 var bodyParser = require('body-parser');
 // 添加json解析
@@ -325,12 +333,13 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
             lastName = '.png';
             break;
     }
+    var userId = req.body.userId;
     // 构建图片名
-    var fileName = Date.now() + lastName;
+    var fileName = userId + '_' + Date.now() + lastName;
     // 图片重命名
-    fs.rename(filePath, fileName, (err) => {
-        if (err) {
-            res.end(JSON.stringify({status:'102',msg:'文件写入失败'}));   
+    fs.rename(filePath, './uploads/' + fileName, (err) => {
+        if (err) { 
+            res.json({code: failCode, data: '文件写入失败'});  
         }else{
             // var localFile = './' + fileName;  
             // var formUploader = new qiniu.form_up.FormUploader(config);
