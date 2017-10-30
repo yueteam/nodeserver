@@ -23,6 +23,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 var MongoClient = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectID;
 var DB_CONN_STR = 'mongodb://localhost:27017/yue'; 
 
 var baseUrl = 'http://www.dbmeinv.com';
@@ -316,7 +317,7 @@ app.post('/saveuserinfo', function(req, res){
 });
 app.post('/upload', upload.single('file'), function (req, res, next) {
     res.header("Content-Type", "application/json; charset=utf-8");
-console.log(req.file);
+console.log(req.file.path);
     // 文件路径
     var filePath = './' + req.file.path;  
     // 文件类型
@@ -333,14 +334,33 @@ console.log(req.file);
             lastName = '.png';
             break;
     }
-    var userId = req.body.userId;
+    var userId = req.body.userId,
+        index = req.body.index;
     // 构建图片名
     var fileName = userId + '_' + Date.now() + lastName;
 
     co(function* () {
         var result = yield client.put(fileName, filePath);
-        console.log(result);
-      
+        console.log(result.requestUrls[0]);
+            
+        var updateInfo = {};
+        updateInfo[index] = result.requestUrls[0];
+
+        MongoClient.connect(DB_CONN_STR, function(err, db) {
+            console.log("upload连接成功！");
+            var collection = db.collection('user');
+            collection.update({'_id':ObjectID(userId)},{$set:updateInfo}, function(err, result1) { 
+                //如果存在错误
+                if(err) {
+                    res.json({code: failCode, data: err}); 
+                    db.close();
+                    return;
+                } 
+                res.json({code: successCode, msg: "", data: result.requestUrls[0]}); 
+                db.close();
+            });
+        });
+
         // 上传之后删除本地文件
         fs.unlinkSync(filePath);
     }).catch(function (err) {
