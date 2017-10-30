@@ -11,10 +11,10 @@ var upload = multer({ dest: 'uploads/' });
 var OSS = require('ali-oss');
 var co = require('co');
 var client = new OSS({
-    accessKeyId: '<accessKeyId>',
-    accessKeySecret: '<accessKeySecret>',
-    bucket: '<bucketName>',
-    endpoint: '<endpoint, 例如http://oss-cn-hangzhou.aliyuncs.com>'
+    accessKeyId: 'LTAIrUHBoHLwlUNY',
+    accessKeySecret: 'OvuJdzBuziDOIQFRD4gbZXI1fDQ8qC',
+    bucket: 'yueavatar',
+    endpoint: 'oss-cn-hangzhou.aliyuncs.com'
 });
 // 引入json解析中间件
 var bodyParser = require('body-parser');
@@ -341,26 +341,16 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
         if (err) { 
             res.json({code: failCode, data: '文件写入失败'});  
         }else{
-            // var localFile = './' + fileName;  
-            // var formUploader = new qiniu.form_up.FormUploader(config);
-            // var putExtra = new qiniu.form_up.PutExtra();
-            // var key = fileName;
-
-            // // 文件上传
-            // formUploader.putFile(uploadToken, key, localFile, putExtra, function(respErr,
-            //   respBody, respInfo) {
-            //   if (respErr) {
-            //     res.end(JSON.stringify({status:'101',msg:'上传失败',error:respErr}));   
-            //   }
-            //   if (respInfo.statusCode == 200) {
-            //     var imageSrc = 'http://o9059a64b.bkt.clouddn.com/' + respBody.key;
-            //     res.end(JSON.stringify({status:'100',msg:'上传成功',imageUrl:imageSrc}));   
-            //   } else {
-            //     res.end(JSON.stringify({status:'102',msg:'上传失败',error:JSON.stringify(respBody)}));  
-            //   }
-            //   // 上传之后删除本地文件
-            //   fs.unlinkSync(localFile);
-            // });
+            var localFile = './uploads/' + fileName;  
+            
+            co(function* () {
+              var result = yield client.get(fileName, localFile);
+              // 上传之后删除本地文件
+              fs.unlinkSync(localFile);
+            }).catch(function (err) {
+              console.log(err);
+            }); 
+            
         }
     });
 })
