@@ -341,10 +341,10 @@ console.log(req.file.path);
 
     co(function* () {
         var result = yield client.put(fileName, filePath);
-        console.log(result.requestUrls[0]);
+        console.log(result.url);
             
         var updateInfo = {};
-        updateInfo[index] = result.requestUrls[0];
+        updateInfo[index] = result.url;
 
         MongoClient.connect(DB_CONN_STR, function(err, db) {
             console.log("upload连接成功！");
@@ -356,7 +356,7 @@ console.log(req.file.path);
                     db.close();
                     return;
                 } 
-                res.json({code: successCode, msg: "", data: result.requestUrls[0]}); 
+                res.json({code: successCode, msg: "", data: result.url}); 
                 db.close();
             });
         });
