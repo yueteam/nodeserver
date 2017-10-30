@@ -316,7 +316,7 @@ app.post('/saveuserinfo', function(req, res){
 });
 app.post('/upload', upload.single('file'), function (req, res, next) {
     res.header("Content-Type", "application/json; charset=utf-8");
-
+console.log(req.file);
     // 文件路径
     var filePath = './' + req.file.path;  
     // 文件类型
@@ -336,23 +336,24 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
     var userId = req.body.userId;
     // 构建图片名
     var fileName = userId + '_' + Date.now() + lastName;
+
+    co(function* () {
+        var result = yield client.put(fileName, filePath);
+        console.log(result);
+      
+        // 上传之后删除本地文件
+        fs.unlinkSync(filePath);
+    }).catch(function (err) {
+        console.log(err);
+    }); 
     // 图片重命名
-    fs.rename(filePath, './uploads/' + fileName, (err) => {
-        if (err) { 
-            res.json({code: failCode, data: '文件写入失败'});  
-        }else{
-            var localFile = './uploads/' + fileName;  
+    // fs.rename(filePath, './uploads/' + fileName, (err) => {
+    //     if (err) { 
+    //         res.json({code: failCode, data: '文件写入失败'});  
+    //     }else{
             
-            co(function* () {
-              var result = yield client.put(fileName, localFile);
-              // 上传之后删除本地文件
-              fs.unlinkSync(localFile);
-            }).catch(function (err) {
-              console.log(err);
-            }); 
-            
-        }
-    });
+        // }
+    // });
 })
 
 app.post('/pubdate', function(req, res){
