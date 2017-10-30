@@ -343,7 +343,7 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
         var result = yield client.put(fileName, filePath);
             
         var updateInfo = {};
-        updateInfo[index] = result.url.replace(/http:/,'');
+        updateInfo[index] = result.url.replace(/http:/,'https:');
 
         // 上传之后删除本地文件
         fs.unlinkSync(filePath);
@@ -358,7 +358,7 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
                     db.close();
                     return;
                 } 
-                res.send(result.url); 
+                res.send(result.url.replace(/http:/,'https:')); 
                 db.close();
             });
         });
