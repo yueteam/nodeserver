@@ -317,7 +317,7 @@ app.post('/saveuserinfo', function(req, res){
 });
 app.post('/upload', upload.single('file'), function (req, res, next) {
     res.header("Content-Type", "application/json; charset=utf-8");
-console.log(req.file.path);
+
     // 文件路径
     var filePath = './' + req.file.path;  
     // 文件类型
@@ -341,10 +341,12 @@ console.log(req.file.path);
 
     co(function* () {
         var result = yield client.put(fileName, filePath);
-        console.log(result.url);
             
         var updateInfo = {};
-        updateInfo[index] = result.url;
+        updateInfo[index] = result.url.replace(/http:/,'');
+
+        // 上传之后删除本地文件
+        fs.unlinkSync(filePath);
 
         MongoClient.connect(DB_CONN_STR, function(err, db) {
             console.log("upload连接成功！");
@@ -356,13 +358,10 @@ console.log(req.file.path);
                     db.close();
                     return;
                 } 
-                res.json({code: successCode, msg: "", data: result.url}); 
+                res.send(result.url); 
                 db.close();
             });
         });
-
-        // 上传之后删除本地文件
-        fs.unlinkSync(filePath);
     }).catch(function (err) {
         console.log(err);
     }); 
