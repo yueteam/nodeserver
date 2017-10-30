@@ -6,6 +6,8 @@ var express = require('express');
 var app = express();
 var https = require('https');
 var fs = require('fs');
+var multer  = require('multer');
+var upload = multer({ dest: 'uploads/' });
 // 引入json解析中间件
 var bodyParser = require('body-parser');
 // 添加json解析
@@ -304,6 +306,55 @@ app.post('/saveuserinfo', function(req, res){
         });
     });
 });
+app.post('/upload', upload.single('file'), function (req, res, next) {
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    // 文件路径
+    var filePath = './' + req.file.path;  
+    // 文件类型
+    var fileType = req.file.mimetype;
+    var lastName = '';
+    switch (fileType){
+        case 'image/png':
+            lastName = '.png';
+            break;
+        case 'image/jpeg':
+            lastName = '.jpg';
+            break;
+        default:
+            lastName = '.png';
+            break;
+    }
+    // 构建图片名
+    var fileName = Date.now() + lastName;
+    // 图片重命名
+    fs.rename(filePath, fileName, (err) => {
+        if (err) {
+            res.end(JSON.stringify({status:'102',msg:'文件写入失败'}));   
+        }else{
+            // var localFile = './' + fileName;  
+            // var formUploader = new qiniu.form_up.FormUploader(config);
+            // var putExtra = new qiniu.form_up.PutExtra();
+            // var key = fileName;
+
+            // // 文件上传
+            // formUploader.putFile(uploadToken, key, localFile, putExtra, function(respErr,
+            //   respBody, respInfo) {
+            //   if (respErr) {
+            //     res.end(JSON.stringify({status:'101',msg:'上传失败',error:respErr}));   
+            //   }
+            //   if (respInfo.statusCode == 200) {
+            //     var imageSrc = 'http://o9059a64b.bkt.clouddn.com/' + respBody.key;
+            //     res.end(JSON.stringify({status:'100',msg:'上传成功',imageUrl:imageSrc}));   
+            //   } else {
+            //     res.end(JSON.stringify({status:'102',msg:'上传失败',error:JSON.stringify(respBody)}));  
+            //   }
+            //   // 上传之后删除本地文件
+            //   fs.unlinkSync(localFile);
+            // });
+        }
+    });
+})
 
 app.post('/pubdate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
