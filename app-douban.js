@@ -11,10 +11,10 @@ var upload = multer({ dest: 'uploads/' });
 var OSS = require('ali-oss');
 var co = require('co');
 var client = new OSS({
+    region: 'oss-cn-hangzhou',
     accessKeyId: 'LTAIrUHBoHLwlUNY',
     accessKeySecret: 'OvuJdzBuziDOIQFRD4gbZXI1fDQ8qC',
-    bucket: 'yueavatar',
-    endpoint: 'oss-cn-hangzhou.aliyuncs.com'
+    bucket: 'yueavatar'
 });
 // 引入json解析中间件
 var bodyParser = require('body-parser');
@@ -344,7 +344,7 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
             var localFile = './uploads/' + fileName;  
             
             co(function* () {
-              var result = yield client.get(fileName, localFile);
+              var result = yield client.put(fileName, localFile);
               // 上传之后删除本地文件
               fs.unlinkSync(localFile);
             }).catch(function (err) {
