@@ -287,18 +287,80 @@ app.get('/finduser', function(req, res){
         });
     });
 });
+function computeAge(birthday) {
+    var birthdayArr = birthday.split("-");  
+    var birthYear = birthdayArr[0];  
+    var birthMonth = birthdayArr[1];  
+    var birthDay = birthdayArr[2]; 
+    var d = new Date();  
+    var nowYear = d.getFullYear();  
+    var nowMonth = d.getMonth() + 1;  
+    var nowDay = d.getDate();
+    var ageDiff = nowYear - birthYear ; //年之差  
+
+    if(nowMonth == birthMonth) {  
+        var dayDiff = nowDay - birthDay;//日之差  
+        if(dayDiff < 0) {  
+            return ageDiff - 1;  
+        }else {  
+            return ageDiff ;  
+        }  
+    } else {  
+        var monthDiff = nowMonth - birthMonth;//月之差  
+        if(monthDiff < 0) {  
+            return ageDiff - 1;  
+        } else {  
+            return ageDiff;  
+        }  
+    }
+}
+function getConstellation(birthday) {
+    var birthdayArr = birthday.split("-"),
+        birthMonthDay = birthdayArr[1] + '.' + birthdayArr[2],
+        birthMonthDay = Number(birthMonthDay);
+
+    if(birthMonthDay >= 3.21 && birthMonthDay <= 4.19) {
+        return '白羊座';
+    } else if(birthMonthDay >= 4.2 && birthMonthDay <= 5.2) {
+        return '金牛座';
+    } else if(birthMonthDay >= 5.21 && birthMonthDay <= 6.21) {
+        return '双子座';
+    } else if(birthMonthDay >= 6.22 && birthMonthDay <= 7.22) {
+        return '巨蟹座';
+    } else if(birthMonthDay >= 7.23 && birthMonthDay <= 8.22) {
+        return '狮子座';
+    } else if(birthMonthDay >= 8.23 && birthMonthDay <= 9.22) {
+        return '处女座';
+    } else if(birthMonthDay >= 9.23 && birthMonthDay <= 10.23) {
+        return '天秤座';
+    } else if(birthMonthDay >= 10.24 && birthMonthDay <= 11.22) {
+        return '天蝎座';
+    } else if(birthMonthDay >= 11.23 && birthMonthDay <= 12.21) {
+        return '射手座';
+    } else if((birthMonthDay >= 12.22 && birthMonthDay <= 12.31) || (birthMonthDay >= 1.1 && birthMonthDay <= 1.19)) {
+        return '摩羯座';
+    } else if(birthMonthDay >= 1.2 && birthMonthDay <= 2.18) {
+        return '水瓶座';
+    } else if(birthMonthDay >= 2.19 && birthMonthDay <= 3.2) {
+        return '双鱼座';
+    } 
+}
 app.post('/saveuserinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var openId = req.body.openId,
+        birthday = req.body.birthday,
         updateInfo = {
             nickName: req.body.nickName,
             gender: req.body.gender,
-            birthday: req.body.birthday,
+            birthday: birthday,
+            age: computeAge(birthday),
+            constellation: getConstellation(birthday),
             personality: req.body.personality,  
             business: req.body.business,  
             company: req.body.company,  
             profession: req.body.profession           
         };
+
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("saveuserinfo连接成功！");
         var collection = db.collection('user');
