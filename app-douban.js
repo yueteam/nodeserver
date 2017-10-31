@@ -358,7 +358,7 @@ app.post('/saveuserinfo', function(req, res){
                 db.close();
                 return;
             } 
-            res.json({code: successCode, msg: "", data: result}); 
+            res.json({code: successCode, msg: "", data: updateInfo}); 
             db.close();
         });
     });
