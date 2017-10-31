@@ -36,6 +36,9 @@ function isEmpty(obj){
     }
     return true;
 }
+function trim(str){  
+  return str.replace(/^(\s|\u00A0)+/,'').replace(/(\s|\u00A0)+$/,'');  
+}
 
 app.get('/', function(req, res){
     res.send('<h1>约吗？</h1>');
@@ -446,8 +449,8 @@ app.post('/pubdate', function(req, res){
         cinemaId: req.body.cinemaId,
         cinemaName: req.body.cinemaName,
         cinemaAddress: req.body.cinemaAddress,
-        words: req.body.words,
-        status: 0, // 0未匹配 1匹配中 2匹配成功
+        // words: req.body.words,
+        status: 1, // 0未匹配 1匹配中 2匹配成功
         createTime: Date.now().toString()
     };
     MongoClient.connect(DB_CONN_STR, function(err, db) {
