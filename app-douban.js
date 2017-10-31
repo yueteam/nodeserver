@@ -224,30 +224,6 @@ app.get('/getopenid', function(req, res){
 
 });
 
-var insertUser = function(data, db, callback) {  
-
-    //获得指定的集合 
-    var collection = db.collection('user');
-
-    collection.find({"openId":data.openId}).toArray(function(err, items){        
-        if(items.length>0) {
-            callback('用户已存在');
-        } else {
-
-            //插入数据
-            collection.insert(data, function(err, result) { 
-                //如果存在错误
-                if(err) {
-                    console.log('Error:'+ err);
-                    return;
-                } 
-                //调用传入的回调方法，将操作结果返回
-                callback(result);
-            });
-        }
-    });
-}
-
 app.get('/adduser', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var userInfo = {
@@ -261,13 +237,23 @@ app.get('/adduser', function(req, res){
         avatarUrl: req.query.avatarUrl
     };
     MongoClient.connect(DB_CONN_STR, function(err, db) {
-        console.log("连接成功！");
-        //执行插入数据操作，调用自定义方法
-        insertUser(userInfo, db, function(result) {
-            //显示结果
-            res.json({code: successCode, msg: "", data: result}); 
-            //关闭数据库
-            db.close();
+        console.log("adduser连接成功！");
+        //执行插入数据操作
+        var collection = db.collection('user');
+        collection.find({"openId":userInfo.openId}).toArray(function(err, items){        
+            if(items.length>0) {
+                res.json({code: 1, msg: "", data: items[0]});
+
+                //关闭数据库
+                db.close();
+            } else {
+
+                //插入数据
+                collection.insert(userInfo, function(error, result) { 
+                    res.json({code: successCode, msg: "", data: result}); 
+                    db.close();
+                });
+            }
         });
     });
 });
@@ -440,10 +426,15 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
 app.post('/pubdate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var dateInfo = {
-        userId: req.body.userId,
+        openId: req.body.openId,
+        avatarUrl: req.body.avatarUrl,
         nickName: req.body.nickName,
         gender: req.body.gender,
-        avatarUrl: req.body.avatarUrl,
+        age: req.body.age,
+        constellation: req.body.constellation,
+        business: req.body.business,
+        company: req.body.company,
+        profession: req.body.profession,
         filmId: req.body.filmId,
         filmName: req.body.filmName,
         cityId: req.body.cityId,
