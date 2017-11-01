@@ -451,7 +451,7 @@ app.post('/pubdate', function(req, res){
         cinemaAddress: req.body.cinemaAddress,
         // words: req.body.words,
         status: 1, // 0未匹配 1匹配中 2匹配成功
-        createTime: Date.now().toString()
+        createTime: Date.now()
     };
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("db连接成功！");
@@ -465,6 +465,39 @@ app.post('/pubdate', function(req, res){
                 return;
             } 
             res.json({code: successCode, msg: "", data: result}); 
+            db.close();
+        });
+    });
+});
+app.get('/match', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var gender = req.query.gender,
+        gender1 = gender==1?2:1,
+        filmId = req.query.filmId,
+        cityId = req.query.cityId,
+        day = req.query.day,
+        time = req.query.time,
+        districtId = req.query.districtId,
+        cinemaId = req.query.cinemaId;
+
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("matching连接成功！");
+        var collection = db.collection('dates');
+        collection.find({
+            'gender': gender1,
+            'filmId': filmId,
+            'cityId': cityId,
+            'day': day,
+            'time': time,
+            'districtId': districtId,
+            'cinemaId': cinemaId,
+            'status': 1
+        }).limit(100).toArray(function(err, items){        
+            if(items.length>0) {
+                res.json({code: successCode, msg: "", data: items});
+            } else {
+                res.json({code: failCode, data: '没匹配到'}); 
+            }
             db.close();
         });
     });
