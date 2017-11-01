@@ -232,7 +232,7 @@ app.get('/adduser', function(req, res){
     var userInfo = {
         openId: req.query.openId,
         nickName: req.query.nickName,
-        gender: req.query.gender,
+        gender: Number(req.query.gender),
         language: req.query.language,
         city: req.query.city,
         province: req.query.province,
@@ -340,7 +340,7 @@ app.post('/saveuserinfo', function(req, res){
         birthday = req.body.birthday,
         updateInfo = {
             nickName: req.body.nickName,
-            gender: req.body.gender,
+            gender: Number(req.body.gender),
             birthday: birthday,
             age: computeAge(birthday),
             constellation: getConstellation(birthday),
@@ -382,7 +382,7 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
             lastName = '.jpg';
             break;
         default:
-            lastName = '.png';
+            lastName = '.jpg';
             break;
     }
     var userId = req.body.userId,
@@ -432,7 +432,7 @@ app.post('/pubdate', function(req, res){
         openId: req.body.openId,
         avatarUrl: req.body.avatarUrl,
         nickName: req.body.nickName,
-        gender: req.body.gender,
+        gender: Number(req.body.gender),
         age: req.body.age,
         constellation: req.body.constellation,
         business: req.body.business,
