@@ -466,13 +466,30 @@ app.post('/pubdate', function(req, res){
                 return;
             } 
             res.json({code: successCode, msg: "", data: result}); 
-            
-            collection.update({openId:openId,status:1,_id:{$ne:ObjectID(result.ops[0]._id)}},{$set:{status:0}}, function(err1, result1) { 
+
+            collection.update({openId:openId,status:1,_id:{$ne:ObjectID(result.insertedIds[0])}},{$set:{status:0}}, function(err1, result1) { 
                 db.close();
             });
         });
     });
 });
+app.get('/getdate', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var openId = req.query.openId;
+
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("getdate连接成功！");
+        var collection = db.collection('dates');
+        collection.find({openId:openId, status:1}).sort({'createTime':-1}).limit(1).toArray(function(err, items){        
+            if(items.length>0) {
+                res.json({code: successCode, msg: "", data: items[0]});
+            } else {
+                res.json({code: failCode, data: '没找到'}); 
+            }
+            db.close();
+        });
+    });
+});   
 app.get('/match', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var gender = req.query.gender,
