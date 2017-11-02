@@ -433,20 +433,20 @@ app.post('/pubdate', function(req, res){
         avatarUrl: req.body.avatarUrl,
         nickName: req.body.nickName,
         gender: Number(req.body.gender),
-        age: req.body.age,
+        age: Number(req.body.age),
         constellation: req.body.constellation,
         business: req.body.business,
         company: req.body.company,
         profession: req.body.profession,
-        filmId: req.body.filmId,
+        filmId: req.body.filmId+'',
         filmName: req.body.filmName,
         cityId: req.body.cityId+'',
         cityName: req.body.cityName,
         day: req.body.day,
         time: req.body.time,
-        districtId: req.body.districtId,
+        districtId: req.body.districtId+'',
         districtName: req.body.districtName,
-        cinemaId: req.body.cinemaId,
+        cinemaId: req.body.cinemaId+'',
         cinemaName: req.body.cinemaName,
         cinemaAddress: req.body.cinemaAddress,
         words: req.body.words,
@@ -473,17 +473,16 @@ app.get('/match', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var gender = req.query.gender,
         gender1 = gender==1?2:1,
-        filmId = req.query.filmId,
+        filmId = req.query.filmId+'',
         cityId = req.query.cityId+'',
         day = req.query.day,
         time = req.query.time,
-        districtId = req.query.districtId,
-        cinemaId = req.query.cinemaId;
+        districtId = req.query.districtId+'',
+        cinemaId = req.query.cinemaId+'';
 
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
-        console.log("matching连接成功！");
-        var collection = db.collection('dates');
-        collection.find({
+    var matchInfo = {};
+    if(districtId !== 'all' && cinemaId !== '') {
+        matchInfo = {
             'gender': gender1,
             'filmId': filmId,
             'cityId': cityId,
@@ -492,7 +491,34 @@ app.get('/match', function(req, res){
             'districtId': districtId,
             'cinemaId': cinemaId,
             'status': 1
-        }).limit(100).toArray(function(err, items){        
+        };
+    } else {
+        if(districtId === 'all') {
+            matchInfo = {
+                'gender': gender1,
+                'filmId': filmId,
+                'cityId': cityId,
+                'day': day,
+                'time': time,
+                'status': 1
+            };
+        } else {
+            matchInfo = {
+                'gender': gender1,
+                'filmId': filmId,
+                'cityId': cityId,
+                'day': day,
+                'time': time,
+                'districtId': districtId,
+                'status': 1
+            };
+        }
+    }
+
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("matching连接成功！");
+        var collection = db.collection('dates');
+        collection.find(matchInfo).sort({'createTime':-1}).limit(100).toArray(function(err, items){        
             if(items.length>0) {
                 res.json({code: successCode, msg: "", data: items});
             } else {
