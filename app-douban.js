@@ -529,6 +529,27 @@ app.get('/match', function(req, res){
         });
     });
 });
+app.get('/updatedate', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var dateId = req.query.dateId,
+        matchId = req.query.matchId;
+
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("updatedate连接成功！");
+        var collection = db.collection('dates');
+        
+        collection.find({_id: ObjectID(dateId)}).toArray(function(err, items){ 
+            if(items.length>0) {
+                var loveIdArr = items[0].loveIds || [];
+                loveIdArr.push(matchId);
+                collection.update({_id: ObjectID(dateId)},{$set:{loveIds:loveIdArr}}, function(err, result) { 
+                    db.close();
+                });
+            }
+        });    
+            
+    });
+}); 
 
 var options = {
 	key: fs.readFileSync('./keys/214248838510598.key'),
