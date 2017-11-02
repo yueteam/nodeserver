@@ -428,8 +428,9 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
 
 app.post('/pubdate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
+    var openId = req.body.openId;
     var dateInfo = {
-        openId: req.body.openId,
+        openId: openId,
         avatarUrl: req.body.avatarUrl,
         nickName: req.body.nickName,
         gender: Number(req.body.gender),
@@ -465,7 +466,10 @@ app.post('/pubdate', function(req, res){
                 return;
             } 
             res.json({code: successCode, msg: "", data: result}); 
-            db.close();
+            
+            collection.update({openId:openId,status:1,_id:{$ne:ObjectID(result.ops[0]._id)}},{$set:{status:0}}, function(err1, result1) { 
+                db.close();
+            });
         });
     });
 });
@@ -480,39 +484,19 @@ app.get('/match', function(req, res){
         districtId = req.query.districtId+'',
         cinemaId = req.query.cinemaId+'';
 
-    var matchInfo = {};
-    if(districtId !== 'all' && cinemaId !== '') {
-        matchInfo = {
-            'gender': gender1,
-            'filmId': filmId,
-            'cityId': cityId,
-            'day': day,
-            'time': time,
-            'districtId': districtId,
-            'cinemaId': cinemaId,
-            'status': 1
-        };
-    } else {
-        if(districtId === 'all') {
-            matchInfo = {
-                'gender': gender1,
-                'filmId': filmId,
-                'cityId': cityId,
-                'day': day,
-                'time': time,
-                'status': 1
-            };
-        } else {
-            matchInfo = {
-                'gender': gender1,
-                'filmId': filmId,
-                'cityId': cityId,
-                'day': day,
-                'time': time,
-                'districtId': districtId,
-                'status': 1
-            };
-        }
+    var matchInfo = {
+        'gender': gender1,
+        'filmId': filmId,
+        'cityId': cityId,
+        'day': day,
+        'time': time,
+        'status': 1
+    };
+    if(districtId !== 'all') {
+        matchInfo.districtId = districtId;
+    } 
+    if(cinemaId !== '') {
+        matchInfo.cinemaId = cinemaId;
     }
 
     MongoClient.connect(DB_CONN_STR, function(err, db) {
