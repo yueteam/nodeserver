@@ -524,9 +524,8 @@ app.get('/match', function(req, res){
 
             collection.find(matchInfo).sort({'createTime':-1}).limit(100).toArray(function(err2, items2){ 
                 var filterArr = [];
-                if(items1.decidedIds && items1.decidedIds.length>0) { 
-                    var decidedIds = items1.decidedIds.join(',');
-                    console.log(decidedIds);
+                if(items1[0].decidedIds && items1[0].decidedIds.length>0) { 
+                    var decidedIds = items1[0].decidedIds.join(',');
                     for(var i=0,len=items2.length;i<len;i++) {
                         var dateId = items2[i]._id;
                         if(decidedIds.indexOf(dateId)<0) {
