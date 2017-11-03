@@ -526,6 +526,7 @@ app.get('/match', function(req, res){
                 var filterArr = [];
                 if(items1.decidedIds && items1.decidedIds.length>0) { 
                     var decidedIds = items1.decidedIds.join(',');
+                    console.log(decidedIds);
                     for(var i=0,len=items2.length;i<len;i++) {
                         var dateId = items2[i]._id;
                         if(decidedIds.indexOf(dateId)<0) {
