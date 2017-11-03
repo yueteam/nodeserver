@@ -492,15 +492,15 @@ app.get('/getdate', function(req, res){
 });   
 app.get('/match', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var gender = req.query.gender,
+    var id = req.query.id,
+        gender = req.query.gender,
         gender1 = gender==1?2:1,
         filmId = req.query.filmId+'',
         cityId = req.query.cityId+'',
         day = req.query.day,
         time = req.query.time,
         districtId = req.query.districtId+'',
-        cinemaId = req.query.cinemaId+'',
-        latestMatch = req.query.latestMatch;
+        cinemaId = req.query.cinemaId+'';
 
     var matchInfo = {
         gender: gender1,
@@ -516,20 +516,32 @@ app.get('/match', function(req, res){
     if(cinemaId !== '') {
         matchInfo.cinemaId = cinemaId;
     }
-    if(latestMatch !== '') {
-        matchInfo.createTime = {$gt:Number(latestMatch)};
-    }
 
     MongoClient.connect(DB_CONN_STR, function(err, db) {
-        console.log("matching连接成功！");
+        console.log("match连接成功！");
         var collection = db.collection('dates');
-        collection.find(matchInfo).sort({'createTime':-1}).limit(100).toArray(function(err, items){        
-            if(items.length>0) {
-                res.json({code: successCode, msg: "", data: items});
-            } else {
-                res.json({code: failCode, data: '没匹配到'}); 
-            }
-            db.close();
+        collection.find({_id: ObjectID(id)}).toArray(function(err1, items1){ 
+
+            collection.find(matchInfo).sort({'createTime':-1}).limit(100).toArray(function(err2, items2){ 
+                var filterArr = [];
+                if(items1.decidedIds && items1.decidedIds.length>0) { 
+                    var decidedIds = items1.decidedIds.join(',');
+                    for(var i=0,len=items2.length;i<len;i++) {
+                        var dateId = items2[i]._id;
+                        if(decidedIds.indexOf(dateId)<0) {
+                            filterArr.push(items2[i]);
+                        }
+                    } 
+                } else {
+                    filterArr = items2;
+                }     
+                if(filterArr.length>0) {
+                    res.json({code: successCode, msg: "", data: filterArr});
+                } else {
+                    res.json({code: failCode, data: '没匹配到'}); 
+                }
+                db.close();
+            });
         });
     });
 });
@@ -537,31 +549,29 @@ app.get('/updatedate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var dateId = req.query.dateId,
         matchId = req.query.matchId,
-        latestMatch = req.query.createTime;
+        act = req.query.act;
 
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("updatedate连接成功！");
         var collection = db.collection('dates');
-        
-        if(latestMatch) {
-            collection.update({_id: ObjectID(dateId)},{$set:{latestMatch:latestMatch}}, function(err, result) { 
-                res.json({code: successCode, msg: "", data: result});
-                db.close();
-            });
-        } else {
-            collection.find({_id: ObjectID(dateId)}).toArray(function(err, items){ 
-                if(items.length>0) {
-                    var loveIdArr = items[0].loveIds || [];
+
+        collection.find({_id: ObjectID(dateId)}).toArray(function(err, items){ 
+            if(items.length>0) {
+                var loveIdArr = items[0].loveIds || [],
+                    decidedIdArr = items[0].decidedIds || [];
+                if(act==='yes') {
                     loveIdArr.push(matchId);
-                    collection.update({_id: ObjectID(dateId)},{$set:{loveIds:loveIdArr}}, function(err, result) { 
-                        res.json({code: successCode, msg: "", data: result});
-                        db.close();
-                    });
-                } else {
-                    db.close();
                 }
-            });    
-        }     
+                decidedIdArr.push(matchId);
+                
+                collection.update({_id: ObjectID(dateId)},{$set:{loveIds:loveIdArr, decidedIds:decidedIdArr}}, function(err, result) { 
+                    res.json({code: successCode, msg: "", data: result});
+                    db.close();
+                });
+            } else {
+                db.close();
+            }
+        });     
     });
 }); 
 
