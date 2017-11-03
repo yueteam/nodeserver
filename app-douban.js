@@ -566,9 +566,9 @@ app.get('/updatedate', function(req, res){
                     if(opposite.length>0) {
                         console.log('匹配成功！！！');
                         var pairArr = opposite[0].pair || [];
-                        pairArr.push(dateId);
+                        pairArr.push(matchId);
                         collection.update({_id: ObjectID(dateId)},{$set:{loveIds:loveIdArr, decidedIds:decidedIdArr, pair:pairArr}}, function(err21, result1) {                     
-                            res.json({code: successCode, msg: "", data: result});
+                            res.json({code: 2, msg: "匹配成功", data: matchId });
                             db.close();
                         });
                     } else {
