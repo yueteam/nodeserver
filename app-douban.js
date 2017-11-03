@@ -499,21 +499,25 @@ app.get('/match', function(req, res){
         day = req.query.day,
         time = req.query.time,
         districtId = req.query.districtId+'',
-        cinemaId = req.query.cinemaId+'';
+        cinemaId = req.query.cinemaId+'',
+        latestMatch = req.query.latestMatch;
 
     var matchInfo = {
-        'gender': gender1,
-        'filmId': filmId,
-        'cityId': cityId,
-        'day': day,
-        'time': time,
-        'status': 1
+        gender: gender1,
+        filmId: filmId,
+        cityId: cityId,
+        day: day,
+        time: time,
+        status: 1
     };
     if(districtId !== 'all') {
         matchInfo.districtId = districtId;
     } 
     if(cinemaId !== '') {
         matchInfo.cinemaId = cinemaId;
+    }
+    if(latestMatch !== '') {
+        matchInfo.createTime = {$gt:Number(latestMatch)};
     }
 
     MongoClient.connect(DB_CONN_STR, function(err, db) {
