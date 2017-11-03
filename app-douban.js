@@ -555,21 +555,34 @@ app.get('/updatedate', function(req, res){
         console.log("updatedate连接成功！");
         var collection = db.collection('dates');
 
-        collection.find({_id: ObjectID(dateId)}).toArray(function(err, items){ 
-            if(items.length>0) {
-                var loveIdArr = items[0].loveIds || [],
-                    decidedIdArr = items[0].decidedIds || [];
-                if(act==='yes') {
-                    loveIdArr.push(matchId);
-                }
-                decidedIdArr.push(matchId);
-                
-                collection.update({_id: ObjectID(dateId)},{$set:{loveIds:loveIdArr, decidedIds:decidedIdArr}}, function(err, result) { 
+        collection.find({_id: ObjectID(dateId)}).toArray(function(err1, items){ 
+            var loveIdArr = items[0].loveIds || [],
+                decidedIdArr = items[0].decidedIds || [];
+
+            decidedIdArr.push(matchId);
+            if(act==='yes') {
+                loveIdArr.push(matchId);
+                collection.find({_id: ObjectID(matchId),loveIds:{$in:[dateId]}}).toArray(function(err2, opposite){ 
+                    if(opposite.length>0) {
+                        console.log('匹配成功！！！');
+                        var pairArr = opposite[0].pair || [];
+                        pairArr.push(dateId);
+                        collection.update({_id: ObjectID(dateId)},{$set:{loveIds:loveIdArr, decidedIds:decidedIdArr, pair:pairArr}}, function(err21, result1) {                     
+                            res.json({code: successCode, msg: "", data: result});
+                            db.close();
+                        });
+                    } else {
+                        collection.update({_id: ObjectID(dateId)},{$set:{loveIds:loveIdArr, decidedIds:decidedIdArr}}, function(err22, result2) {                     
+                            res.json({code: successCode, msg: "", data: result2});
+                            db.close();
+                        });
+                    }
+                });
+            } else {           
+                collection.update({_id: ObjectID(dateId)},{$set:{decidedIds:decidedIdArr}}, function(err3, result) {                     
                     res.json({code: successCode, msg: "", data: result});
                     db.close();
                 });
-            } else {
-                db.close();
             }
         });     
     });
