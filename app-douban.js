@@ -262,11 +262,11 @@ app.get('/adduser', function(req, res){
 });
 app.get('/finduser', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var openId = req.query.openId;
+    var userId = req.query.id;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("finduser连接成功！");
         var collection = db.collection('user');
-        collection.find({"openId":openId}).toArray(function(err, items){        
+        collection.find({"_id":ObjectID(userId)}).toArray(function(err, items){        
             if(items.length>0) {
                 res.json({code: successCode, msg: "", data: items[0]});
             } else {
@@ -336,7 +336,7 @@ function getConstellation(birthday) {
 }
 app.post('/saveuserinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var openId = req.body.openId,
+    var userId = req.body.userId,
         birthday = req.body.birthday,
         updateInfo = {
             nickName: req.body.nickName,
@@ -353,7 +353,7 @@ app.post('/saveuserinfo', function(req, res){
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("saveuserinfo连接成功！");
         var collection = db.collection('user');
-        collection.update({'openId':openId},{$set:updateInfo}, function(err, result) { 
+        collection.update({'_id':ObjectID(userId)},{$set:updateInfo}, function(err, result) { 
             //如果存在错误
             if(err) {
                 console.log('Error:'+ err);
@@ -428,9 +428,9 @@ app.post('/upload', upload.single('file'), function (req, res, next) {
 
 app.post('/pubdate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var openId = req.body.openId;
+    var userId = req.body.userId;
     var dateInfo = {
-        openId: openId,
+        userId: userId,
         avatarUrl: req.body.avatarUrl,
         nickName: req.body.nickName,
         gender: Number(req.body.gender),
@@ -467,7 +467,7 @@ app.post('/pubdate', function(req, res){
             } 
             res.json({code: successCode, msg: "", data: result}); 
 
-            collection.update({openId:openId,status:1,_id:{$ne:ObjectID(result.insertedIds[0])}},{$set:{status:0}}, function(err1, result1) { 
+            collection.update({userId:userId,status:1,_id:{$ne:ObjectID(result.insertedIds[0])}},{$set:{status:0}}, function(err1, result1) { 
                 db.close();
             });
         });
@@ -475,13 +475,13 @@ app.post('/pubdate', function(req, res){
 });
 app.get('/getdate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var openId = req.query.openId;
+    var userId = req.query.userId;
 
     MongoClient.connect(DB_CONN_STR, function(error, db) {
         console.log("getdate连接成功！");
         var collection = db.collection('dates');
         var collection_pair = db.collection('pair');
-        collection.find({openId:openId, $or:[{status:1},{status:2}]}).sort({'createTime':-1}).limit(1).toArray(function(err, items){        
+        collection.find({userId:userId, $or:[{status:1},{status:2}]}).sort({'createTime':-1}).limit(1).toArray(function(err, items){        
             if(items.length>0) {
                 if(items[0].status===1){
                     res.json({code: successCode, msg: "", data: items[0]});
@@ -581,8 +581,8 @@ app.get('/updatedate', function(req, res){
                                 ObjectID(matchId)
                             ],
                             userIds: [
-                                items[0].openId,
-                                opposite[0].openId
+                                ObjectID(items[0].userId),
+                                ObjectID(opposite[0].userId)
                             ],
                             avatars: [
                                 items[0].avatarUrl,
