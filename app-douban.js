@@ -487,7 +487,7 @@ app.get('/getdate', function(req, res){
                     res.json({code: successCode, msg: "", data: items[0]});
                     db.close();
                 } else if(items[0].status===2) {
-                    collection_pair.find({pair:{$in:[ObjectID(items[0]._id)]}}).toArray(function(err1, arr){ 
+                    collection_pair.find({pair:{$in:[items[0]._id]}}).toArray(function(err1, arr){ 
                         res.json({code: 2, msg: "", data: arr});
                         db.close();
                     });
