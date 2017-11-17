@@ -477,16 +477,25 @@ app.get('/getdate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var openId = req.query.openId;
 
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
+    MongoClient.connect(DB_CONN_STR, function(error, db) {
         console.log("getdate连接成功！");
         var collection = db.collection('dates');
-        collection.find({openId:openId, status:1}).sort({'createTime':-1}).limit(1).toArray(function(err, items){        
+        var collection_pair = db.collection('pair');
+        collection.find({openId:openId, $or:[{status:1},{status:2}]}).sort({'createTime':-1}).limit(1).toArray(function(err, items){        
             if(items.length>0) {
-                res.json({code: successCode, msg: "", data: items[0]});
+                if(items[0].status===1){
+                    res.json({code: successCode, msg: "", data: items[0]});
+                    db.close();
+                } else if(items[0].status===2) {
+                    collection_pair.find({pair:{$in:[ObjectID(items[0]._id)]}}).toArray(function(err1, arr){ 
+                        res.json({code: 2, msg: "", data: arr});
+                        db.close();
+                    });
+                }
             } else {
                 res.json({code: failCode, data: '没找到'}); 
+                db.close();
             }
-            db.close();
         });
     });
 });   
@@ -565,12 +574,32 @@ app.get('/updatedate', function(req, res){
                 collection.find({_id: ObjectID(matchId),loveIds:{$in:[dateId]}}).toArray(function(err2, opposite){ 
                     if(opposite.length>0) {
                         console.log('匹配成功！！！');
-                        var pairArr = opposite[0].pair || [];
-                        pairArr.push(matchId);
-                        collection.update({_id: ObjectID(dateId)},{$set:{loveIds:loveIdArr, decidedIds:decidedIdArr, pair:pairArr}}, function(err21, result1) {                     
-                            res.json({code: 2, msg: "匹配成功", data: matchId });
-                            db.close();
+                        var pairJson = {
+                            status: 1,
+                            pair: [
+                                ObjectID(dateId),
+                                ObjectID(matchId)
+                            ],
+                            userIds: [
+                                items[0].openId,
+                                opposite[0].openId
+                            ],
+                            avatars: [
+                                items[0].avatarUrl,
+                                opposite[0].avatarUrl
+                            ],
+                            createTime: Date.now()
+                        };
+                        var collection_pair = db.collection('pair');
+                        collection_pair.insert(pairJson, function(err23, result3) { 
+                            collection.update({_id: ObjectID(dateId)},{$set:{loveIds:loveIdArr, decidedIds:decidedIdArr, status:2}}, function(err231, result231) {  
+                                collection.update({_id: ObjectID(matchId)},{$set:{status:2}}, function(err232, result232) {                   
+                                    res.json({code: 2, msg: "匹配成功", data: [pairJson]});
+                                    db.close();
+                                });
+                            });
                         });
+                            
                     } else {
                         collection.update({_id: ObjectID(dateId)},{$set:{loveIds:loveIdArr, decidedIds:decidedIdArr}}, function(err22, result2) {                     
                             res.json({code: successCode, msg: "", data: result2});
