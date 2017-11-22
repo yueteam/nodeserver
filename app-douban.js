@@ -615,6 +615,22 @@ app.get('/updatedate', function(req, res){
             }
         });     
     });
+});
+
+app.get('/getpair', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var id = req.query.id;
+
+    MongoClient.connect(DB_CONN_STR, function(error, db) {
+        console.log("getpair连接成功！");
+        var collection = db.collection('pair');
+        var collection_dates = db.collection('dates');
+        var result = collection.findOne({_id: ObjectID(id)},{pair:1});
+        collection_dates.find({_id: {"$in": result["pair"]}}).toArray(function(err, items){        
+            res.json({code: successCode, msg: "", data: items});
+            db.close();
+        });
+    });
 }); 
 
 var options = {
