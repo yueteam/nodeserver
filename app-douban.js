@@ -626,6 +626,7 @@ app.get('/getpair', function(req, res){
         var collection = db.collection('pair');
         var collection_dates = db.collection('dates');
         var result = collection.findOne({_id: ObjectID(id)},{pair:1});
+        console.log(result);
         collection_dates.find({_id: {"$in": result["pair"]}}).toArray(function(err, items){        
             res.json({code: successCode, msg: "", data: items});
             db.close();
