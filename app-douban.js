@@ -637,6 +637,28 @@ app.get('/getpair', function(req, res){
     });
 }); 
 
+app.post('/sendmsg', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var id = req.body.id;
+    var msgObj = {
+        userId: req.body.userId,
+        words: req.body.words,
+        sendTime: Date.now()
+    };
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("sendmsg连接成功！");
+        var collection = db.collection('pair');
+        collection.find({_id: ObjectID(id)}).toArray(function(err, arr){ 
+            var msgList = arr[0].msgList || [];
+            msgList.push(msgObj);
+            collection.update({_id: ObjectID(id)},{$set:{msgList:msgList}}, function(err1, result1) { 
+                res.json({code: successCode, msg: "", data: msgObj}); 
+                db.close();
+            });
+        });
+    });
+});
+
 var options = {
 	key: fs.readFileSync('./keys/214248838510598.key'),
 	cert: fs.readFileSync('./keys/214248838510598.pem')
