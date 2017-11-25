@@ -625,10 +625,10 @@ app.get('/getpair', function(req, res){
         console.log("getpair连接成功！");
         var collection = db.collection('pair');
         var collection_dates = db.collection('dates');
-        collection.find({_id: ObjectID(id)},{pair:1}).toArray(function(err, arr){ 
+        collection.find({_id: ObjectID(id)}).toArray(function(err, arr){ 
             console.log(arr.length);
             collection_dates.find({_id: {"$in": arr[0]["pair"]}}).toArray(function(err1, items){        
-                res.json({code: successCode, msg: "", data: items});
+                res.json({code: successCode, msg: "", data: items, msgList: arr[0]['msgList']});
                 db.close();
             });
         });
