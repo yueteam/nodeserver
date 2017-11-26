@@ -488,7 +488,7 @@ app.get('/getdate', function(req, res){
                     db.close();
                 } else if(items[0].status===2) {
                     collection_pair.find({pair:{$in:[items[0]._id]}}).toArray(function(err1, arr){ 
-                        res.json({code: 2, msg: "", data: arr});
+                        res.json({code: 2, msg: "匹配成功", data: arr});
                         db.close();
                     });
                 }
@@ -530,27 +530,34 @@ app.get('/match', function(req, res){
         console.log("match连接成功！");
         var collection = db.collection('dates');
         collection.find({_id: ObjectID(id)}).toArray(function(err1, items1){ 
-
-            collection.find(matchInfo).sort({'createTime':-1}).limit(100).toArray(function(err2, items2){ 
-                var filterArr = [];
-                if(items1[0].decidedIds && items1[0].decidedIds.length>0) { 
-                    var decidedIds = items1[0].decidedIds.join(',');
-                    for(var i=0,len=items2.length;i<len;i++) {
-                        var dateId = items2[i]._id;
-                        if(decidedIds.indexOf(dateId)<0) {
-                            filterArr.push(items2[i]);
-                        }
-                    } 
-                } else {
-                    filterArr = items2;
-                }     
-                if(filterArr.length>0) {
-                    res.json({code: successCode, msg: "", data: filterArr});
-                } else {
-                    res.json({code: failCode, data: '没匹配到'}); 
-                }
-                db.close();
-            });
+            if(items1[0].status===2) {
+                var collection_pair = db.collection('pair');
+                collection_pair.find({pair:{$in:[items1[0]._id]}}).toArray(function(err3, items3){ 
+                    res.json({code: 2, msg: "匹配成功", data: items3});
+                    db.close();
+                });
+            } else {
+                collection.find(matchInfo).sort({'createTime':-1}).limit(100).toArray(function(err2, items2){ 
+                    var filterArr = [];
+                    if(items1[0].decidedIds && items1[0].decidedIds.length>0) { 
+                        var decidedIds = items1[0].decidedIds.join(',');
+                        for(var i=0,len=items2.length;i<len;i++) {
+                            var dateId = items2[i]._id;
+                            if(decidedIds.indexOf(dateId)<0) {
+                                filterArr.push(items2[i]);
+                            }
+                        } 
+                    } else {
+                        filterArr = items2;
+                    }     
+                    if(filterArr.length>0) {
+                        res.json({code: successCode, msg: "", data: filterArr});
+                    } else {
+                        res.json({code: failCode, data: '没匹配到'}); 
+                    }
+                    db.close();
+                });
+            }
         });
     });
 });
