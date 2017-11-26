@@ -519,11 +519,16 @@ app.get('/match', function(req, res){
         time: time,
         status: 1
     };
+    let orArr = [];
     if(districtId !== 'all') {
-        matchInfo.districtId = districtId;
+        orArr.push({districtId:'all'});
+        orArr.push({districtId:districtId});
+        matchInfo.$or = orArr;
     } 
     if(cinemaId !== '') {
-        matchInfo.cinemaId = cinemaId;
+        orArr.push({cinemaId:''});
+        orArr.push({cinemaId:cinemaId});
+        matchInfo.$or = orArr;
     }
 
     MongoClient.connect(DB_CONN_STR, function(err, db) {
