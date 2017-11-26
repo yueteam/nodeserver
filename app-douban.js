@@ -643,8 +643,7 @@ app.get('/getpair', function(req, res){
                 res.json({code: successCode, msg: "", data: items, msgList: arr[0]['msgList']});
                 db.close();
             });
-        });
-        
+        });       
         
     });
 }); 
@@ -670,6 +669,21 @@ app.post('/sendmsg', function(req, res){
         });
     });
 });
+
+app.get('/receivemsg', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var id = req.query.id;
+
+    MongoClient.connect(DB_CONN_STR, function(error, db) {
+        console.log("receivemsg连接成功！");
+        var collection = db.collection('pair');
+        collection.find({_id: ObjectID(id)},{msgList:1}).toArray(function(err, arr){ 
+            res.json({code: successCode, msg: "", data: arr[0]['msgList']});
+            db.close();
+        });       
+        
+    });
+}); 
 
 var options = {
 	key: fs.readFileSync('./keys/214248838510598.key'),
