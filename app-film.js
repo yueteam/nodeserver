@@ -137,8 +137,9 @@ app.post('/broadcast', function(req, res){
     var userId = req.body.userId;
     var dateInfo = {
         userId: userId,
-        avatarUrl: req.body.avatarUrl,
         nickName: req.body.nickName,
+        gender: Number(req.body.gender),
+        avatarUrl: req.body.avatarUrl,
         filmId: req.body.filmId+'',
         filmName: req.body.filmName,
         words: req.body.words,
@@ -146,8 +147,8 @@ app.post('/broadcast', function(req, res){
         createTime: Date.now()
     };
     MongoClient.connect(DB_CONN_STR, function(err, db) {
-        console.log("db连接成功！");
-        var collection = db.collection('vote');
+        console.log("broadcast连接成功！");
+        var collection = db.collection('broadcast');
         collection.insert(dateInfo, function(err, result) { 
             //如果存在错误
             if(err) {
@@ -157,10 +158,6 @@ app.post('/broadcast', function(req, res){
                 return;
             } 
             res.json({code: successCode, msg: "", data: result}); 
-
-            collection.update({userId:userId,status:1,_id:{$ne:ObjectID(result.insertedIds[0])}},{$set:{status:0}}, function(err1, result1) { 
-                db.close();
-            });
         });
     });
 });
