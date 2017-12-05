@@ -592,9 +592,9 @@ app.post('/broadcast', function(req, res){
          createTime: Date.now()
      };
      MongoClient.connect(DB_CONN_STR, function(err, db) {
-         console.log("broadcast连接成功！");
-         var collection = db.collection('broadcast');
-         collection.find({userId:userId,filmId:filmId}).toArray(function(err1, items){ 
+        console.log("broadcast连接成功！");
+        var collection = db.collection('broadcast');
+        collection.find({userId:userId,filmId:filmId}).toArray(function(err1, items){ 
             if(items.length>0) {
                 var broadcastId = items[0]._id;
                 collection.update({_id: broadcastId},{$set:{words:req.body.words}}, function(err2, result1) { 
@@ -607,6 +607,7 @@ app.post('/broadcast', function(req, res){
                     db.close();
                 });
             }
+        });
      });
  });
 
