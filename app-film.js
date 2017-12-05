@@ -389,7 +389,8 @@ app.get('/getdate', function(req, res){
             }
         });
     });
-});   
+}); 
+
 app.get('/match', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var id = req.query.id,
@@ -457,6 +458,7 @@ app.get('/match', function(req, res){
         });
     });
 });
+
 app.get('/updatedate', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var dateId = req.query.dateId,
@@ -575,6 +577,38 @@ app.get('/receivemsg', function(req, res){
         
     });
 }); 
+
+app.post('/broadcast', function(req, res){
+     var userId = req.body.userId,
+         filmId = req.body.filmId+'';
+     var dateInfo = {
+         userId: userId,
+         nickName: req.body.nickName,
+         avatarUrl: req.body.avatarUrl,
+         filmId: filmId,
+         filmName: req.body.filmName,
+         filmCover: req.body.filmCover,
+         words: req.body.words,
+         createTime: Date.now()
+     };
+     MongoClient.connect(DB_CONN_STR, function(err, db) {
+         console.log("broadcast连接成功！");
+         var collection = db.collection('broadcast');
+         collection.find({userId:userId,filmId:filmId}).toArray(function(err1, items){ 
+            if(items.length>0) {
+                var broadcastId = items[0]._id;
+                collection.update({_id: broadcastId},{$set:{words:req.body.words}}, function(err2, result1) { 
+                    res.json({code: successCode, msg: "", data: broadcastId}); 
+                    db.close();
+                });
+            } else {
+                collection.insert(dateInfo, function(err3, result2) { 
+                    res.json({code: successCode, msg: "", data: result2.insertedIds[0]}); 
+                    db.close();
+                });
+            }
+     });
+ });
 
 var options = {
     key: fs.readFileSync('./keys/214248838510598.key'),
