@@ -125,6 +125,47 @@ app.get('/getopenid', function(req, res){
 
 });
 
+app.get('/getaccesstoken', function(req, res){
+    var code = req.query.code;
+    res.header("Content-Type", "application/json; charset=utf-8");
+       
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('wx');
+        var requestNewToken = function(){
+            superagent.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx288b9aa48204f09c&secret=7f0d2d16a6d82ddb3fd3ade56bc23712')
+            .charset('utf-8')
+            .end(function (err, sres) {
+                if (err) {
+                    res.json({code: failCode, msg: err});
+                    return;
+                }
+                var dataJson = JSON.parse(sres.text),
+                    access_token = dataJson.access_token,
+                    expires_in = dataJson.expires_in;
+                collection.update({name:'token'},{$set:{
+                    access_token: access_token,
+                    expires_time: Date.now() + expires_in*1000
+                }}, function(err, result) { 
+                    res.json({code: successCode, msg: "", data: access_token});  
+                    db.close();
+                });
+                      
+            });
+        };
+        collection.find({name:'token'}).toArray(function(err, items){ 
+            if(items.length>0) {
+                var now = Date.now();
+                if(now < items[0].expires_time) {
+                    res.json({code: successCode, msg: "", data: items[0].access_token}); 
+                    db.close();
+                } else {
+                    requestNewToken();
+                }
+            }
+        });
+    });
+});
+
 app.get('/adduser', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var userInfo = {
