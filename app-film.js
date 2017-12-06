@@ -165,6 +165,24 @@ app.get('/getaccesstoken', function(req, res){
         });
     });
 });
+app.get('/getqrcode', function(req, res){
+    var accessToken = req.query.accessToken,
+        path = req.query.path,
+        width = Number(req.query.width);
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    superagent.post('https://api.weixin.qq.com/wxa/getwxacode?access_token='+accessToken)
+    .send({path:path,width:width})
+    // .charset('utf-8')
+    .end(function (err, sres) {
+        if (err) {
+            res.json({code: failCode, msg: err});
+            return;
+        }
+        res.json({code: successCode, msg: "", data: JSON.parse(sres.text)});        
+    });
+
+});
 
 app.get('/adduser', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
