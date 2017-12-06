@@ -170,17 +170,17 @@ app.get('/getqrcode', function(req, res){
         path = req.query.path,
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
-console.log(path);
+
     superagent.post('https://api.weixin.qq.com/wxa/getwxacode?access_token='+accessToken)
     .send({path:path,width:width})
     .charset('utf-8')
     .end(function (err, sres) {
-        console.log(err);
+        console.log(sres);
         if (err) {
             res.json({code: failCode, msg: err});
             return;
         }
-        res.json({code: successCode, msg: "", data: JSON.parse(sres.text)});        
+        res.json({code: successCode, msg: "", data: sres});        
     });
 
 });
