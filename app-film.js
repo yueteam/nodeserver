@@ -7,7 +7,6 @@ var app = express();
 var https = require('https');
 var request = require('request'); 
 var fs = require('fs');
-
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var OSS = require('ali-oss');
@@ -18,10 +17,14 @@ var client = new OSS({
     accessKeySecret: 'OvuJdzBuziDOIQFRD4gbZXI1fDQ8qC',
     bucket: 'yueavatar'
 });
-
+var client1 = new OSS({
+    region: 'oss-cn-hangzhou',
+    accessKeyId: 'LTAIrUHBoHLwlUNY',
+    accessKeySecret: 'OvuJdzBuziDOIQFRD4gbZXI1fDQ8qC',
+    bucket: 'yueqrcode'
+});
 // 引入json解析中间件
 var bodyParser = require('body-parser');
-
 // 添加json解析
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -171,16 +174,22 @@ app.get('/getaccesstoken', function(req, res){
 });
 app.get('/getqrcode', function(req, res){
     var accessToken = req.query.accessToken,
-        scene = req.query.scene || '',
+        scene = req.query.scene,
+        id = scene.split('=')[1],
         path = req.query.path,
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
-
+    
     request({ 
         method: 'POST', 
         url: 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' + accessToken, 
         body: JSON.stringify({scene:scene,path:path,width:width}) 
-    }).pipe(fs.createWriteStream('./uploads/qrcode/asd.png'));
+    }).pipe(fs.createWriteStream('./uploads/qrcode/'+id+'.png'))
+    .on('close', function() {
+        var stream = fs.createReadStream('./uploads/qrcode/'+id+'.png');
+        var result = yield client1.putStream(id+'.png', stream);
+        console.log(result);
+    });
 
 });
 
@@ -657,7 +666,7 @@ app.post('/broadcast', function(req, res){
             if(items.length>0) {
                 var broadcastId = items[0]._id;
                 collection.update({_id: broadcastId},{$set:{words:req.body.words}}, function(err2, result1) { 
-                    res.json({code: successCode, msg: "", data: broadcastId}); 
+                    res.json({code: 1, msg: "", data: broadcastId}); 
                     db.close();
                 });
             } else {
