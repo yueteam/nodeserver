@@ -186,11 +186,13 @@ app.get('/getqrcode', function(req, res){
         body: JSON.stringify({scene:scene,path:path,width:width}) 
     }).pipe(fs.createWriteStream('./uploads/qrcode/'+id+'.png'))
     .on('close', function() {
-        var stream = fs.createReadStream('./uploads/qrcode/'+id+'.png');
-        var result = yield client1.putStream(id+'.png', stream);
-        console.log(result);
+        console.log('close');
+        co(function* () {
+            var stream = fs.createReadStream('./uploads/qrcode/'+id+'.png');
+            var result = yield client1.putStream(id+'.png', stream);
+            console.log(result);
+        });
     });
-
 });
 
 app.get('/adduser', function(req, res){
