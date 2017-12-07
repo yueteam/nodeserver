@@ -5,7 +5,9 @@ var cheerio = require('cheerio');
 var express = require('express');
 var app = express();
 var https = require('https');
+var request = require('request'); 
 var fs = require('fs');
+
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var OSS = require('ali-oss');
@@ -16,8 +18,10 @@ var client = new OSS({
     accessKeySecret: 'OvuJdzBuziDOIQFRD4gbZXI1fDQ8qC',
     bucket: 'yueavatar'
 });
+
 // 引入json解析中间件
 var bodyParser = require('body-parser');
+
 // 添加json解析
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -171,13 +175,12 @@ app.get('/getqrcode', function(req, res){
         path = req.query.path,
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
-    var stream = fs.createReadStream('./uploads/qrcode/asd.png');
 
-    var request = superagent.post('https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='+accessToken)
-    // .set('Content-Type', 'application/json')
-    .send(JSON.stringify({scene:scene,path:path,width:width}));
-    // .charset('utf-8')
-    stream.pipe(request);
+    request({ 
+        method: 'POST', 
+        url: 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' + accessToken, 
+        body: JSON.stringify({scene:scene,path:path,width:width}) 
+    }).pipe(fs.createWriteStream('./uploads/qrcode/asd.png'));
 
 });
 
