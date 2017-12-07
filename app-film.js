@@ -171,7 +171,7 @@ app.get('/getqrcode', function(req, res){
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
 
-    superagent.post('https://api.weixin.qq.com/wxa/getwxacode?access_token='+accessToken)
+    superagent.post('https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='+accessToken)
     .send({path:path,width:width})
     .charset('utf-8')
     .end(function (err, sres) {
