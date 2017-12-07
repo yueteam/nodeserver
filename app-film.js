@@ -171,12 +171,13 @@ app.get('/getqrcode', function(req, res){
         path = req.query.path,
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
+    var stream = fs.createReadStream('./uploads/qrcode/asd.png');
 
-    superagent.post('https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='+accessToken)
+    var request = superagent.post('https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='+accessToken)
     // .set('Content-Type', 'application/json')
-    .send(JSON.stringify({scene:scene,path:path,width:width}))
+    .send(JSON.stringify({scene:scene,path:path,width:width}));
     // .charset('utf-8')
-    .pipe(fs.createWriteStream('./uploads/qrcode/asd.png'))
+    stream.pipe(request);
 
 });
 
