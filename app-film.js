@@ -167,12 +167,13 @@ app.get('/getaccesstoken', function(req, res){
 });
 app.get('/getqrcode', function(req, res){
     var accessToken = req.query.accessToken,
+        scene = req.query.scene || '',
         path = req.query.path,
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
 
     superagent.post('https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='+accessToken)
-    .send({path:path,width:width})
+    .send('{scene:'+scene+',path:'+path+',width:'+width+'}')
     .charset('utf-8')
     .end(function (err, sres) {
         console.log(sres);
