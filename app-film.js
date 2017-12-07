@@ -179,18 +179,18 @@ app.get('/getqrcode', function(req, res){
         path = req.query.path,
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
-    
+    var filePath = './uploads/qrcode/'+id+'.png';
     request({ 
         method: 'POST', 
         url: 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' + accessToken, 
         body: JSON.stringify({scene:scene,path:path,width:width}) 
-    }).pipe(fs.createWriteStream('./uploads/qrcode/'+id+'.png'))
+    }).pipe(fs.createWriteStream(filePath))
     .on('close', function() {
-        console.log('close');
         co(function* () {
-            var stream = fs.createReadStream('./uploads/qrcode/'+id+'.png');
+            var stream = fs.createReadStream(filePath);
             var result = yield client1.putStream(id+'.png', stream);
-            console.log(result);
+            res.json({code: successCode, msg: "", data: result.url.replace(/http:/,'https:')});
+            fs.unlinkSync(filePath);
         });
     });
 });
