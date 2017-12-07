@@ -176,14 +176,7 @@ app.get('/getqrcode', function(req, res){
     // .set('Content-Type', 'application/json')
     .send(JSON.stringify({scene:scene,path:path,width:width}))
     // .charset('utf-8')
-    .end(function (err, sres) {
-        console.log(sres);
-        if (err) {
-            res.json({code: failCode, msg: err});
-            return;
-        }
-        res.json({code: successCode, msg: "", data: sres});        
-    });
+    .pipe(fs.createWriteStream('./uploads/qrcode/asd.png'))
 
 });
 
