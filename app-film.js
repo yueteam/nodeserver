@@ -102,7 +102,7 @@ app.get('/getcinemas', function(req, res){
     var districtId = req.query.districtId;
     res.header("Content-Type", "application/json; charset=utf-8");
 
-    superagent.get('https://movie.douban.com/j/cinema/cinemas/?city_id='+cityId+'&district_id='+districtId)
+    superagent.get('https://movie.douban.com/j/cinema/cinemas/?city_id='+cityId)
     .charset('utf-8')
     .end(function (err, sres) {
         if (err) {
@@ -113,6 +113,50 @@ app.get('/getcinemas', function(req, res){
         res.json({code: successCode, msg: "", data: list});        
     });
 
+});
+app.get('/getdistrict', function(req, res){
+    var cityJson = {'A':[{'id':'118190','uid':'anqing','name':'安庆'},{'id':'118244','uid':'anyang','name':'安阳'},{'id':'118125','uid':'anshan','name':'鞍山'},{'id':'118342','uid':'anshun','name':'安顺'},{'id':'118379','uid':'ankang','name':'安康'},{'id':'118421','uid':'aletai','name':'阿勒泰'},{'id':'118413','uid':'akesu','name':'阿克苏'},{'id':'118336','uid':'aba','name':'阿坝'}],'B':[{'id':'108288','uid':'beijing','name':'北京'},{'id':'118093','uid':'baoding','name':'保定'},{'id':'118373','uid':'baoji','name':'宝鸡'},{'id':'118235','uid':'binzhou','name':'滨州'},{'id':'118112','uid':'baotou','name':'包头'},{'id':'118185','uid':'bangbu','name':'蚌埠'},{'id':'118197','uid':'bozhou','name':'亳州'},{'id':'118344','uid':'bijie','name':'毕节'},{'id':'118306','uid':'beihai','name':'北海'},{'id':'118118','uid':'bayannaoer','name':'巴彦淖尔'},{'id':'118383','uid':'baiyin','name':'白银'},{'id':'118351','uid':'baoshan','name':'保山'},{'id':'118311','uid':'baise','name':'百色'},{'id':'118127','uid':'benxi','name':'本溪'},{'id':'118416','uid':'bayinguoleng','name':'巴音郭楞'},{'id':'118142','uid':'baishan','name':'白山'},{'id':'118144','uid':'baicheng','name':'白城'},{'id':'118334','uid':'bazhong','name':'巴中'},{'id':'131586','uid':'131586','name':'保亭'}],'C':[{'id':'108309','uid':'chongqing','name':'重庆'},{'id':'118318','uid':'chengdu','name':'成都'},{'id':'118267','uid':'changsha','name':'长沙'},{'id':'118137','uid':'changchun','name':'长春'},{'id':'118162','uid':'changzhou','name':'常州'},{'id':'118276','uid':'chenzhou','name':'郴州'},{'id':'118273','uid':'changde','name':'常德'},{'id':'118192','uid':'chuzhou','name':'滁州'},{'id':'118096','uid':'cangzhou','name':'沧州'},{'id':'118103','uid':'changzhi','name':'长治'},{'id':'118114','uid':'chifeng','name':'赤峰'},{'id':'118095','uid':'chengde','name':'承德'},{'id':'118135','uid':'chaoyang','name':'朝阳'},{'id':'118299','uid':'chaozhou','name':'潮州'},{'id':'118417','uid':'changji','name':'昌吉'},{'id':'118198','uid':'chizhou','name':'池州'},{'id':'118315','uid':'chongzuo','name':'崇左'},{'id':'118359','uid':'chuxiong','name':'楚雄'},{'id':'129306','uid':'129306','name':'常熟'},{'id':'131580','uid':'131580','name':'澄迈'},{'id':'131583','uid':'131583','name':'昌江'}],'D':[{'id':'118297','uid':'dongguan','name':'东莞'},{'id':'118124','uid':'dalian','name':'大连'},{'id':'118151','uid':'daqing','name':'大庆'},{'id':'118224','uid':'dongying','name':'东营'},{'id':'118322','uid':'deyang','name':'德阳'},{'id':'118233','uid':'dezhou','name':'德州'},{'id':'118100','uid':'datong','name':'大同'},{'id':'118360','uid':'dali','name':'大理'},{'id':'118128','uid':'dandong','name':'丹东'},{'id':'118331','uid':'dazhou','name':'达州'},{'id':'118391','uid':'dingxi','name':'定西'},{'id':'118361','uid':'dehong','name':'德宏'},{'id':'131433','uid':'danzhou','name':'儋州'},{'id':'131577','uid':'131577','name':'东方'},{'id':'118158','uid':'daxinganling','name':'大兴安岭'},{'id':'118363','uid':'diqing','name':'迪庆'}],'E':[{'id':'118266','uid':'enshi','name':'恩施'},{'id':'118116','uid':'eerduosi','name':'鄂尔多斯'},{'id':'118261','uid':'ezhou','name':'鄂州'}],'F':[{'id':'118286','uid':'foshan','name':'佛山'},{'id':'118200','uid':'fuzhou','name':'福州'},{'id':'118218','uid':'118218','name':'抚州'},{'id':'118193','uid':'fuyang','name':'阜阳'},{'id':'118126','uid':'fushun','name':'抚顺'},{'id':'118307','uid':'fangchenggang','name':'防城港'},{'id':'118131','uid':'fuxin','name':'阜新'}],'G':[{'id':'118281','uid':'guangzhou','name':'广州'},{'id':'118215','uid':'ganzhou','name':'赣州'},{'id':'118339','uid':'guiyang','name':'贵阳'},{'id':'118304','uid':'guilin','name':'桂林'},{'id':'118324','uid':'guangyuan','name':'广元'},{'id':'118330','uid':'guangan','name':'广安'},{'id':'118406','uid':'guyuan','name':'固原'},{'id':'118394','uid':'gannan','name':'甘南'},{'id':'118309','uid':'guigang','name':'贵港'},{'id':'118337','uid':'ganzi','name':'甘孜'}],'H':[{'id':'118172','uid':'hangzhou','name':'杭州'},{'id':'118183','uid':'hefei','name':'合肥'},{'id':'118146','uid':'haerbin','name':'哈尔滨'},{'id':'118291','uid':'huizhou','name':'惠州'},{'id':'118091','uid':'handan','name':'邯郸'},{'id':'118176','uid':'huzhou','name':'湖州'},{'id':'118316','uid':'haikou','name':'海口'},{'id':'118166','uid':'huaian','name':'淮安'},{'id':'118111','uid':'huhehaote','name':'呼和浩特'},{'id':'118270','uid':'hengyang','name':'衡阳'},{'id':'118263','uid':'huanggang','name':'黄冈'},{'id':'118294','uid':'heyuan','name':'河源'},{'id':'118236','uid':'heze','name':'菏泽'},{'id':'118117','uid':'hulunbeier','name':'呼伦贝尔'},{'id':'118255','uid':'huangshi','name':'黄石'},{'id':'118186','uid':'huainan','name':'淮南'},{'id':'118191','uid':'huangshan','name':'黄山'},{'id':'118357','uid':'honghe','name':'红河'},{'id':'118098','uid':'hengshui','name':'衡水'},{'id':'118278','uid':'huaihua','name':'怀化'},{'id':'118136','uid':'huludao','name':'葫芦岛'},{'id':'118377','uid':'hanzhong','name':'汉中'},{'id':'118156','uid':'heihe','name':'黑河'},{'id':'118188','uid':'huaibei','name':'淮北'},{'id':'118242','uid':'hebi','name':'鹤壁'},{'id':'118313','uid':'hechi','name':'河池'},{'id':'118312','uid':'hezhou','name':'贺州'},{'id':'118149','uid':'hegang','name':'鹤岗'},{'id':'118402','uid':'haixi','name':'海西'},{'id':'118396','uid':'haidong','name':'海东'},{'id':'118411','uid':'hami','name':'哈密'},{'id':'118183','uid':'hefei','name':'合肥'},{'id':'118399','uid':'118399','name':'海南'}],'J':[{'id':'118178','uid':'jinhua','name':'金华'},{'id':'118220','uid':'jinan','name':'济南'},{'id':'118175','uid':'jiaxing','name':'嘉兴'},{'id':'118287','uid':'jiangmen','name':'江门'},{'id':'118212','uid':'jiujiang','name':'九江'},{'id':'118228','uid':'jining','name':'济宁'},{'id':'118258','uid':'jingzhou','name':'荆州'},{'id':'118216','uid':'jian','name':'吉安'},{'id':'129059','uid':'jilin','name':'吉林'},{'id':'118300','uid':'jieyang','name':'揭阳'},{'id':'118106','uid':'jinzhong','name':'晋中'},{'id':'118241','uid':'jiaozuo','name':'焦作'},{'id':'118260','uid':'jingmen','name':'荆门'},{'id':'118104','uid':'jincheng','name':'晋城'},{'id':'118389','uid':'jiuquan','name':'酒泉'},{'id':'118129','uid':'jinzhou','name':'锦州'},{'id':'118210','uid':'jingdezhen','name':'景德镇'},{'id':'118154','uid':'jiamusi','name':'佳木斯'},{'id':'128517','uid':'jiyuan','name':'济源'},{'id':'118382','uid':'jinchang','name':'金昌'},{'id':'118148','uid':'jixi','name':'鸡西'},{'id':'118385','uid':'jiayuguan','name':'嘉峪关'},{'id':'108294','uid':'jilinsheng','name':'吉林'}],'K':[{'id':'118348','uid':'kunming','name':'昆明'},{'id':'118238','uid':'kaifeng','name':'开封'},{'id':'118409','uid':'kelamayi','name':'克拉玛依'},{'id':'118414','uid':'kashen','name':'喀什'},{'id':'131410','uid':'131410','name':'昆山'},{'id':'130313','uid':'130313','name':'开平'},{'id':'131410','uid':'131410','name':'昆山'}],'L':[{'id':'118232','uid':'linyi','name':'临沂'},{'id':'118381','uid':'lanzhou','name':'兰州'},{'id':'118239','uid':'luoyang','name':'洛阳'},{'id':'118109','uid':'linfen','name':'临汾'},{'id':'118182','uid':'lishui','name':'丽水'},{'id':'118097','uid':'langfang','name':'廊坊'},{'id':'118196','uid':'luan','name':'六安'},{'id':'118279','uid':'loudi','name':'娄底'},{'id':'118234','uid':'liaocheng','name':'聊城'},{'id':'118303','uid':'liuzhou','name':'柳州'},{'id':'118110','uid':'lvliang','name':'吕梁'},{'id':'118165','uid':'lianyungang','name':'连云港'},{'id':'118327','uid':'leshan','name':'乐山'},{'id':'118207','uid':'longyan','name':'龙岩'},{'id':'118247','uid':'luohe','name':'漯河'},{'id':'118321','uid':'luzhou','name':'泸州'},{'id':'118393','uid':'linxia','name':'临夏'},{'id':'118132','uid':'liaoyang','name':'辽阳'},{'id':'118340','uid':'liupanshui','name':'六盘水'},{'id':'118392','uid':'longnan','name':'陇南'},{'id':'118338','uid':'liangshan','name':'凉山'},{'id':'118314','uid':'laibin','name':'来宾'},{'id':'118364','uid':'lasa','name':'拉萨'},{'id':'118140','uid':'liaoyuan','name':'辽源'},{'id':'118353','uid':'lijiang','name':'丽江'},{'id':'118355','uid':'lincang','name':'临沧'},{'id':'118231','uid':'laiwu','name':'莱芜'},{'id':'131584','uid':'131584','name':'乐东'}],'M':[{'id':'118323','uid':'mianyang','name':'绵阳'},{'id':'118292','uid':'meizhou','name':'梅州'},{'id':'118289','uid':'maoming','name':'茂名'},{'id':'118187','uid':'maanshan','name':'马鞍山'},{'id':'118332','uid':'meishan','name':'眉山'},{'id':'118153','uid':'mudanjiang','name':'牡丹江'}],'N':[{'id':'118159','uid':'nanjing','name':'南京'},{'id':'118173','uid':'ningbo','name':'宁波'},{'id':'118164','uid':'nantong','name':'南通'},{'id':'118209','uid':'nanchang','name':'南昌'},{'id':'118302','uid':'nanning','name':'南宁'},{'id':'118328','uid':'nanchong','name':'南充'},{'id':'118249','uid':'nanyang','name':'南阳'},{'id':'118208','uid':'ningde','name':'宁德'},{'id':'118206','uid':'nanping','name':'南平'},{'id':'118326','uid':'neijiang','name':'内江'},{'id':'118362','uid':'nujiang','name':'怒江'}],'P':[{'id':'118240','uid':'pingdingshan','name':'平顶山'},{'id':'118202','uid':'putian','name':'莆田'},{'id':'118133','uid':'panjin','name':'盘锦'},{'id':'118211','uid':'pingxiang','name':'萍乡'},{'id':'118388','uid':'pingliang','name':'平凉'},{'id':'130880','uid':'puer','name':'普洱'},{'id':'118245','uid':'puyang','name':'濮阳'},{'id':'118320','uid':'panzhihua','name':'攀枝花'}],'Q':[{'id':'118221','uid':'qingdao','name':'青岛'},{'id':'118204','uid':'quanzhou','name':'泉州'},{'id':'118179','uid':'quzhou','name':'衢州'},{'id':'118349','uid':'qujing','name':'曲靖'},{'id':'118296','uid':'qingyuan','name':'清远'},{'id':'118346','uid':'qiandongnan','name':'黔东南'},{'id':'118347','uid':'qiannan','name':'黔南'},{'id':'118345','uid':'qianxinan','name':'黔西南'},{'id':'118090','uid':'qinhuangdao','name':'秦皇岛'},{'id':'118147','uid':'qiqihaer','name':'齐齐哈尔'},{'id':'118390','uid':'qingyang','name':'庆阳'},{'id':'118308','uid':'qinzhou','name':'钦州'},{'id':'128466','uid':'qianjiang','name':'潜江'},{'id':'118155','uid':'qitaihe','name':'七台河'},{'id':'131407','uid':'qionghai','name':'琼海'}],'R':[{'id':'118230','uid':'rizhao','name':'日照'}],'S':[{'id':'108296','uid':'shanghai','name':'上海'},{'id':'118282','uid':'shenzhen','name':'深圳'},{'id':'118163','uid':'suzhou','name':'苏州'},{'id':'118088','uid':'shijiazhuang','name':'石家庄'},{'id':'118123','uid':'shenyang','name':'沈阳'},{'id':'118219','uid':'shangrao','name':'上饶'},{'id':'118177','uid':'shaoxing','name':'绍兴'},{'id':'118250','uid':'shangqiu','name':'商丘'},{'id':'118284','uid':'shantou','name':'汕头'},{'id':'118171','uid':'suqian','name':'宿迁'},{'id':'118285','uid':'shaoguan','name':'韶关'},{'id':'118203','uid':'sanming','name':'三明'},{'id':'118271','uid':'shaoyang','name':'邵阳'},{'id':'118317','uid':'sanya','name':'三亚'},{'id':'118157','uid':'suihua','name':'绥化'},{'id':'118257','uid':'shiyan','name':'十堰'},{'id':'118293','uid':'shanwei','name':'汕尾'},{'id':'118139','uid':'siping','name':'四平'},{'id':'118325','uid':'suining','name':'遂宁'},{'id':'118194','uid':'118194','name':'宿州'},{'id':'118143','uid':'songyuan','name':'松原'},{'id':'118265','uid':'suizhou','name':'随州'},{'id':'118380','uid':'shangluo','name':'商洛'},{'id':'118404','uid':'shizuishan','name':'石嘴山'},{'id':'118248','uid':'sanmenxia','name':'三门峡'},{'id':'118105','uid':'shuozhou','name':'朔州'},{'id':'118150','uid':'shuangyashan','name':'双鸭山'},{'id':'128496','uid':'shihezi','name':'石河子'}],'T':[{'id':'108289','uid':'tianjin','name':'天津'},{'id':'118181','uid':'118181','name':'台州'},{'id':'118170','uid':'taizhou','name':'泰州'},{'id':'118089','uid':'tangshan','name':'唐山'},{'id':'118099','uid':'taiyuan','name':'太原'},{'id':'118229','uid':'taian','name':'泰安'},{'id':'118115','uid':'tongliao','name':'通辽'},{'id':'118134','uid':'tieling','name':'铁岭'},{'id':'118343','uid':'tongren','name':'铜仁'},{'id':'118141','uid':'tonghua','name':'通化'},{'id':'118384','uid':'tianshui','name':'天水'},{'id':'118189','uid':'tongling','name':'铜陵'},{'id':'118372','uid':'tongchuan','name':'铜川'},{'id':'118420','uid':'tacheng','name':'塔城'},{'id':'128464','uid':'tianmen','name':'天门'},{'id':'131579','uid':'131579','name':'屯昌'}],'W':[{'id':'118254','uid':'wuhan','name':'武汉'},{'id':'118174','uid':'wenzhou','name':'温州'},{'id':'118160','uid':'wuxi','name':'无锡'},{'id':'118225','uid':'weifang','name':'潍坊'},{'id':'118184','uid':'wuhu','name':'芜湖'},{'id':'118408','uid':'wulumuqi','name':'乌鲁木齐'},{'id':'118227','uid':'weihai','name':'威海'},{'id':'118375','uid':'weinan','name':'渭南'},{'id':'118305','uid':'wuzhou','name':'梧州'},{'id':'118119','uid':'wulanchabu','name':'乌兰察布'},{'id':'118113','uid':'wuhai','name':'乌海'},{'id':'118356','uid':'wenshan','name':'文山'},{'id':'118405','uid':'wuzhong','name':'吴忠'},{'id':'118386','uid':'wuwei','name':'武威'},{'id':'131497','uid':'wenchang','name':'文昌'},{'id':'131576','uid':'131576','name':'万宁'},{'id':'129309','uid':'129309','name':'吴江区'},{'id':'131575','uid':'131575','name':'五指山'}],'X':[{'id':'118371','uid':'xian','name':'西安'},{'id':'118201','uid':'xiamen','name':'厦门'},{'id':'118161','uid':'xuzhou','name':'徐州'},{'id':'118243','uid':'xinxiang','name':'新乡'},{'id':'118256','uid':'xiangyang','name':'襄阳'},{'id':'118251','uid':'xinyang','name':'信阳'},{'id':'118269','uid':'xiangtan','name':'湘潭'},{'id':'118092','uid':'xingtai','name':'邢台'},{'id':'118199','uid':'xuancheng','name':'宣城'},{'id':'118246','uid':'xuchang','name':'许昌'},{'id':'118264','uid':'xianning','name':'咸宁'},{'id':'118395','uid':'xining','name':'西宁'},{'id':'118262','uid':'xiaogan','name':'孝感'},{'id':'118374','uid':'xianyang','name':'咸阳'},{'id':'118280','uid':'xiangxi','name':'湘西'},{'id':'118213','uid':'xinyu','name':'新余'},{'id':'128465','uid':'xiantao','name':'仙桃'},{'id':'118108','uid':'xinzhou','name':'忻州'},{'id':'118122','uid':'xinganmeng','name':'兴安盟'},{'id':'118358','uid':'xishuangbanna','name':'西双版纳'},{'id':'118120','uid':'xilinguole','name':'锡林郭勒'},{'id':'118122','uid':'xinganmeng','name':'兴安盟'}],'Y':[{'id':'118167','uid':'yancheng','name':'盐城'},{'id':'118226','uid':'yantai','name':'烟台'},{'id':'118217','uid':'yichun','name':'宜春'},{'id':'118168','uid':'yangzhou','name':'扬州'},{'id':'118403','uid':'yinchuan','name':'银川'},{'id':'118107','uid':'yuncheng','name':'运城'},{'id':'118259','uid':'yichang','name':'宜昌'},{'id':'118295','uid':'yangjiang','name':'阳江'},{'id':'118329','uid':'yibin','name':'宜宾'},{'id':'118130','uid':'yingkou','name':'营口'},{'id':'118277','uid':'yongzhou','name':'永州'},{'id':'118310','uid':'yulin','name':'玉林'},{'id':'118145','uid':'yanbian','name':'延边'},{'id':'118275','uid':'yiyang','name':'益阳'},{'id':'118272','uid':'yueyang','name':'岳阳'},{'id':'118378','uid':'118378','name':'榆林'},{'id':'118350','uid':'yuxi','name':'玉溪'},{'id':'118376','uid':'yanan','name':'延安'},{'id':'118214','uid':'yingtan','name':'鹰潭'},{'id':'118419','uid':'yili','name':'伊犁'},{'id':'118102','uid':'yangquan','name':'阳泉'},{'id':'118301','uid':'yunfu','name':'云浮'},{'id':'118333','uid':'yaan','name':'雅安'},{'id':'118152','uid':'118152','name':'伊春'},{'id':'131061','uid':'131061','name':'杨凌区'}],'Z':[{'id':'118237','uid':'zhengzhou','name':'郑州'},{'id':'118298','uid':'zhongshan','name':'中山'},{'id':'118169','uid':'zhenjiang','name':'镇江'},{'id':'118283','uid':'zhuhai','name':'珠海'},{'id':'118268','uid':'zhuzhou','name':'株洲'},{'id':'118288','uid':'zhanjiang','name':'湛江'},{'id':'118205','uid':'zhangzhou','name':'漳州'},{'id':'118222','uid':'zibo','name':'淄博'},{'id':'118094','uid':'zhangjiakou','name':'张家口'},{'id':'118290','uid':'zhaoqing','name':'肇庆'},{'id':'118341','uid':'zunyi','name':'遵义'},{'id':'118252','uid':'zhoukou','name':'周口'},{'id':'118253','uid':'zhumadian','name':'驻马店'},{'id':'118223','uid':'zaozhuang','name':'枣庄'},{'id':'118180','uid':'zhoushan','name':'舟山'},{'id':'118319','uid':'zigong','name':'自贡'},{'id':'118335','uid':'ziyang','name':'资阳'},{'id':'118274','uid':'zhangjiajie','name':'张家界'},{'id':'118387','uid':'zhangye','name':'张掖'},{'id':'118407','uid':'zhongwei','name':'中卫'},{'id':'118352','uid':'zhaotong','name':'昭通'}]};
+    var cityArr = cityJson[req.query.cityLetter];
+    res.header("Content-Type", "application/json; charset=utf-8");
+    for(var i=0;i<cityArr.length;i++){
+        var cityObj = cityArr[i];
+        var cityuid = cityArr[i].uid;
+        var route = 'https://www.douban.com/location/'+cityuid+'/events/weekend-1803';
+        superagent.get(route)
+        .charset('utf-8')
+        .end(function (err, sres) {
+            if (err) {
+                console.log('ERR: ' + err);
+                res.json({code: failCode, msg: err});
+                return;
+            }
+            var $ = cheerio.load(sres.text);
+
+            var districtArr = [];
+            $('.ui-fbox a').each(function (idx, element) {
+                var $element = $(element);
+                var href = $element.attr('href');
+                var districtId = href.substring(href.lastIndexOf('-')+1);
+                var districtName = $element.text();
+                districtArr.push({
+                    id: districtId,
+                    name: districtName
+                })
+            });
+            cityObj.district = districtArr;
+
+            MongoClient.connect(DB_CONN_STR, function(err, db) {
+                var collection = db.collection('city');
+
+                //插入数据
+                collection.insert(cityObj, function(error, result) { 
+                    res.json({code: successCode, msg: "", data: result}); 
+                    db.close();
+                });
+            });
+            
+        });
+    }
 });
 
 app.get('/getopenid', function(req, res){
@@ -168,6 +212,8 @@ app.get('/getaccesstoken', function(req, res){
                 } else {
                     requestNewToken();
                 }
+            } else {
+                requestNewToken();
             }
         });
     });
@@ -649,19 +695,19 @@ app.get('/receivemsg', function(req, res){
 }); 
 
 app.post('/broadcast', function(req, res){
-     var userId = req.body.userId,
-         filmId = req.body.filmId+'';
-     var dateInfo = {
-         userId: userId,
-         nickName: req.body.nickName,
-         avatarUrl: req.body.avatarUrl,
-         filmId: filmId,
-         filmName: req.body.filmName,
-         filmCover: req.body.filmCover,
-         words: req.body.words,
-         createTime: Date.now()
-     };
-     MongoClient.connect(DB_CONN_STR, function(err, db) {
+    var userId = req.body.userId,
+        filmId = req.body.filmId+'';
+    var dateInfo = {
+        userId: userId,
+        nickName: req.body.nickName,
+        avatarUrl: req.body.avatarUrl,
+        filmId: filmId,
+        filmName: req.body.filmName,
+        filmCover: req.body.filmCover,
+        words: req.body.words,
+        createTime: Date.now()
+    };
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("broadcast连接成功！");
         var collection = db.collection('broadcast');
         collection.find({userId:userId,filmId:filmId}).toArray(function(err1, items){ 
@@ -678,7 +724,7 @@ app.post('/broadcast', function(req, res){
                 });
             }
         });
-     });
+    });
  });
 
 var options = {
