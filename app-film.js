@@ -141,11 +141,13 @@ app.get('/getdistrict', function(req, res){
             var $element = $(element);
             var href = $element.attr('href');
             var districtId = href.substring(href.lastIndexOf('-')+1);
-            var districtName = $element.text().replace(/\\n/g,'').replace(/^(\s|\u00A0)+/,'').replace(/(\s|\u00A0)+$/,'');;
-            districtArr.push({
-                id: districtId,
-                name: districtName
-            })
+            var districtName = $element.text().replace(/\\n/g,'').replace(/^(\s|\u00A0)+/,'').replace(/(\s|\u00A0)+$/,'');
+            if(districtName!=='全部'){
+                districtArr.push({
+                    id: districtId,
+                    name: districtName
+                })
+            }
         });
         cityObj.district = districtArr;
 
