@@ -102,15 +102,34 @@ app.get('/getcinemas', function(req, res){
     var districtId = req.query.districtId;
     res.header("Content-Type", "application/json; charset=utf-8");
 
-    superagent.get('https://movie.douban.com/j/cinema/cinemas/?city_id='+cityId+'&district_id='+districtId)
-    .charset('utf-8')
-    .end(function (err, sres) {
-        if (err) {
-            res.json({code: failCode, msg: err});
-            return;
-        }
-        var list = JSON.parse(sres.text);
-        res.json({code: successCode, msg: "", data: list});        
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('cinema');
+        collection.find({city_id: cityId, district_id: districtId}).toArray(function(err, items){        
+            if(items.length>0) {
+                res.json({code: successCode, msg: "", data: items[0].cinemas});
+
+                //关闭数据库
+                db.close();
+            } else {
+                superagent.get('https://movie.douban.com/j/cinema/cinemas/?city_id='+cityId+'&district_id='+districtId)
+                .charset('utf-8')
+                .end(function (err, sres) {
+                    if (err) {
+                        res.json({code: failCode, msg: err});
+                        return;
+                    }
+                    var list = JSON.parse(sres.text);
+                    collection.insert({
+                        city_id: cityId, 
+                        district_id: districtId,
+                        cinemas: list
+                    }, function(error, result) { 
+                        res.json({code: successCode, msg: "", data: list}); 
+                        db.close();
+                    });       
+                });
+            }
+        });
     });
 
 });
