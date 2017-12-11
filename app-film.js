@@ -63,9 +63,8 @@ app.get('/nowplaying', function(req, res){
             return;
         }
         var $ = cheerio.load(sres.text);
-        var dataObj = {},
-            films = [],
-            districts = [];
+        var filmJson = {},
+            films = [];
         $('#nowplaying .lists .list-item').each(function (idx, element) {
             if(idx < 15) {
                 var $element = $(element),
@@ -74,7 +73,7 @@ app.get('/nowplaying', function(req, res){
                     id: $element.attr('id'),
                     img : $poster.attr('src'),
                     title : $element.data('title'),
-                    rate : $element.data('score'),
+                    score : $element.data('score'),
                     release: $element.data('release'),
                     duration: $element.data('duration'),
                     region: $element.data('region'),
@@ -82,18 +81,20 @@ app.get('/nowplaying', function(req, res){
                     actors: $element.data('actors')
                 });
             }
-        });
-        dataObj.filmList = films;   
+        }); 
+        filmJson = {
+            filmList: films,
+            createTime: Date.now()
+        };
+        MongoClient.connect(DB_CONN_STR, function(err, db) {
+            var collection = db.collection('film');
 
-        $('#districts .district-item').each(function (idx, element) {
-            var $element = $(element);
-            districts.push({
-                id: $element.attr('id'),
-                name: $element.text()
+            //插入数据
+            collection.insert(filmJson, function(error, result) { 
+                res.json({code: successCode, msg: "", data: result}); 
+                db.close();
             });
-        });
-        dataObj.districtList = districts;    
-        res.json({code: successCode, msg: "", data: dataObj});
+        }); 
     });
 });
 app.get('/getcinemas', function(req, res){
@@ -112,6 +113,21 @@ app.get('/getcinemas', function(req, res){
         res.json({code: successCode, msg: "", data: list});        
     });
 
+});
+app.get('/getfilmlist', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('film');
+        collection.find().sort({'createTime':-1}).limit(1).toArray(function(err, items){        
+            if(items.length>0) {
+                res.json({code: successCode, msg: "", data: items[0].filmList});
+
+                //关闭数据库
+                db.close();
+            }
+        });
+    });
 });
 app.get('/getdistrict', function(req, res){
     var cityId = req.query.cityId;
@@ -499,8 +515,8 @@ app.get('/match', function(req, res){
         status: 1
     };
     let orArr = [];
-    if(districtId !== 'all') {
-        orArr.push({districtId:'all'});
+    if(districtId !== '') {
+        orArr.push({districtId:''});
         orArr.push({districtId:districtId});
         matchInfo.$or = orArr;
     } 
