@@ -117,8 +117,15 @@ app.get('/getcinemas', function(req, res){
 app.get('/getdistrict', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     
-    var cityuid = req.query.cityuid;
-    var route = 'https://www.douban.com/location/'+cityuid+'/events/weekend-1803';
+    var cityId = req.query.id,
+        cityUid = req.query.uid,
+        cityName = req.query.name;
+    cityObj = {
+        id: cityId,
+        uid: cityUid,
+        name: cityName
+    };
+    var route = 'https://www.douban.com/location/'+cityUid+'/events/weekend-1803';
     superagent.get(route)
     .charset('utf-8')
     .end(function (err, sres) {
