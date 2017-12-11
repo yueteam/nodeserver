@@ -96,13 +96,12 @@ app.get('/nowplaying', function(req, res){
         res.json({code: successCode, msg: "", data: dataObj});
     });
 });
-
 app.get('/getcinemas', function(req, res){
     var cityId = req.query.cityId;
     var districtId = req.query.districtId;
     res.header("Content-Type", "application/json; charset=utf-8");
 
-    superagent.get('https://movie.douban.com/j/cinema/cinemas/?city_id='+cityId)
+    superagent.get('https://movie.douban.com/j/cinema/cinemas/?city_id='+cityId+'&district_id='+districtId)
     .charset('utf-8')
     .end(function (err, sres) {
         if (err) {
@@ -115,54 +114,20 @@ app.get('/getcinemas', function(req, res){
 
 });
 app.get('/getdistrict', function(req, res){
+    var cityId = req.query.cityId;
     res.header("Content-Type", "application/json; charset=utf-8");
-    
-    var cityId = req.query.id,
-        cityUid = req.query.uid,
-        cityName = req.query.name;
-    cityObj = {
-        id: cityId,
-        uid: cityUid,
-        name: cityName
-    };
-    var route = 'https://www.douban.com/location/'+cityUid+'/events/weekend-1803';
-    superagent.get(route)
-    .charset('utf-8')
-    .end(function (err, sres) {
-        if (err) {
-            console.log('ERR: ' + err);
-            res.json({code: failCode, msg: err});
-            return;
-        }
-        var $ = cheerio.load(sres.text);
 
-        var districtArr = [];
-        $('.ui-fbox a').each(function (idx, element) {
-            var $element = $(element);
-            var href = $element.attr('href');
-            var districtId = href.substring(href.lastIndexOf('-')+1);
-            var districtName = $element.text().replace(/\\n/g,'').replace(/^(\s|\u00A0)+/,'').replace(/(\s|\u00A0)+$/,'');
-            if(districtName!=='全部'){
-                districtArr.push({
-                    id: districtId,
-                    name: districtName
-                })
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('city');
+        collection.find({id: cityId}).toArray(function(err, items){        
+            if(items.length>0) {
+                res.json({code: successCode, msg: "", data: items[0].district});
+
+                //关闭数据库
+                db.close();
             }
         });
-        cityObj.district = districtArr;
-
-        MongoClient.connect(DB_CONN_STR, function(err, db) {
-            var collection = db.collection('city');
-
-            //插入数据
-            collection.insert(cityObj, function(error, result) { 
-                res.json({code: successCode, msg: "", data: result}); 
-                db.close();
-            });
-        });
-        
     });
-    
 });
 
 app.get('/getopenid', function(req, res){

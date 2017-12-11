@@ -209,6 +209,56 @@ app.get('/citys', function(req, res){
         res.json({code: successCode, msg: "", data: cityObj});
     });
 });
+app.get('/getdistrict', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    
+    var cityId = req.query.id,
+        cityUid = req.query.uid,
+        cityName = req.query.name;
+    cityObj = {
+        id: cityId,
+        uid: cityUid,
+        name: cityName
+    };
+    var route = 'https://www.douban.com/location/'+cityUid+'/events/weekend-1803';
+    superagent.get(route)
+    .charset('utf-8')
+    .end(function (err, sres) {
+        if (err) {
+            console.log('ERR: ' + err);
+            res.json({code: failCode, msg: err});
+            return;
+        }
+        var $ = cheerio.load(sres.text);
+
+        var districtArr = [];
+        $('.ui-fbox a').each(function (idx, element) {
+            var $element = $(element);
+            var href = $element.attr('href');
+            var districtId = href.substring(href.lastIndexOf('-')+1);
+            var districtName = $element.text().replace(/\\n/g,'').replace(/^(\s|\u00A0)+/,'').replace(/(\s|\u00A0)+$/,'');
+            if(districtName!=='全部'){
+                districtArr.push({
+                    id: districtId,
+                    name: districtName
+                })
+            }
+        });
+        cityObj.district = districtArr;
+
+        MongoClient.connect(DB_CONN_STR, function(err, db) {
+            var collection = db.collection('city');
+
+            //插入数据
+            collection.insert(cityObj, function(error, result) { 
+                res.json({code: successCode, msg: "", data: result}); 
+                db.close();
+            });
+        });
+        
+    });
+    
+});
 
 app.get('/getopenid', function(req, res){
     var code = req.query.code;
