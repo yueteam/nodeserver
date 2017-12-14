@@ -731,7 +731,64 @@ app.post('/broadcast', function(req, res){
             }
         });
     });
- });
+});
+
+app.get('/bcdetail', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var id = req.query.id;
+
+    MongoClient.connect(DB_CONN_STR, function(error, db) {
+        console.log("broadcast连接成功！");
+        var collection = db.collection('broadcast');
+        collection.find({_id: ObjectID(id)}).toArray(function(err, items){   
+            if(items.length>0) {   
+                res.json({code: successCode, msg: "", data: items[0]});
+            } else {
+                res.json({code: failCode, data: '没找到'}); 
+            }
+            db.close();
+        });              
+    });
+}); 
+
+
+app.get('/willing', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var id = req.body.id,
+        userId = req.body.userId;
+    var dateInfo = {
+        id: id,
+        userId: userId,
+        nickName: req.body.nickName,
+        avatarUrl: req.body.avatarUrl,
+        createTime: Date.now()
+    };
+
+    MongoClient.connect(DB_CONN_STR, function(error, db) {
+        console.log("broadcast连接成功！");
+        var collection = db.collection('broadcast');
+        collection.find({_id: ObjectID(id)}).toArray(function(err, items){            
+            var willingArr = items[0].willingUsers || [];
+            var isExist = false;
+            for(var i=0,len=willingArr.length;i<len;i++) {
+                if(willingArr[i] === userId){
+                    isExist = true;
+                    break;
+                }
+            }
+            if(!isExist) {
+                willingArr.push(userId);
+                collection.update({_id: ObjectID(id)},{$set:{willingUsers:willingArr}}, function(err, result) { 
+                    res.json({code: successCode, msg: "操作成功"});
+                    db.close();
+                });
+            } else {
+                res.json({code: failCode, msg: "已表达过意愿"});
+                db.close();
+            }
+        });               
+    });
+}); 
 
 /**
  * [breakfast] 天天晒早餐
