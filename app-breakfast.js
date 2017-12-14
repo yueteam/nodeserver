@@ -25,11 +25,14 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
-var DB_CONN_STR = 'mongodb://localhost:27017/yue'; 
+var DB_CONN_STR = 'mongodb://localhost:27017/breakfast'; 
 
 var baseUrl = 'https://movie.douban.com';
 const successCode = 0, failCode = -1;
-
+var breakfastWXInfo = {
+        appid: 'wx8f2f018d92b566a6',
+        secret: 'dcc283dfa0ce262dd03d410fe4c04d00'
+    };
 function isEmpty(obj){
     for (var i in obj){
         return false;
@@ -48,7 +51,7 @@ app.get('/fetchopenid', function(req, res){
     var code = req.query.code;
     res.header("Content-Type", "application/json; charset=utf-8");
 
-    superagent.get('https://api.weixin.qq.com/sns/jscode2session?appid=wx288b9aa48204f09c&secret=7f0d2d16a6d82ddb3fd3ade56bc23712&js_code='+code+'&grant_type=authorization_code')
+    superagent.get('https://api.weixin.qq.com/sns/jscode2session?appid='+breakfastWXInfo.appid+'&secret='+breakfastWXInfo.secret+'&js_code='+code+'&grant_type=authorization_code')
     .charset('utf-8')
     .end(function (err, sres) {
         if (err) {
@@ -68,7 +71,7 @@ app.get('/fetchaccesstoken', function(req, res){
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('wx');
         var requestNewToken = function(){
-            superagent.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx288b9aa48204f09c&secret=7f0d2d16a6d82ddb3fd3ade56bc23712')
+            superagent.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid'+breakfastWXInfo.appid+'&secret='+breakfastWXInfo.secret)
             .charset('utf-8')
             .end(function (err, sres) {
                 if (err) {
@@ -126,7 +129,7 @@ app.get('/fetchqrcode', function(req, res){
     });
 });
 
-app.get('/createuser', function(req, res){
+app.get('/addbfuser', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var userInfo = {
         openId: req.query.openId,
