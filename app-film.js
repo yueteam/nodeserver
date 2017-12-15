@@ -741,12 +741,22 @@ app.get('/bcdetail', function(req, res){
         console.log("broadcast连接成功！");
         var collection = db.collection('broadcast');
         collection.find({_id: ObjectID(id)}).toArray(function(err, items){   
-            if(items.length>0) {   
-                res.json({code: successCode, msg: "", data: items[0]});
+            if(items.length>0) {  
+                var willingUsers = items[0].willingUsers;
+                if(willingUsers.length>0) {
+                    var collection_user = db.collection('user');
+                    collection_user.find({_id: {"$in": willingUsers}}, {_id:1,nickName:1,avatarUrl:1}).toArray(function(err1, items1){        
+                        res.json({code: successCode, msg: "", data: items[0], userList: items1});
+                        db.close();
+                    });
+                } else {
+                    res.json({code: successCode, msg: "", data: items[0]});
+                    db.close();
+                }
             } else {
                 res.json({code: failCode, data: '没找到'}); 
+                db.close();
             }
-            db.close();
         });              
     });
 }); 
@@ -756,36 +766,29 @@ app.get('/willing', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var id = req.body.id,
         userId = req.body.userId;
-    var dateInfo = {
-        id: id,
-        userId: userId,
-        nickName: req.body.nickName,
-        avatarUrl: req.body.avatarUrl,
-        createTime: Date.now()
-    };
 
     MongoClient.connect(DB_CONN_STR, function(error, db) {
         console.log("broadcast连接成功！");
         var collection = db.collection('broadcast');
         collection.find({_id: ObjectID(id)}).toArray(function(err, items){            
             var willingArr = items[0].willingUsers || [];
-            var isExist = false;
-            for(var i=0,len=willingArr.length;i<len;i++) {
-                if(willingArr[i] === userId){
-                    isExist = true;
-                    break;
-                }
-            }
-            if(!isExist) {
-                willingArr.push(userId);
+            // var isExist = false;
+            // for(var i=0,len=willingArr.length;i<len;i++) {
+            //     if(willingArr[i] === userId){
+            //         isExist = true;
+            //         break;
+            //     }
+            // }
+            // if(!isExist) {
+                willingArr.push(ObjectID(userId));
                 collection.update({_id: ObjectID(id)},{$set:{willingUsers:willingArr}}, function(err, result) { 
                     res.json({code: successCode, msg: "操作成功"});
                     db.close();
                 });
-            } else {
-                res.json({code: failCode, msg: "已表达过意愿"});
-                db.close();
-            }
+            // } else {
+            //     res.json({code: failCode, msg: "已表达过意愿"});
+            //     db.close();
+            // }
         });               
     });
 }); 
