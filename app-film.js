@@ -743,7 +743,7 @@ app.get('/bcdetail', function(req, res){
         collection.find({_id: ObjectID(id)}).toArray(function(err, items){   
             if(items.length>0) {  
                 var willingUsers = items[0].willingUsers;
-                if(willingUsers.length>0) {
+                if(willingUsers && willingUsers.length>0) {
                     var collection_user = db.collection('user');
                     collection_user.find({_id: {"$in": willingUsers}}, {_id:1,nickName:1,avatarUrl:1}).toArray(function(err1, items1){        
                         res.json({code: successCode, msg: "", data: items[0], userList: items1});
