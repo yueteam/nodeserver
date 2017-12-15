@@ -762,7 +762,7 @@ app.get('/bcdetail', function(req, res){
 }); 
 
 
-app.get('/willing', function(req, res){
+app.post('/willing', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var id = req.body.id,
         userId = req.body.userId;
