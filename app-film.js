@@ -1012,6 +1012,25 @@ app.post('/addmeal', function(req, res){
     });
 });
 
+app.get('/getmeal', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var pageNo = parseInt(req.query.pageNo);
+    var skipCount = (pageNo-1)*30;
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        var collection = db.collection('meal');
+        collection.find().sort({'createTime':-1}).limit(30).skip(skipCount).toArray(function(err, items){        
+            if(items.length>0) {
+                res.json({code: successCode, msg: "", data: items});
+            } else {
+                res.json({code: failCode, msg: "没有更多了~"});
+            }
+            //关闭数据库
+            db.close();
+        });
+    });
+});
+
 var options = {
     key: fs.readFileSync('./keys/214248838510598.key'),
     cert: fs.readFileSync('./keys/214248838510598.pem')
