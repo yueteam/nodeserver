@@ -1005,7 +1005,7 @@ app.post('/addmeal', function(req, res){
         coverImg: req.body.coverImg,
         title: req.body.title,
         desc: req.body.desc,
-        cookTime: req.body.cookTime,
+        cookTime: Number(req.body.cookTime),
         forkCount: 0,
         day: dayStr,
         createTime: now
