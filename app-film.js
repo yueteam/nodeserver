@@ -935,6 +935,23 @@ app.get('/addbfuser', function(req, res){
     });
 });
 
+app.get('/findbfuser', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var userId = req.query.id;
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        console.log("findbfuser连接成功！");
+        var collection = db.collection('user');
+        collection.find({_id: ObjectID(userId)}).toArray(function(err, items){        
+            if(items.length>0) {
+                res.json({code: successCode, msg: "", data: items[0]});
+            } else {
+                res.json({code: failCode, data: '用户不存在'}); 
+            }
+            db.close();
+        });
+    });
+});
+
 app.post('/uploadcover', upload.single('file'), function (req, res, next) {
     res.header("Content-Type", "application/json; charset=utf-8");
 
@@ -989,6 +1006,7 @@ app.post('/addmeal', function(req, res){
         title: req.body.title,
         desc: req.body.desc,
         cookTime: req.body.cookTime,
+        forkCount: 0,
         day: dayStr,
         createTime: now
     };
