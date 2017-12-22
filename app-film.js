@@ -973,6 +973,7 @@ app.post('/uploadcover', upload.single('file'), function (req, res, next) {
 
 app.post('/addmeal', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
+    var userId = req.body.userId;
     var now = Date.now(),
         nowdate = new Date(),
         year = nowdate.getFullYear(),
@@ -980,8 +981,8 @@ app.post('/addmeal', function(req, res){
         date = nowdate.getDate(),
         dayStr = year+'/'+month+'/'+date;
 
-    var pubInfo = {
-        userId: req.body.userId,
+    var mealInfo = {
+        userId: userId,
         avatarUrl: req.body.avatarUrl,
         nickName: req.body.nickName,
         coverImg: req.body.coverImg,
@@ -991,10 +992,13 @@ app.post('/addmeal', function(req, res){
         day: dayStr,
         createTime: now
     };
+    if(userId === '5a3cd169165cea3cee830b11') {
+        mealInfo.official = true;
+    }
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
         console.log("meal连接成功！");
         var collection = db.collection('meal');
-        collection.insert(pubInfo, function(err, result) { 
+        collection.insert(mealInfo, function(err, result) { 
             //如果存在错误
             if(err) {
                 console.log('Error:'+ err);
