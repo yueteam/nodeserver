@@ -802,9 +802,12 @@ app.post('/willing', function(req, res){
  * [breakfast] 天天晒早餐
  * @type {Object}
  */
+app.get('/tGFrYeQFZG.txt', function(req, res){
+    res.send('5dc88363851a7957e9616c47004dc67e');
+});
 var breakfastWXInfo = {
-        appid: 'wx8f2f018d92b566a6',
-        secret: 'dcc283dfa0ce262dd03d410fe4c04d00'
+        appid: 'wx52835d43c1a57fdc',
+        secret: 'd6c815d9dd61e7c475c0aaaef6a24ae7'
     };
 app.get('/breakfast', function(req, res){
     res.send('<h1>天天晒早餐</h1>');
