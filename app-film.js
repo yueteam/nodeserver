@@ -964,7 +964,7 @@ app.post('/uploadcover', upload.single('file'), function (req, res, next) {
         // 上传之后删除本地文件
         fs.unlinkSync(filePath);
 
-        res.json({code: successCode, msg: "", data: result.url.replace(/http:/,'https:')});  
+        res.send(result.url.replace(/http:/,'https:'));  
         db.close();
     }).catch(function (err) {
         console.log(err);
