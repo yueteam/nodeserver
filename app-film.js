@@ -971,26 +971,28 @@ app.post('/uploadcover', upload.single('file'), function (req, res, next) {
     }); 
 })
 
-app.post('/pubbreakfast', function(req, res){
+app.post('/addmeal', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var userId = req.body.userId;
     var now = Date.now(),
-        year = now.getFullYear(),
-        month = now.getMonth()+1,
-        date = now.getDate(),
-        dateStr = year + '/' + month + '/' + date;
+        nowdate = new Date(),
+        year = nowdate.getFullYear(),
+        month = nowdate.getMonth()+1,
+        date = nowdate.getDate(),
+        dayStr = year+'/'+month+'/'+date;
 
     var pubInfo = {
-        userId: userId,
+        userId: req.body.userId,
         avatarUrl: req.body.avatarUrl,
         nickName: req.body.nickName,
         coverImg: req.body.coverImg,
-        words: req.body.words,
-        day: dateStr,
+        title: req.body.title,
+        desc: req.body.desc,
+        cookTime: req.body.cookTime,
+        day: dayStr,
         createTime: now
     };
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
-        console.log("breakfast连接成功！");
+        console.log("meal连接成功！");
         var collection = db.collection('meal');
         collection.insert(pubInfo, function(err, result) { 
             //如果存在错误
@@ -1000,7 +1002,7 @@ app.post('/pubbreakfast', function(req, res){
                 db.close();
                 return;
             } 
-            res.json({code: successCode, msg: "", data: result}); 
+            res.json({code: successCode, msg: "", data: result.insertedIds[0]}); 
             db.close();
         });
     });
