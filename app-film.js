@@ -23,6 +23,12 @@ var client1 = new OSS({
     accessKeySecret: 'OvuJdzBuziDOIQFRD4gbZXI1fDQ8qC',
     bucket: 'yueqrcode'
 });
+var client2 = new OSS({
+    region: 'oss-cn-hangzhou',
+    accessKeyId: 'LTAIrUHBoHLwlUNY',
+    accessKeySecret: 'OvuJdzBuziDOIQFRD4gbZXI1fDQ8qC',
+    bucket: 'breakfastcover'
+});
 // 引入json解析中间件
 var bodyParser = require('body-parser');
 // 添加json解析
@@ -806,8 +812,8 @@ app.get('/tGFrYeQFZG.txt', function(req, res){
     res.send('5dc88363851a7957e9616c47004dc67e');
 });
 var breakfastWXInfo = {
-        appid: 'wx52835d43c1a57fdc',
-        secret: 'd6c815d9dd61e7c475c0aaaef6a24ae7'
+        appid: 'wx2992e5dce30736a9',
+        secret: 'b2befe7883f36ddc7808c998b27158a0'
     };
 app.get('/breakfast', function(req, res){
     res.send('<h1>天天晒早餐</h1>');
@@ -834,7 +840,7 @@ app.get('/bfaccesstoken', function(req, res){
     var code = req.query.code;
     res.header("Content-Type", "application/json; charset=utf-8");
        
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('wx');
         var requestNewToken = function(){
             superagent.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid'+breakfastWXInfo.appid+'&secret='+breakfastWXInfo.secret)
@@ -953,7 +959,7 @@ app.post('/uploadcover', upload.single('file'), function (req, res, next) {
     var fileName = userId + '_' + Date.now() + lastName;
 
     co(function* () {
-        var result = yield client.put(fileName, filePath);
+        var result = yield client2.put(fileName, filePath);
 
         // 上传之后删除本地文件
         fs.unlinkSync(filePath);
