@@ -1032,16 +1032,14 @@ app.post('/addmeal', function(req, res){
 });
 
 function inArray(search, arr) {
+    var isExist = 0;
     arr.forEach(function(item){
-        console.log(item);
         if(item === search){
-            return true;
+            isExist = 1;
+            return isExist;
         }
     });
-    if(arr.length>0){
-        console.log(arr.length);
-    }
-    return false;
+    return isExist;
 }
 app.get('/getmeal', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
@@ -1067,7 +1065,7 @@ app.get('/getmeal', function(req, res){
                         official: item.official
                     }
                     var forkUsers = item.fork_users;
-                    if(inArray(userId,forkUsers)) {
+                    if(inArray(userId,forkUsers) === 1) {
                         newItem.forked = true;
                     }
                     list.push(newItem);
