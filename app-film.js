@@ -1034,8 +1034,9 @@ app.post('/addmeal', function(req, res){
 function inArray(search, arr) {
     var isExist = 0;
     arr.forEach(function(item){
-        console.log(item.toString());
-        if(item.str === search){
+        console.log(typeof item.toString());
+        if(item.toString() === search){
+            console.log(1);
             isExist = 1;
             return isExist;
         }
@@ -1066,7 +1067,7 @@ app.get('/getmeal', function(req, res){
                         official: item.official
                     }
                     var forkUsers = item.fork_users;
-                    if(inArray('ObjectID('+userId+')',forkUsers) === 1) {
+                    if(inArray(userId,forkUsers) === 1) {
                         newItem.forked = true;
                     }
                     list.push(newItem);
