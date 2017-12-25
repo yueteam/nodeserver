@@ -1034,7 +1034,8 @@ app.post('/addmeal', function(req, res){
 function inArray(search, arr) {
     var isExist = 0;
     arr.forEach(function(item){
-        if(item === search){
+        console.log(typeof item);
+        if(item.str === search){
             isExist = 1;
             return isExist;
         }
