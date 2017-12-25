@@ -1007,6 +1007,7 @@ app.post('/addmeal', function(req, res){
         desc: req.body.desc,
         cookTime: Number(req.body.cookTime),
         forkCount: 0,
+        fork_users: [],
         day: dayStr,
         createTime: now
     };
@@ -1030,16 +1031,44 @@ app.post('/addmeal', function(req, res){
     });
 });
 
+function inArray(search, arr) {
+    arr.forEach(function(item){
+        if(item === search){
+            return true;
+        }
+    });
+    return false;
+}
 app.get('/getmeal', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
     var pageNo = parseInt(req.query.pageNo);
+    var userId = req.query.userId;
     var skipCount = (pageNo-1)*30;
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('meal');
         collection.find().sort({'createTime':-1}).limit(30).skip(skipCount).toArray(function(err, items){        
             if(items.length>0) {
-                res.json({code: successCode, msg: "", data: items});
+                var list = [];
+                items.forEach(function(item){
+                    var newItem = {
+                        _id: item._id,
+                        userId: item.userId,
+                        avatarUrl: item.avatarUrl,
+                        coverImg: item.coverImg,
+                        title: item.title,
+                        desc: item.desc,
+                        forkCount: item.forkCount,
+                        day: item.day,
+                        official: item.official
+                    }
+                    var forkUsers = item.fork_users;
+                    if(inArray(ObjectID(userId),forkUsers)) {
+                        newItem.forked = true;
+                    }
+                    list.push(newItem);
+                });
+                res.json({code: successCode, msg: "", data: list});
             } else {
                 res.json({code: failCode, msg: "没有更多了~"});
             }
@@ -1049,38 +1078,21 @@ app.get('/getmeal', function(req, res){
     });
 });
 
-app.post('/fork', function(req, res){
+app.get('/fork', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
-    var userId = req.body.userId,
-        avatar = req.body.avatar,
-        mealId = req.body.mealId;
+    var userId = req.query.userId,
+        mealId = req.query.mealId;
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
-        var collection = db.collection('fork');
-        var collection_meal = db.collection('meal');
-        var params = {
-            userId: userId,
-            avatar: avatar,
-            mealId: mealId,
-            createTime: Date.now()
-        };
-        collection.insert(params, function(err1, result) { 
-            //如果存在错误
+        var collection = db.collection('meal');
+        collection.update({_id: ObjectID(mealId)}, {$inc: {forkCount: 1}, $addToSet: {fork_users: ObjectID(userId)}}, function(err1, result) {  
             if(err1) {
                 res.json({code: failCode, data: err1}); 
                 db.close();
                 return;
             } 
-            var insertedId = result.insertedIds[0];
-            res.json({code: successCode, msg: "", data: insertedId});
+            res.json({code: successCode, msg: ""});
             db.close();
-            // collection_meal.find({_id: ObjectID(mealId)}).limit(1).toArray(function(err2, items){   
-            //     var forkCount = items[0].forkCount;
-            //     collection_meal.update({_id: ObjectID(mealId)},{$set:{forkCount:forkCount+1}}, function(err3, result1) {  
-            //         db.close();
-            //     });
-            // });
-            
         });
     });
 });
@@ -1090,23 +1102,15 @@ app.get('/unfork', function(req, res){
     var userId = req.query.userId,
         mealId = req.query.mealId;
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
-        var collection = db.collection('fork');
-        collection.remove({userId: userId, mealId: mealId}, function(err1, result) { 
-            //如果存在错误
+        var collection = db.collection('meal');
+        collection.update({_id: ObjectID(mealId)}, {$inc: {forkCount: -1}, $pull: {fork_users: ObjectID(userId)}}, function(err1, result) {  
             if(err1) {
                 res.json({code: failCode, data: err1}); 
                 db.close();
                 return;
-            }
+            } 
             res.json({code: successCode, msg: ""});
             db.close();
-            // collection_meal.find({_id: ObjectID(id)}).limit(1).toArray(function(err2, items){   
-            //     var forkCount = items[0].forkCount;
-            //     collection_meal.update({_id: ObjectID(id)},{$set:{forkCount:forkCount-1}}, function(err3, result1) {  
-            //         db.close();
-            //     });
-            // });
-            
         });
     });
 });
