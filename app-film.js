@@ -1033,7 +1033,8 @@ app.post('/addmeal', function(req, res){
 
 function inArray(search, arr) {
     arr.forEach(function(item){
-        if(item === search){
+        console.log(item);
+        if(item.toString() === search){
             return true;
         }
     });
@@ -1063,7 +1064,7 @@ app.get('/getmeal', function(req, res){
                         official: item.official
                     }
                     var forkUsers = item.fork_users;
-                    if(inArray(ObjectID(userId),forkUsers)) {
+                    if(inArray(userId,forkUsers)) {
                         newItem.forked = true;
                     }
                     list.push(newItem);
