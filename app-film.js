@@ -1063,7 +1063,7 @@ app.get('/getmeal', function(req, res){
                         desc: item.desc,
                         forkCount: item.forkCount,
                         day: item.day,
-                        official: item.official
+                        official: item.official || false
                     }
                     var forkUsers = item.fork_users;
                     if(inArray(userId,forkUsers) === 1) {
@@ -1122,10 +1122,11 @@ app.get('/mealdetail', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
     var id = req.query.id;
+    var userId = req.query.userId;
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('meal');
         var collection_user = db.collection('user');
-        collection.findOne({_id: ObjectID(id)}, {fork_users: 0}, function(err1, data){        
+        collection.findOne({_id: ObjectID(id)}, function(err1, item){        
             if(err1) {
                 res.json({code: failCode, data: err1}); 
                 db.close();
@@ -1135,7 +1136,23 @@ app.get('/mealdetail', function(req, res){
             // collection_user.find({_id: {$in:[data.fork_users]}}).limit(30).toArray(function(err, items){ 
 
             // });
-            res.json({code: successCode, msg: "", data: data});
+            var newItem = {
+                _id: item._id,
+                userId: item.userId,
+                nickName: item.nickName,
+                avatarUrl: item.avatarUrl,
+                coverImg: item.coverImg,
+                title: item.title,
+                desc: item.desc,
+                cookTime: item.cookTime,
+                forkCount: item.forkCount,
+                day: item.day,
+                official: item.official || false
+            }
+            if(inArray(userId, item.fork_users) === 1) {
+                newItem.forked = true;
+            }
+            res.json({code: successCode, msg: "", data: newItem});
             db.close();
         });
     });
