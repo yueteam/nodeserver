@@ -1049,6 +1049,68 @@ app.get('/getmeal', function(req, res){
     });
 });
 
+app.post('/fork', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var userId = req.body.userId,
+        avatar = req.body.avatar,
+        mealId = req.body.mealId;
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        var collection = db.collection('fork');
+        var collection_meal = db.collection('meal');
+        var params = {
+            userId: userId,
+            avatar: avatar,
+            mealId: mealId,
+            createTime: Date.now()
+        };
+        collection.insert(params, function(err1, result) { 
+            //如果存在错误
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+            var insertedId = result.insertedIds[0];
+            res.json({code: successCode, msg: "", data: insertedId});
+            db.close();
+            // collection_meal.find({_id: ObjectID(mealId)}).limit(1).toArray(function(err2, items){   
+            //     var forkCount = items[0].forkCount;
+            //     collection_meal.update({_id: ObjectID(mealId)},{$set:{forkCount:forkCount+1}}, function(err3, result1) {  
+            //         db.close();
+            //     });
+            // });
+            
+        });
+    });
+});
+app.get('/unfork', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var userId = req.query.userId,
+        mealId = req.query.mealId;
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        var collection = db.collection('fork');
+        collection.remove({userId: userId, mealId: mealId}, function(err1, result) { 
+            //如果存在错误
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            }
+            res.json({code: successCode, msg: ""});
+            db.close();
+            // collection_meal.find({_id: ObjectID(id)}).limit(1).toArray(function(err2, items){   
+            //     var forkCount = items[0].forkCount;
+            //     collection_meal.update({_id: ObjectID(id)},{$set:{forkCount:forkCount-1}}, function(err3, result1) {  
+            //         db.close();
+            //     });
+            // });
+            
+        });
+    });
+});
+
 var options = {
     key: fs.readFileSync('./keys/214248838510598.key'),
     cert: fs.readFileSync('./keys/214248838510598.pem')
