@@ -1125,7 +1125,7 @@ app.get('/mealdetail', function(req, res){
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('meal');
         var collection_user = db.collection('user');
-        collection.findOne({_id: ObjectID(id), {fork_users: 0}}, function(err1, data){        
+        collection.findOne({_id: ObjectID(id)}, {fork_users: 0}, function(err1, data){        
             if(err1) {
                 res.json({code: failCode, data: err1}); 
                 db.close();
