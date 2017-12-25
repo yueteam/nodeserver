@@ -1034,10 +1034,13 @@ app.post('/addmeal', function(req, res){
 function inArray(search, arr) {
     arr.forEach(function(item){
         console.log(item);
-        if(item.toString() === search){
+        if(item === search){
             return true;
         }
     });
+    if(arr.length>0){
+        console.log(arr.length);
+    }
     return false;
 }
 app.get('/getmeal', function(req, res){
