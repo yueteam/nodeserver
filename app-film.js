@@ -1034,9 +1034,8 @@ app.post('/addmeal', function(req, res){
 function inArray(search, arr) {
     var isExist = 0;
     arr.forEach(function(item){
-        console.log(typeof item.toString());
+        // console.log(typeof item.toString());
         if(item.toString() === search){
-            console.log(1);
             isExist = 1;
             return isExist;
         }
@@ -1114,6 +1113,29 @@ app.get('/unfork', function(req, res){
                 return;
             } 
             res.json({code: successCode, msg: ""});
+            db.close();
+        });
+    });
+});
+
+app.get('/mealdetail', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var id = req.query.id;
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        var collection = db.collection('meal');
+        var collection_user = db.collection('user');
+        collection.findOne({_id: ObjectID(id), {fork_users: 0}}, function(err1, data){        
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+
+            // collection_user.find({_id: {$in:[data.fork_users]}}).limit(30).toArray(function(err, items){ 
+
+            // });
+            res.json({code: successCode, msg: "", data: data});
             db.close();
         });
     });
