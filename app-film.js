@@ -1157,6 +1157,25 @@ app.get('/mealdetail', function(req, res){
         });
     });
 });
+app.post('/editmeal', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var mealId = req.body.id;
+    var materials = JSON.parse(req.body.materials);
+    var steps = JSON.parse(req.body.steps);
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        var collection = db.collection('meal');
+        collection.update({_id: ObjectID(mealId)}, {$set:{materials:materials,steps:steps}}, function(err1, result) {  
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: ""});
+            db.close();
+        });
+    });
+});
 
 var options = {
     key: fs.readFileSync('./keys/214248838510598.key'),
