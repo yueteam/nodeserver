@@ -1147,7 +1147,9 @@ app.get('/mealdetail', function(req, res){
                 cookTime: item.cookTime,
                 forkCount: item.forkCount,
                 day: item.day,
-                official: item.official || false
+                official: item.official || false,
+                materials: item.materials || [],
+                steps: item.steps || []
             }
             if(inArray(userId, item.fork_users) === 1) {
                 newItem.forked = true;
