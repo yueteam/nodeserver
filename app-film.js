@@ -949,13 +949,8 @@ app.get('/findbfuser', function(req, res){
                 return;
             }      
             collection_meal.aggregate([{$match:{userId:userId}},{$group:{_id:"$userId", pub_num:{$sum:1}, forked_num:{$sum:"$forkCount"}}}], function(err2, result) {                     
-                let count = {
-                    pub_num : result.pub_num,
-                    forked_num : result.forked_num
-                };                   
                 collection_meal.aggregate([{$match:{fork_users:ObjectID(userId)}},{$group:{_id:1, fork_num:{$sum:1}}}], function(err3, result1) {                        
-                    count.fork_num = result1.fork_num;
-                    res.json({code: successCode, msg: "", data: item, count: count});
+                    res.json({code: successCode, msg: "", data: item, count: result, count1: result1});
                     db.close();
                 });
             });
