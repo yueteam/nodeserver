@@ -246,15 +246,15 @@ app.post('/addmeal', function(req, res){
         coverImg: req.body.coverImg,
         title: req.body.title,
         desc: req.body.desc,
-        cookTime: Number(req.body.cookTime),
+        // cookTime: Number(req.body.cookTime),
         forkCount: 0,
         fork_users: [],
         day: dayStr,
         createTime: now
     };
-    if(userId === '5a40efbcf18ac53540f49459') {
-        mealInfo.official = true;
-    }
+    // if(userId === '5a40efbcf18ac53540f49459') {
+    //     mealInfo.official = true;
+    // }
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("meal连接成功！");
         var collection = db.collection('meal');
@@ -301,9 +301,7 @@ app.get('/getmeal', function(req, res){
                         coverImg: item.coverImg,
                         title: item.title,
                         desc: item.desc,
-                        forkCount: item.forkCount,
-                        day: item.day,
-                        official: item.official || false
+                        forkCount: item.forkCount
                     }
                     var forkUsers = item.fork_users;
                     if(inArray(userId,forkUsers) === 1) {
@@ -381,12 +379,12 @@ app.get('/mealdetail', function(req, res){
                 coverImg: item.coverImg,
                 title: item.title,
                 desc: item.desc,
-                cookTime: item.cookTime,
-                forkCount: item.forkCount,
-                day: item.day,
-                official: item.official || false,
-                materials: item.materials || [],
-                steps: item.steps || []
+                // cookTime: item.cookTime,
+                forkCount: item.forkCount
+                // day: item.day,
+                // official: item.official || false,
+                // materials: item.materials || [],
+                // steps: item.steps || []
             }
             if(inArray(userId, item.fork_users) === 1) {
                 newItem.forked = true;
