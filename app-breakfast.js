@@ -50,8 +50,8 @@ var breakfastWXInfo = {
         appid: 'wx2992e5dce30736a9',
         secret: 'b2befe7883f36ddc7808c998b27158a0'
     };
-app.get('/breakfast', function(req, res){
-    res.send('<h1>天天晒早餐</h1>');
+app.get('/', function(req, res){
+    res.send('<h1>时刻有约</h1>');
 });
 
 app.get('/bfopenid', function(req, res){
