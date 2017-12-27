@@ -942,22 +942,23 @@ app.get('/findbfuser', function(req, res){
         console.log("findbfuser连接成功！");
         var collection = db.collection('user');
         var collection_meal = db.collection('meal');
-        collection.find({_id: ObjectID(userId)}).toArray(function(err1, items){        
-            if(items.length>0) {
-                collection_meal.aggregate([{$match:{userId:userId}},{$group:{_id:"$userId", pub_num:{$sum:1}, forked_num:{$sum:"$forkCount"}}}], function(err2, result) {                     
-                    let count = {
-                        pub_num : result.pub_num,
-                        forked_num : result.forked_num
-                    };                   
-                    collection_meal.aggregate([{$match:{fork_users:ObjectID(userId)}},{$group:{_id:1, fork_num:{$sum:1}}}], function(err3, result1) {                        
-                        count.fork_num = result1.fork_num;
-                        res.json({code: successCode, msg: "", data: items[0], count: count});
-                    });
+        collection.findOne({_id: ObjectID(userId)}, function(err1, item){  
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            }      
+            collection_meal.aggregate([{$match:{userId:userId}},{$group:{_id:"$userId", pub_num:{$sum:1}, forked_num:{$sum:"$forkCount"}}}], function(err2, result) {                     
+                let count = {
+                    pub_num : result.pub_num,
+                    forked_num : result.forked_num
+                };                   
+                collection_meal.aggregate([{$match:{fork_users:ObjectID(userId)}},{$group:{_id:1, fork_num:{$sum:1}}}], function(err3, result1) {                        
+                    count.fork_num = result1.fork_num;
+                    res.json({code: successCode, msg: "", data: item, count: count});
+                    db.close();
                 });
-            } else {
-                res.json({code: failCode, data: '用户不存在'}); 
-            }
-            db.close();
+            });
         });
     });
 });
