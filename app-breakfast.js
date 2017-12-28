@@ -40,7 +40,7 @@ function trim(str){
 }
 
 /**
- * [breakfast] 天天晒早餐
+ * [breakfast] 人人许愿
  * @type {Object}
  */
 app.get('/tGFrYeQFZG.txt', function(req, res){
