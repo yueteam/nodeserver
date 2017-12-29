@@ -272,6 +272,42 @@ app.post('/addmeal', function(req, res){
     });
 });
 
+app.post('/newwish', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var userId = req.body.userId;
+    var now = Date.now(),
+        nowdate = new Date(),
+        year = nowdate.getFullYear(),
+        month = nowdate.getMonth()+1,
+        date = nowdate.getDate(),
+        dayStr = year+'/'+month+'/'+date;
+
+    var wishInfo = {
+        user_id: userId,
+        avatar_url: req.body.avatarUrl,
+        nick_name: req.body.nickName,
+        words: req.body.words,
+        fav_users: [],
+        day: dayStr,
+        create_time: now
+    };
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("wish连接成功！");
+        var collection = db.collection('wish');
+        collection.insert(wishInfo, function(err, result) { 
+            //如果存在错误
+            if(err) {
+                console.log('Error:'+ err);
+                res.json({code: failCode, data: err}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: "", data: result.insertedIds[0]}); 
+            db.close();
+        });
+    });
+});
+
 function inArray(search, arr) {
     var isExist = 0;
     arr.forEach(function(item){
@@ -318,6 +354,41 @@ app.get('/getmeal', function(req, res){
         });
     });
 });
+app.get('/getwish', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var pageNo = parseInt(req.query.pageNo);
+    var userId = req.query.userId;
+    var skipCount = (pageNo-1)*50;
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('wish');
+        collection.find().sort({'createTime':-1}).limit(50).skip(skipCount).toArray(function(err, items){        
+            if(items.length>0) {
+                var list = [];
+                items.forEach(function(item){
+                    var newItem = {
+                        _id: item._id,
+                        userId: item.user_id,
+                        avatarUrl: item.avatar_url,
+                        nickName: item.nick_name,
+                        words: item.words,
+                        favCount: item.fav_users.length
+                    }
+                    var favUsers = item.fav_users;
+                    if(inArray(userId,favUsers) === 1) {
+                        newItem.faved = true;
+                    }
+                    list.push(newItem);
+                });
+                res.json({code: successCode, msg: "", data: list});
+            } else {
+                res.json({code: failCode, msg: "没有更多了~"});
+            }
+            //关闭数据库
+            db.close();
+        });
+    });
+});
 
 app.get('/fork', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
@@ -337,6 +408,7 @@ app.get('/fork', function(req, res){
         });
     });
 });
+
 app.get('/unfork', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
@@ -351,6 +423,70 @@ app.get('/unfork', function(req, res){
                 return;
             } 
             res.json({code: successCode, msg: ""});
+            db.close();
+        });
+    });
+});
+
+app.get('/fav', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var userId = req.query.userId,
+        wishId = req.query.wishId;
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('wish');
+        collection.update({_id: ObjectID(wishId)}, {$addToSet: {fav_users: ObjectID(userId)}}, function(err1, result) {  
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: ""});
+            db.close();
+        });
+    });
+});
+app.get('/unfav', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var userId = req.query.userId,
+        wishId = req.query.wishId;
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('wish');
+        collection.update({_id: ObjectID(wishId)}, {$pull: {fav_users: ObjectID(userId)}}, function(err1, result) {  
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: ""});
+            db.close();
+        });
+    });
+});
+app.get('/wishdetail', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var id = req.query.id;
+    var userId = req.query.userId;
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('wish');
+        collection.findOne({_id: ObjectID(id)}, function(err1, item){        
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+
+            var newItem = {
+                _id: item._id,
+                userId: item.user_id,
+                nickName: item.nick_name,
+                avatarUrl: item.avatar_url,
+                words: item.words,
+                favCount: item.fav_users.length
+            }
+            res.json({code: successCode, msg: "", data: newItem});
             db.close();
         });
     });
