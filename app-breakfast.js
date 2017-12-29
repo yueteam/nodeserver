@@ -362,7 +362,7 @@ app.get('/getwish', function(req, res){
     var skipCount = (pageNo-1)*50;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('wish');
-        collection.find().sort({'createTime':-1}).limit(50).skip(skipCount).toArray(function(err, items){        
+        collection.find().sort({'create_time':-1}).limit(50).skip(skipCount).toArray(function(err, items){        
             if(items.length>0) {
                 var list = [];
                 items.forEach(function(item){
