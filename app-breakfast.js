@@ -372,6 +372,7 @@ app.get('/getwish', function(req, res){
                         avatarUrl: item.avatar_url,
                         nickName: item.nick_name,
                         words: item.words,
+                        day: item.day,
                         favCount: item.fav_users.length
                     }
                     var favUsers = item.fav_users;
