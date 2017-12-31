@@ -573,7 +573,7 @@ app.get('/getrank', function(req, res){
 
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('wish');
-        collection.aggregate([{$unwind:"$fav_users"}, {$project:{user_id:1,nick_name:1,avatar_url:1}}, {$group:{_id:"$user_id",total_fork:{$sum:1}}}, {$sort:{total_fork:-1}}, {$limit:10}], function(err1, result) {                     
+        collection.aggregate([{$unwind:"$fav_users"}, {$group:{_id:{wish_id:"$_id",nick_name:"$nick_name",avatar_url:"$avatar_url",words:"$words"},total_fork:{$sum:1}}}, {$sort:{total_fork:-1}}, {$limit:10}], function(err1, result) {                     
             res.json({code: successCode, msg: "", data: result});
             db.close();
         });
