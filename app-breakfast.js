@@ -568,6 +568,18 @@ app.get('/mymeal', function(req, res){
     });
 });
 
+app.get('/getrank', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('wish');
+        collection.aggregate([{$unwind:"$fav_users"}, {$group:{_id:"$user_id",nick_name:"$nick_name",avatar_url:"$avatar_url",total_fork:{$sum:1}}}, {$sort:{total_fork:-1}}, {$limit:10}], function(err1, result) {                     
+            res.json({code: successCode, msg: "", data: result});
+            db.close();
+        });
+    });
+});
+
 var options = {
     key: fs.readFileSync('./keys/214248838510598.key'),
     cert: fs.readFileSync('./keys/214248838510598.pem')
