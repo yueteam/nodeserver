@@ -246,7 +246,7 @@ app.get('/getnews1', function(req, res){
                     richContent.push({
                         type: 'picture',
                         pic_url: mod.picture.picUrl,
-                        pic_width: mod.picture.picWidth
+                        pic_width: mod.picture.picWidth,
                         pic_height: mod.picture.picHeight
                     });
                 } else if(mod.resource) { // 文字
