@@ -250,14 +250,18 @@ app.get('/getnews1', function(req, res){
                         pic_height: mod.picture.picHeight
                     });
                 } else if(mod.resource) { // 文字
-                    var text = '';
-                    for(var j=0,len1=mod.resource.length;j<len1;j++){
-                        text += mod.resource[j].content;
+                    if(i>=len-3 && mod.style.textAlign==='right'){
+
+                    }else{
+                        var text = '';
+                        for(var j=0,len1=mod.resource.length;j<len1;j++){
+                            text += mod.resource[j].content;
+                        }
+                        richContent.push({
+                            type: 'text',
+                            content: text
+                        });
                     }
-                    richContent.push({
-                        type: 'text',
-                        content: text
-                    });
                 } else if(mod.videoUrl) { // 视频
                     richContent.push({
                         type: 'video',
