@@ -224,6 +224,7 @@ app.get('/getnews1', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
     var contentId = req.query.id;
+    var tag = req.query.tag;
     MongoClient.connect(DB_CONN_STR, function(err, db) {       
         superagent.get('https://m.freshhema.com/json/getContentDetailById?contentId='+contentId+'&source=hema')
         .charset('utf-8')
@@ -279,6 +280,7 @@ app.get('/getnews1', function(req, res){
                     cover_width: coverW,
                     cover_height: coverH
                 },
+                tag: tag,
                 rich_content: richContent
             }, function(error, result) { 
                 res.json({code: successCode, msg: ""}); 
