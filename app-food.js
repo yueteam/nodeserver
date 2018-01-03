@@ -223,23 +223,63 @@ app.post('/uploadcover', upload.single('file'), function (req, res, next) {
 app.get('/getnews1', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
+    var contentId = req.query.id;
     MongoClient.connect(DB_CONN_STR, function(err, db) {       
-        superagent.get('https://m.freshhema.com/json/getContentDetailById?contentId=200494306109&source=hema')
+        superagent.get('https://m.freshhema.com/json/getContentDetailById?contentId='+contentId+'&source=hema')
         .charset('utf-8')
         .end(function (err, sres) {
             if (err) {
                 res.json({code: failCode, msg: err});
                 return;
             }
-            var list = JSON.parse(sres.text);
+            var resJson = JSON.parse(sres.text),
+                title = resJson.data.result.contentBaseInfo.title,
+                summary = resJson.data.result.contentBaseInfo.summary,
+                cover = resJson.data.result.contentBaseInfo.cover.picUrl,
+                coverW = resJson.data.result.contentBaseInfo.cover.picWidth,
+                coverH = resJson.data.result.contentBaseInfo.cover.picHeight,
+                resourceList = resJson.data.result.resourceInfo.resourceList;
+            var richContent = [];
+            for(var i=0,len=resourceList.length;i<len;i++){
+                var mod = resourceList[i];
+                if(mod.picture) { // 图片
+                    richContent.push({
+                        type: 'picture',
+                        pic_url: mod.picture.picUrl,
+                        pic_width: mod.picture.picWidth
+                        pic_height: mod.picture.picHeight
+                    });
+                } else if(mod.resource) { // 文字
+                    var text = '';
+                    for(var j=0,len1=mod.resource.length;j<len1;j++){
+                        text += mod.resource[j].content;
+                    }
+                    richContent.push({
+                        type: 'text',
+                        content: text
+                    });
+                } else if(mod.videoUrl) { // 视频
+                    richContent.push({
+                        type: 'video',
+                        video_url: mod.videoUrl,
+                        video_cover: mod.videoCover.picUrl
+                    });
+                }
+            }
             var collection = db.collection('news');
-            res.json({code: successCode, msg: "", data: list}); 
-            // collection.insert({
-                
-            // }, function(error, result) { 
-            //     res.json({code: successCode, msg: "", data: list}); 
-            //     db.close();
-            // });       
+            collection.insert({
+                title: title,
+                summary: summary,
+                cover: {
+                    cover_img: cover,
+                    cover_width: coverW,
+                    cover_height: coverH
+                },
+                rich_content: richContent
+            }, function(error, result) { 
+                res.json({code: successCode, msg: ""}); 
+                db.close();
+            });       
         });
     });
 
