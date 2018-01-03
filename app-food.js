@@ -233,12 +233,12 @@ app.get('/getnews1', function(req, res){
                 return;
             }
             var resJson = JSON.parse(sres.text),
-                title = resJson.data.result.contentBaseInfo.title,
-                summary = resJson.data.result.contentBaseInfo.summary,
-                cover = resJson.data.result.contentBaseInfo.cover.picUrl,
-                coverW = resJson.data.result.contentBaseInfo.cover.picWidth,
-                coverH = resJson.data.result.contentBaseInfo.cover.picHeight,
-                resourceList = resJson.data.result.resourceInfo.resourceList;
+                title = resJson.result.contentBaseInfo.title,
+                summary = resJson.result.contentBaseInfo.summary,
+                cover = resJson.result.contentBaseInfo.cover.picUrl,
+                coverW = resJson.result.contentBaseInfo.cover.picWidth,
+                coverH = resJson.result.contentBaseInfo.cover.picHeight,
+                resourceList = resJson.result.resourceInfo.resourceList;
             var richContent = [];
             for(var i=0,len=resourceList.length;i<len;i++){
                 var mod = resourceList[i];
