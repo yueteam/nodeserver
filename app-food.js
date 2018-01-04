@@ -299,7 +299,7 @@ app.get('/getnews', function(req, res){
     var skipCount = (pageNo-1)*20;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('news');
-        collection.find().sort({'create_time':-1}).limit(20).skip(skipCount).toArray(function(err, items){        
+        collection.find({},{rich_content:-1}).sort({'create_time':-1}).limit(20).skip(skipCount).toArray(function(err, items){        
             if(items.length>0) {
                 res.json({code: successCode, msg: "", data: items});
             } else {
@@ -311,14 +311,13 @@ app.get('/getnews', function(req, res){
     });
 });
 
-app.get('/fooddetail', function(req, res){
+app.get('/newsdetail', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
     var id = req.query.id;
     var userId = req.query.userId;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
-        var collection = db.collection('meal');
-        var collection_user = db.collection('user');
+        var collection = db.collection('news');
         collection.findOne({_id: ObjectID(id)}, function(err1, item){        
             if(err1) {
                 res.json({code: failCode, data: err1}); 
