@@ -281,7 +281,8 @@ app.get('/getnews1', function(req, res){
                     cover_height: coverH
                 },
                 tag: tag,
-                rich_content: richContent
+                rich_content: richContent,
+                create_time: Date.now()
             }, function(error, result) { 
                 res.json({code: successCode, msg: ""}); 
                 db.close();
