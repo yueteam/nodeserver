@@ -265,10 +265,12 @@ app.get('/getnews1', function(req, res){
                         for(var j=0,len1=mod.resource.length;j<len1;j++){
                             text += mod.resource[j].content;
                         }
+                        if(text.indexOf('不得转载')===-1 && text.indexOf('华人健康网')===-1 && text.indexOf('吃的三次方')===-1 && text.indexOf('微信ID')===-1){
                         richContent.push({
                             type: 'text',
                             content: text
                         });
+                        }
                     }
                 } else if(mod.videoUrl) { // 视频
                     var videoUrl = mod.videoUrl,
