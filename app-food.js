@@ -299,7 +299,7 @@ app.get('/getnews', function(req, res){
     var skipCount = (pageNo-1)*20;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('news');
-        collection.find({},{rich_content:-1}).sort({'create_time':-1}).limit(20).skip(skipCount).toArray(function(err, items){        
+        collection.find({}, {rich_content: 0}).sort({'create_time':-1}).limit(20).skip(skipCount).toArray(function(err, items){        
             if(items.length>0) {
                 res.json({code: successCode, msg: "", data: items});
             } else {
