@@ -240,13 +240,20 @@ app.get('/getnews1', function(req, res){
                 coverW = resJson.result.contentBaseInfo.cover.picWidth,
                 coverH = resJson.result.contentBaseInfo.cover.picHeight,
                 resourceList = resJson.result.resourceInfo.resourceList;
+            if(cover.substr(0,4)!=='http') {
+                cover = 'https:'+cover;
+            }
             var richContent = [];
             for(var i=0,len=resourceList.length;i<len;i++){
                 var mod = resourceList[i];
                 if(mod.picture) { // 图片
+                    var picUrl = mod.picture.picUrl;
+                    if(picUrl.substr(0,4)!=='http') {
+                        picUrl = 'https:'+picUrl;
+                    }
                     richContent.push({
                         type: 'picture',
-                        pic_url: mod.picture.picUrl,
+                        pic_url: picUrl,
                         pic_width: mod.picture.picWidth,
                         pic_height: mod.picture.picHeight
                     });
@@ -264,10 +271,18 @@ app.get('/getnews1', function(req, res){
                         });
                     }
                 } else if(mod.videoUrl) { // 视频
+                    var videoUrl = mod.videoUrl,
+                        videoCover = mod.videoCover.picUrl;
+                    if(videoUrl.substr(0,4)!=='http') {
+                        videoUrl = 'https:'+videoUrl;
+                    }
+                    if(videoCover.substr(0,4)!=='http') {
+                        videoCover = 'https:'+videoCover;
+                    }
                     richContent.push({
                         type: 'video',
-                        video_url: mod.videoUrl,
-                        video_cover: mod.videoCover.picUrl
+                        video_url: videoUrl,
+                        video_cover: videoCover
                     });
                 }
             }
