@@ -392,24 +392,26 @@ app.get('/ke', function(req, res){
                             caption: $(element).find('p').text()
                         });
                     }); 
-                } else {
-                    res.json({code: failCode, msg: ''});
                 }
             }); 
             
-            MongoClient.connect(DB_CONN_STR, function(err, db) {
-                var collection = db.collection('xiangke');
+            if(arr.length>0) {
+                MongoClient.connect(DB_CONN_STR, function(err, db) {
+                    var collection = db.collection('xiangke');
 
-                //插入数据
-                collection.insert({
-                    short_name: name,
-                    name: title,
-                    ke_arr: arr
-                }, function(error, result) { 
-                    res.json({code: successCode, msg: ""}); 
-                    db.close();
-                });
-            }); 
+                    //插入数据
+                    collection.insert({
+                        short_name: name,
+                        name: title,
+                        ke_arr: arr
+                    }, function(error, result) { 
+                        res.json({code: successCode, msg: ""}); 
+                        db.close();
+                    });
+                }); 
+            } else {
+                res.json({code: failCode, msg: ''});
+            }
         } else {
             res.json({code: failCode, msg: ''});
         }
