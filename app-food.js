@@ -348,53 +348,62 @@ app.get('/newsdetail', function(req, res){
     });
 });
 
-app.get('/shicai', function(req, res){
-    // var city = req.query.city;
-    // var route = 'http://www.meishichina.com/YuanLiao/category/rql/';
-    // res.header("Content-Type", "application/json; charset=utf-8");
-    // superagent.get(baseUrl+route)
-    // .charset('utf-8')
-    // .end(function (err, sres) {
-    //     if (err) {
-    //         console.log('ERR: ' + err);
-    //         res.json({code: failCode, msg: err});
-    //         return;
-    //     }
-    //     var $ = cheerio.load(sres.text);
-    //     var filmJson = {},
-    //         films = [];
-    //     $('#nowplaying .lists .list-item').each(function (idx, element) {
-    //         if(idx < 15) {
-    //             var $element = $(element),
-    //                 $poster = $element.find('.poster img');
-    //             films.push({
-    //                 id: $element.attr('id'),
-    //                 img : $poster.attr('src'),
-    //                 title : $element.data('title'),
-    //                 score : $element.data('score'),
-    //                 release: $element.data('release'),
-    //                 duration: $element.data('duration'),
-    //                 region: $element.data('region'),
-    //                 director: $element.data('director'),
-    //                 actors: $element.data('actors')
-    //             });
-    //         }
-    //     }); 
-    //     filmJson = {
-    //         filmList: films,
-    //         createTime: Date.now()
-    //     };
-        var scArr = [{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"RenSen","name":"人参"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"YaWo","name":"燕窝"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"EJiao","name":"阿胶"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"XueHa","name":"雪蛤"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"CanYong","name":"蚕蛹"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"FuLing","name":"茯苓"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"DangShen","name":"党参"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"DangGui","name":"当归"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"FengWangJiang","name":"蜂王浆"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaiHeGan","name":"百合干"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"KuDouZin","name":"苦豆子"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"MaBianCao","name":"马鞭草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"KaFeiDou","name":"咖啡豆"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"GanCao","name":"甘草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"ChuanBei","name":"川贝"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"JiGuCao","name":"鸡骨草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"AiHao","name":"艾蒿"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"JueMa","name":"蕨麻"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"JieGeng","name":"桔梗"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaJiaoYe","name":"芭蕉叶"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"JiXueCao","name":"积雪草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaiJiang","name":"败酱"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaiHuaJieGeng","name":"白花桔梗"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"JuPi","name":"橘皮"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"JueMingZi","name":"决明子"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaiZhi","name":"白芷"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaiYuCao","name":"白玉草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"KuShen","name":"苦参"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"ShuWeiCao","name":"鼠尾草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"ShenXu","name":"蔘须"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaiZiRen","name":"柏子仁"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"NanBanLanYe","name":"南板蓝叶"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaJiTian","name":"巴戟天"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaiShen","name":"白参"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaiFuZi","name":"白附子"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"ChangPu","name":"菖蒲"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"LouLu","name":"漏芦"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"TongCao","name":"通草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"TianMa","name":"天麻"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"LaiFuZi","name":"莱菔子"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"LunYeDangShen","name":"轮叶党参"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"TaiZiShen","name":"太子参"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"TuSanQi","name":"土三七"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"MuFei","name":"木榧"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"DuZhong","name":"杜仲"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"MuXiang","name":"木香"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"MuLian","name":"木莲"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"MuJiangZi","name":"木姜子"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"NvZhenZi","name":"女贞子"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"NiuXi","name":"牛膝"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"NiuZhi","name":"牛至"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"NanShaShen","name":"南沙参"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"NanXiong","name":"南芎"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"NiuHuang","name":"牛黄"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"PoBuZi","name":"破布子"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"PaJingTian","name":"爬景天"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"QingXiangZi","name":"青葙子"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"Xuelian","name":"雪莲"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"YiMuCao","name":"益母草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"QingZhu","name":"青竹"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"QiaBuQi","name":"掐不齐"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"Yujin","name":"郁金"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"DanZhuYe","name":"淡竹叶"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"DanShen","name":"丹参"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"YaSheTou","name":"鸭舌头"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"YaZhiCao","name":"鸭跖草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"YaMaRen","name":"亚麻仁"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"ZiSuZi","name":"紫苏子"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"ZhenZhuMei","name":"珍珠梅"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"DanDouChi","name":"淡豆豉"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"DingXiangHua","name":"丁香花"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"DongChongXiaCao","name":"冬虫夏草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"DongFengCai","name":"东风菜"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"EZhu","name":"莪术"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"FengYong","name":"蜂蛹"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"GuYa","name":"谷芽"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"GuiBan","name":"龟板"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"GouWeiCao","name":"狗尾草"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"HuangQi","name":"黄芪"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"shemei","name":"蛇莓"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BanLanGen","name":"板蓝根"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"LvSu","name":"绿苏"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"SanYeXiang","name":"三叶香"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"FanXing","name":"番杏"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"TaoJiao","name":"桃胶"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"HeiGouQi","name":"黑枸杞"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaiMaoGen","name":"白茅根"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"GuiLingGao","name":"龟苓膏"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"MaZha","name":"蚂蚱"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"MaHuang","name":"麻黄"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"ShanNai","name":"山奈"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"BaiLianXu","name":"白莲须"},{"category_id":"ys","category_name":"药食","category_sub_id":"ys","category_sub_name":"药食","short_name":"ChanYong","name":"蝉蛹"}];
-        MongoClient.connect(DB_CONN_STR, function(err, db) {
-            var collection = db.collection('shicai');
+app.get('/getfood', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
 
-            //插入数据
-            collection.insertMany(scArr, function(error, result) { 
-                res.json({code: successCode, msg: "", data: result}); 
-                db.close();
-            });
-        }); 
-    // });
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('shicai');
+        collection.find({}, {name:1,short_name:1}).toArray(function(err, items){        
+            if(items.length>0) {
+                res.json({code: successCode, msg: "", data: items});
+            } else {
+                res.json({code: failCode, msg: "没有更多了~"});
+            }
+            //关闭数据库
+            db.close();
+        });
+    });
+});
+app.get('/ke', function(req, res){
+    var cai = req.query.cai;
+    var route = 'http://www.meishichina.com/YuanLiao/'+cai+'/yiji/';
+    res.header("Content-Type", "application/json; charset=utf-8");
+    superagent.get(route)
+    .charset('utf-8')
+    .end(function (err, sres) {
+        if (err) {
+            console.log('ERR: ' + err);
+            res.json({code: failCode, msg: err});
+            return;
+        }
+        var $ = cheerio.load(sres.text);
+        if($('.yiji').length>0) {
+            var title = trim($('#category_title').text()),
+                insertArr = [],
+                $yiji = $('.yiji').eq(1),
+                $li = $yiji.find('li');
+            $li.each(function (idx, element) {
+                var $element = $(element);
+                var text = trim($(element).find('a').text());
+                insertArr.push({
+                    food: [title,text],
+                    caption: $(element).find('p').text()
+                });
+            }); 
+            
+            MongoClient.connect(DB_CONN_STR, function(err, db) {
+                var collection = db.collection('xiangke');
+
+                //插入数据
+                collection.insertMany(insertArr, function(error, result) { 
+                    res.json({code: successCode, msg: ""}); 
+                    db.close();
+                });
+            }); 
+        } else {
+            res.json({code: failCode, msg: ''});
+        }
+    });
 });
 // var $categorySub = $('.category_sub').eq(0).find('a');
 // var arr = [];
