@@ -365,8 +365,8 @@ app.get('/getfood', function(req, res){
     });
 });
 app.get('/ke', function(req, res){
-    var cai = req.query.cai;
-    var route = 'http://www.meishichina.com/YuanLiao/'+cai+'/yiji/';
+    var name = req.query.name;
+    var route = 'http://www.meishichina.com/YuanLiao/'+name+'/yiji/';
     res.header("Content-Type", "application/json; charset=utf-8");
     superagent.get(route)
     .charset('utf-8')
