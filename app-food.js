@@ -379,23 +379,33 @@ app.get('/ke', function(req, res){
         var $ = cheerio.load(sres.text);
         if($('.yiji').length>0) {
             var title = trim($('#category_title').text()),
-                insertArr = [],
-                $yiji = $('.yiji').eq(1),
-                $li = $yiji.find('li');
-            $li.each(function (idx, element) {
-                var $element = $(element);
-                var text = trim($(element).find('a').text());
-                insertArr.push({
-                    food: [title,text],
-                    caption: $(element).find('p').text()
-                });
+                arr = [],
+                $yiji = $('.yiji');
+            $yiji.each(function (index, item) {                
+                $li = $(item).find('li');
+                if($(item).find('.ji').length>0) {
+                    $li.each(function (idx, element) {
+                        var $element = $(element);
+                        var text = trim($(element).find('a').text());
+                        arr.push({
+                            name: text,
+                            caption: $(element).find('p').text()
+                        });
+                    }); 
+                } else {
+                    res.json({code: failCode, msg: ''});
+                }
             }); 
             
             MongoClient.connect(DB_CONN_STR, function(err, db) {
                 var collection = db.collection('xiangke');
 
                 //插入数据
-                collection.insertMany(insertArr, function(error, result) { 
+                collection.insert({
+                    short_name: name,
+                    name: title,
+                    ke_arr: arr
+                }, function(error, result) { 
                     res.json({code: successCode, msg: ""}); 
                     db.close();
                 });
