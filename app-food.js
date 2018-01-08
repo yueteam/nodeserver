@@ -348,6 +348,71 @@ app.get('/newsdetail', function(req, res){
     });
 });
 
+app.get('/shicai', function(req, res){
+    // var city = req.query.city;
+    // var route = 'http://www.meishichina.com/YuanLiao/category/rql/';
+    // res.header("Content-Type", "application/json; charset=utf-8");
+    // superagent.get(baseUrl+route)
+    // .charset('utf-8')
+    // .end(function (err, sres) {
+    //     if (err) {
+    //         console.log('ERR: ' + err);
+    //         res.json({code: failCode, msg: err});
+    //         return;
+    //     }
+    //     var $ = cheerio.load(sres.text);
+    //     var filmJson = {},
+    //         films = [];
+    //     $('#nowplaying .lists .list-item').each(function (idx, element) {
+    //         if(idx < 15) {
+    //             var $element = $(element),
+    //                 $poster = $element.find('.poster img');
+    //             films.push({
+    //                 id: $element.attr('id'),
+    //                 img : $poster.attr('src'),
+    //                 title : $element.data('title'),
+    //                 score : $element.data('score'),
+    //                 release: $element.data('release'),
+    //                 duration: $element.data('duration'),
+    //                 region: $element.data('region'),
+    //                 director: $element.data('director'),
+    //                 actors: $element.data('actors')
+    //             });
+    //         }
+    //     }); 
+    //     filmJson = {
+    //         filmList: films,
+    //         createTime: Date.now()
+    //     };
+        var scArr = [{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuRou","name":"猪肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"LiJi","name":"里脊"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuXiaoPai","name":"猪小排"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuDaPai","name":"猪大排"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"PaiGu","name":"排骨"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuTi","name":"猪蹄"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuDu","name":"猪肚"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"WuHuaRou","name":"五花肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"zhuXue","name":"猪血"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuPai","name":"猪排"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuJiao","name":"猪脚"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuGan","name":"猪肝"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuYao","name":"猪腰"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZiPai","name":"子排"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuZhou","name":"猪肘"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuXin","name":"猪心"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuXiaoChang","name":"猪小肠"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuWei","name":"猪尾巴"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuEr","name":"猪耳"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuRouPi","name":"猪皮"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuShe","name":"猪舌"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuGuTou","name":"猪骨头"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuYi","name":"猪胰"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuTui","name":"猪腿"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"LongGu","name":"龙骨"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"LeiPai","name":"肋排"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"HouTuiRou","name":"后腿肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"BangGu","name":"棒骨"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"QiangGu","name":"腔骨"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuTouRou","name":"猪头肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuFei","name":"猪肺"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuDaGu","name":"猪大骨"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuTiJin","name":"猪蹄筋"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuJian","name":"猪腱"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuHouTuiRou","name":"猪后腿肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuDaChang","name":"猪大肠"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"RouMo","name":"肉末"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuLiJi","name":"猪里脊"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuJingRou","name":"猪颈肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuFeiChang","name":"猪肥肠"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"QianTunJian","name":"前臀尖"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"HouTunJian","name":"后臀尖"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuNao","name":"猪脑"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"XiaoLiJiRou","name":"小里脊肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuWuHuaNan","name":"猪五花腩"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"YeZhuRou","name":"野猪肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuLongGu","name":"猪龙骨"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuJiaXinRouRou","name":"猪胛心肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuJiaRou","name":"猪颊肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuTianTi","name":"猪天梯"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuZuiBianRou","name":"猪嘴边肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"FeiBiaoRou","name":"肥膘肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"FeiRou","name":"肥肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ShouRou","name":"瘦肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"RouXian","name":"肉馅"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuJiaXinRou","name":"猪夹心肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuTongGu","name":"猪筒骨"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuQianJiaRou","name":"猪前夹肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"QianTuiRou","name":"前腿肉"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuShanGu","name":"猪扇骨"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"ZhuPi","name":"猪脾"},{"category_id":"rqd","category_name":"肉禽蛋","category_sub_id":"zhu","category_sub_name":"猪肉","short_name":"MeiHuaRou","name":"梅花肉"}];
+        MongoClient.connect(DB_CONN_STR, function(err, db) {
+            var collection = db.collection('shicai');
+
+            //插入数据
+            collection.insertMany(scArr, function(error, result) { 
+                res.json({code: successCode, msg: "", data: result}); 
+                db.close();
+            });
+        }); 
+    // });
+});
+// var $categorySub = $('.category_sub').eq(0).find('a');
+// var arr = [];
+// $categorySub.each(function(index,item){
+//     var url = $(item).attr('href');
+//     var reg = new RegExp('YuanLiao/([^/]+)');
+//     var match = url.match(reg);
+//     arr.push({
+//         category_id: 'rqd',
+//         category_name: '肉禽蛋',
+//         category_sub_id: 'zhu',
+//         category_sub_name: '猪肉',
+//         short_name: match[1],
+//         name: $(item).attr('title')
+//     });
+// });
+// console.log(JSON.stringify(arr));
+
 var options = {
     key: fs.readFileSync('./keys/214248838510598.key'),
     cert: fs.readFileSync('./keys/214248838510598.pem')
