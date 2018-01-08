@@ -348,91 +348,24 @@ app.get('/newsdetail', function(req, res){
     });
 });
 
-app.get('/getfood', function(req, res){
+app.get('/souxiangke', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
+    var name = req.query.name;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
-        var collection = db.collection('shicai');
-        collection.find({}, {name:1,short_name:1}).toArray(function(err, items){        
-            if(items.length>0) {
-                res.json({code: successCode, msg: "", data: items});
-            } else {
-                res.json({code: failCode, msg: "没有更多了~"});
-            }
-            //关闭数据库
+        var collection = db.collection('xiangke');
+        collection.findOne({name: name}, function(err1, item){        
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+
+            res.json({code: successCode, msg: "", data: item});
             db.close();
         });
     });
 });
-app.get('/ke', function(req, res){
-    var name = req.query.name;
-    var route = 'http://www.meishichina.com/YuanLiao/'+name+'/yiji/';
-    res.header("Content-Type", "application/json; charset=utf-8");
-    superagent.get(route)
-    .charset('utf-8')
-    .end(function (err, sres) {
-        if (err) {
-            console.log('ERR: ' + err);
-            res.json({code: failCode, msg: err});
-            return;
-        }
-        var $ = cheerio.load(sres.text);
-        if($('.yiji').length>0) {
-            var title = trim($('#category_title').text()),
-                arr = [],
-                $yiji = $('.yiji');
-            $yiji.each(function (index, item) {                
-                $li = $(item).find('li');
-                if($(item).find('.ji').length>0) {
-                    $li.each(function (idx, element) {
-                        var $element = $(element);
-                        var text = trim($(element).find('a').text());
-                        arr.push({
-                            name: text,
-                            caption: $(element).find('p').text()
-                        });
-                    }); 
-                }
-            }); 
-            
-            if(arr.length>0) {
-                MongoClient.connect(DB_CONN_STR, function(err, db) {
-                    var collection = db.collection('xiangke');
-
-                    //插入数据
-                    collection.insert({
-                        short_name: name,
-                        name: title,
-                        ke_arr: arr
-                    }, function(error, result) { 
-                        res.json({code: successCode, msg: ""}); 
-                        db.close();
-                    });
-                }); 
-            } else {
-                res.json({code: failCode, msg: ''});
-            }
-        } else {
-            res.json({code: failCode, msg: ''});
-        }
-    });
-});
-// var $categorySub = $('.category_sub').eq(0).find('a');
-// var arr = [];
-// $categorySub.each(function(index,item){
-//     var url = $(item).attr('href');
-//     var reg = new RegExp('YuanLiao/([^/]+)');
-//     var match = url.match(reg);
-//     arr.push({
-//         category_id: 'rqd',
-//         category_name: '肉禽蛋',
-//         category_sub_id: 'zhu',
-//         category_sub_name: '猪肉',
-//         short_name: match[1],
-//         name: $(item).attr('title')
-//     });
-// });
-// console.log(JSON.stringify(arr));
 
 var options = {
     key: fs.readFileSync('./keys/214248838510598.key'),
