@@ -184,6 +184,40 @@ app.get('/findfduser', function(req, res){
     });
 });
 
+app.get('/getgongxiao', function(req, res){
+    var id = req.query.id;
+    var route = 'http://www.meishichina.com/YuanLiao/gongxiao/' + id + '/';
+    res.header("Content-Type", "application/json; charset=utf-8");
+    superagent.get(route)
+    .charset('utf-8')
+    .end(function (err, sres) {
+        if (err) {
+            console.log('ERR: ' + err);
+            res.json({code: failCode, msg: err});
+            return;
+        }
+        var $ = cheerio.load(sres.text);
+        var dataJson = {},
+            shicai = [];
+        $('.tui_c ul li').each(function (idx, element) {
+            var $element = $(element),
+                $link = $element.find('a');
+            shicai.push($link.attr('title'));
+        }); 
+        dataJson = {
+            summary: $element.find('.collect_txt').text(),
+            shicai: shicai
+        };
+        MongoClient.connect(DB_CONN_STR, function(err, db) {
+            var collection = db.collection('shiliao');
+
+            collection.update({pinyin:id},{$set:dataJson}, function(error, result) { 
+                res.json({code: successCode, msg: "", data: result}); 
+                db.close();
+            });
+        }); 
+    });
+});
 app.get('/gethomeinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
