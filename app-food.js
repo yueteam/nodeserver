@@ -205,7 +205,7 @@ app.get('/getgongxiao', function(req, res){
             shicai.push($link.attr('title'));
         }); 
         dataJson = {
-            summary: $element.find('.collect_txt').text(),
+            summary: $('.collect_txt').text(),
             shicai: shicai
         };
         MongoClient.connect(DB_CONN_STR, function(err, db) {
