@@ -209,7 +209,7 @@ app.get('/getrecipe', function(req, res){
         var $recipeCategory1 = $('.recipeCategory_sub_R').last();
         $recipeCategory1.find('li').each(function (idx, element) {
             var $element = $(element);
-            if($element.find('.category_s2')==='耗时') {
+            if($element.find('.category_s2').text()==='耗时') {
                 cookTimeStr = $element.find('.category_s1 a').text();
             }
         });
@@ -234,7 +234,7 @@ app.get('/getrecipe', function(req, res){
         }); 
         dataJson = {
             cover_url: 'https://foodcover.oss-cn-hangzhou.aliyuncs.com/'+fileName,
-            title: $('.recipe_title').text(),
+            title: $('.recipe_De_title #recipe_title').text(),
             summary: summary,
             tags: arr,
             category: '健康食谱',
