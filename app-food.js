@@ -189,7 +189,7 @@ app.get('/getrecipe', function(req, res){
             arr = [],
             arr1 = [],
             arr2 = [];
-        $('.recipeTip:eq(2) a').each(function (idx, element) {
+        $('.recipeTip:last a').each(function (idx, element) {
             var $element = $(element);
             arr.push($element.text());
         }); 
@@ -232,7 +232,7 @@ app.get('/getrecipe', function(req, res){
             cook_time: cookTime,
             shicai: arr1,
             steps: arr2,
-            tip: $('.recipeTip:eq(0)').text(),
+            tip: $('.recipeTip:first').text(),
             create_time: Date.now()
         };
         MongoClient.connect(DB_CONN_STR, function(err, db) {
