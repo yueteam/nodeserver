@@ -189,7 +189,8 @@ app.get('/getrecipe', function(req, res){
             arr = [],
             arr1 = [],
             arr2 = [];
-        $('.recipeTip:last a').each(function (idx, element) {
+        var $recipeTip = $('.recipeTip').last();
+        $recipeTip.find('a').each(function (idx, element) {
             var $element = $(element);
             arr.push($element.text());
         }); 
