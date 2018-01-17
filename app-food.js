@@ -17,6 +17,12 @@ var client = new OSS({
     accessKeySecret: 'OvuJdzBuziDOIQFRD4gbZXI1fDQ8qC',
     bucket: 'breakfastcover'
 });
+var client_food = new OSS({
+    region: 'oss-cn-hangzhou',
+    accessKeyId: 'LTAIrUHBoHLwlUNY',
+    accessKeySecret: 'OvuJdzBuziDOIQFRD4gbZXI1fDQ8qC',
+    bucket: 'foodcover'
+});
 // 引入json解析中间件
 var bodyParser = require('body-parser');
 // 添加json解析
@@ -67,71 +73,6 @@ app.get('/fdopenid', function(req, res){
         res.json({code: successCode, msg: "", data: openId});        
     });
 
-});
-
-app.get('/fdaccesstoken', function(req, res){
-    var code = req.query.code;
-    res.header("Content-Type", "application/json; charset=utf-8");
-       
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
-        var collection = db.collection('wx');
-        var requestNewToken = function(){
-            superagent.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid'+foodWXInfo.appid+'&secret='+foodWXInfo.secret)
-            .charset('utf-8')
-            .end(function (err, sres) {
-                if (err) {
-                    res.json({code: failCode, msg: err});
-                    return;
-                }
-                var dataJson = JSON.parse(sres.text),
-                    access_token = dataJson.access_token,
-                    expires_in = dataJson.expires_in;
-                collection.update({name:'token'},{$set:{
-                    access_token: access_token,
-                    expires_time: Date.now() + expires_in*1000
-                }}, function(err, result) { 
-                    res.json({code: successCode, msg: "", data: access_token});  
-                    db.close();
-                });
-                      
-            });
-        };
-        collection.find({name:'token'}).toArray(function(err, items){ 
-            if(items.length>0) {
-                var now = Date.now();
-                if(now < items[0].expires_time) {
-                    res.json({code: successCode, msg: "", data: items[0].access_token}); 
-                    db.close();
-                } else {
-                    requestNewToken();
-                }
-            } else {
-                requestNewToken();
-            }
-        });
-    });
-});
-app.get('/fdqrcode', function(req, res){
-    var accessToken = req.query.accessToken,
-        scene = req.query.scene,
-        id = scene.split('=')[1],
-        path = req.query.path,
-        width = Number(req.query.width);
-    res.header("Content-Type", "application/json; charset=utf-8");
-    var filePath = './uploads/qrcode/'+id+'.png';
-    request({ 
-        method: 'POST', 
-        url: 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' + accessToken, 
-        body: JSON.stringify({scene:scene,path:path,width:width}) 
-    }).pipe(fs.createWriteStream(filePath))
-    .on('close', function() {
-        co(function* () {
-            var stream = fs.createReadStream(filePath);
-            var result = yield client.putStream(id+'.png', stream);
-            res.json({code: successCode, msg: "", data: result.url.replace(/http:/,'https:')});
-            fs.unlinkSync(filePath);
-        });
-    });
 });
 
 app.get('/addfduser', function(req, res){
@@ -219,6 +160,62 @@ app.get('/getgongxiao', function(req, res){
         }); 
     });
 });
+app.get('/getrecipe', function(req, res){
+    var id = req.query.id;
+    var route = 'http://www.xiachufang.com/recipe/' + id + '/';
+    res.header("Content-Type", "application/json; charset=utf-8");
+    superagent.get(route)
+    .charset('utf-8')
+    .end(function (err, sres) {
+        if (err) {
+            console.log('ERR: ' + err);
+            res.json({code: failCode, msg: err});
+            return;
+        }
+        var $ = cheerio.load(sres.text);
+        var coverImg = $('.cover img').attr('src');
+        var fileName = Date.now()+'.jpg';
+        var filePath = './uploads/cover/'+fileName;
+        request(coverImg).pipe(fs.createWriteStream(filePath))
+        .on('close', function() {
+            co(function* () {
+                var stream = fs.createReadStream(filePath);
+                var result = yield client_food.putStream(fileName, stream);
+                fs.unlinkSync(filePath);
+            });
+        });
+        var dataJson = {},
+            arr = [],
+            arr1 = [];
+        $('.ings tr').each(function (idx, element) {
+            var $element = $(element);
+            arr.push({
+                name: trim($element.find('.name').text()),
+                unit: trim($element.find('.unit').text())
+            });
+        }); 
+        $('.steps li .text').each(function (idx, element) {
+            var $element = $(element);
+            arr1.push($element.text());
+        }); 
+        dataJson = {
+            cover_url: 'https://foodcover.oss-cn-hangzhou.aliyuncs.com/'+fileName,
+            title: trim($('.page-title').text()),
+            summary: '',
+            shicai: arr,
+            steps: arr1,
+            tip: $('.tip').text()
+        };
+        MongoClient.connect(DB_CONN_STR, function(err, db) {
+            var collection = db.collection('recipe');
+
+            collection.insert(dataJson, function(error, result) { 
+                res.json({code: successCode, msg: "", data: result}); 
+                db.close();
+            });
+        }); 
+    });
+});
 app.get('/gethomeinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
@@ -277,46 +274,10 @@ app.get('/getnews2', function(req, res){
                 },{
                     "type" : "text",
                     "content" : "材料：大米少许、红薯1个、黄豆适量"
-                },{
-                    "type" : "text",
-                    "content" : "做法：1、将豆子洗净并浸泡一夜，红薯洗净去皮并切块。2、将泡一夜后的豆子打成浆，煮沸。3、加入红薯块和少许大米。小火慢煮至浓稠即可。"
-                },{
-                    "type" : "text",
-                    "content" : "提示：研究发现，每100克红薯含脂肪仅为0.2克，是大米的1/4。因此红薯是低热量、低脂肪食品中的佼佼者。除此之外，红薯还含有均衡的营养成份。助你填满肚子的同时，轻松甩掉小肉肉哦!"
-                },{
-                    "type" : "title",
-                    "content" : "白菜粥"
-                },{
-                    "type" : "text",
-                    "content" : "材料：大白菜、熟米饭。(白菜与米饭的比例是4：1，如果是家常早餐，白菜和米饭的比例可以是2：1。"
-                },{
-                    "type" : "text",
-                    "content" : "做法"
-                },{
-                    "type" : "text",
-                    "content" : "1、将白菜切成短丝，准备好葱姜蒜末。"
-                },{
-                    "type" : "text",
-                    "content" : "2、在热锅中倒入适量的油、用葱姜蒜爆锅后再放入白菜丝翻炒，出汤后加水和米饭，改成中火熬制，直至将米粥熬粘为止。"
-                },{
-                    "type" : "text",
-                    "content" : "3、出锅前放入少量的盐。"
-                },{
-                    "type" : "title",
-                    "content" : "香菇肉丝粥"
-                },{
-                    "type" : "text",
-                    "content" : "材料：香菇5朵，鸡肉丝100克，玉米粒40克，红萝卜60克，新鲜莲子30克，红枣8个，白米75克，芡实、山药各15克，盐适量，姜母3片，青葱2根，胡椒粉酌量。"
-                },{
-                    "type" : "text",
-                    "content" : "做法：1、先把玉米粒洗净、红萝卜洗净后切成丁、鸡肉洗净后切成丝备用。2、把姜母、香菇、青葱切好备用。3、把红枣、莲子、芡实、山药、白米洗干净备用。4、在锅子放入油1大匙，先用小火烧热后放入葱花、姜母、香菇炒香，然后再放入所有食材，但鸡肉丝除外，直到炒熟后放入鸡肉丝继续炒，等到鸡肉熟了以后倒入白米粥，以及撒上胡椒粉调味即可。"
-                },{
-                    "type" : "text",
-                    "content" : "提示：香菇肉丝粥能降脂降压、益肾补脾。"
-                },
+                }
             ],
             create_time: 1516016906535
-        },{ "title" : "冬季孕妈首选的6种水果", "summary" : "孕妈妈们都会为了保证宝宝的营养多吃一些水果，那么现在到了冬天，孕妈妈都想知道吃什么水果更合适呢？毕竟冬天这么冷，吃哪些水果更合适呢？", "cover" : { "cover_img" : "https://foodcover.oss-cn-hangzhou.aliyuncs.com/201801151839.jpg", "cover_width" : "500", "cover_height" : "400" }, "tag" : "母婴", "source" : "mstx", "rich_content" : [ { "type" : "title", "content" : "香蕉" }, { "type" : "text", "content" : "香蕉富含叶酸，能够帮助预防胎儿畸形。而且吃些香蕉还能增强抵抗力、提高食欲、保护神经系统，流感节吃它准没错。" }, { "type" : "title", "content" : "牛油果" }, { "type" : "text", "content" : "冬天吃水果实在太冷了？试试牛油果吧，能做沙拉还能做热菜。牛油果中含有的丰富的天然叶酸，对胎儿发育有重要作用，而且吃牛油果还有利于预防孕期便秘和降低胆固醇。" }, { "type" : "title", "content" : "柑橘" }, { "type" : "text", "content" : "柑橘类水果被称为冬天的水果之王，不仅富含维生素C，还含有生物碱，能促进体脂分解，提高新陈代谢，帮助孕妈控制体重。" }, { "type" : "title", "content" : "草莓" }, { "type" : "text", "content" : "草莓的维生素C比柑橘柠檬还高，通便能力比香蕉强多了，抗氧化能力比猕猴桃强好几倍，冬季养颜养胎，千万别错过它！" }, { "type" : "title", "content" : "苹果" }, { "type" : "text", "content" : "苹果能够给准妈妈带来丰富的维生素、矿物质、苹果酸鞣酸、细纤维等营养。准妈妈多吃苹果可以缓解孕吐、增进食欲;苹果还能帮助孕妇预防便秘以及改善贫血状况哦！" }, { "type" : "title", "content" : "樱桃" }, { "type" : "text", "content" : "水果樱桃含有丰富的铁元素、胡萝卜素、维生素b族c族、柠檬酸、钙、磷等营养成分，准妈妈多吃樱桃对肠胃很好，具有增进食欲以及改善贫血的症状等功效。" }, { "type" : "title", "content" : "孕妇冬天吃水果要注意什么" }, { "type" : "text", "content" : "孕期食用水果，应该注意“度”和“道”。“度”是指食用水果应该适量，而“道”是指食用水果应该注意方法。" }, { "type" : "text", "content" : "1、水果中含有发酵糖类物质，因此吃后最好漱口。对其过敏，易发湿疹者不宜食用。" }, { "type" : "text", "content" : "2、进食瓜果一定要注意饮食卫生，生吃水果前必须洗净外皮，不要用菜刀削水果，避免将寄生虫卵带到水果上。" }, { "type" : "text", "content" : "3、适量：水果的补充，每天最多不要超过200克，尽量选择含糖量低的水果，不要无节制食用西瓜等高糖分水果。" }, { "type" : "text", "content" : "4、适时：吃水果宜在饭后2小时内或饭前1小时，饭后立即吃水果，会造成胀气和便秘。" }, { "type" : "text", "content" : "5、禁忌：山楂、木瓜最好不吃。山楂对子宫有一定的兴奋作用，会促使子宫收缩。如果孕妇们大量食用山楂，就可能会导致流产。木瓜中含有女性荷尔蒙，容易干扰孕妇体内的荷尔蒙变化，尤其是青木瓜，孕妇更应完全戒除。因为它不但对胎儿的稳定度有害，还有可能导致流产。" }, { "type" : "text", "content" : "另外，对于那些非常喜欢吃水果的孕妇，孕妇最好在怀孕第24周到第28周时，去医院进行定期血糖测定，随时监控，避免妊娠糖尿病的发生。" } ], "create_time" : 1516013306435 }], function(error, result) { 
+        }], function(error, result) { 
             res.json({code: successCode, msg: ""}); 
             db.close();
         });
