@@ -162,7 +162,7 @@ app.get('/findfduser', function(req, res){
 // });
 app.get('/getrecipe', function(req, res){
     var id = req.query.id;
-    var route = 'http://home.meishichina.com/recipe-' + id + '.html';
+    var route = 'http://www.xiachufang.com/recipe/' + id + '/';
     res.header("Content-Type", "application/json; charset=utf-8");
     superagent.get(route)
     .charset('utf-8')
@@ -173,8 +173,7 @@ app.get('/getrecipe', function(req, res){
             return;
         }
         var $ = cheerio.load(sres.text);
-        var coverImg = $('#recipe_De_imgBox img').attr('src');
-        coverImg = coverImg.replace(/@!p800/,'');
+        var coverImg = $('.cover img').attr('src');
         var fileName = Date.now()+'.jpg';
         var filePath = './uploads/cover/'+fileName;
         request(coverImg).pipe(fs.createWriteStream(filePath))
@@ -187,61 +186,25 @@ app.get('/getrecipe', function(req, res){
         });
         var dataJson = {},
             arr = [],
-            arr1 = [],
-            arr2 = [];
-        var $recipeTip = $('.recipeTip').last();
-        $recipeTip.find('a').each(function (idx, element) {
+            arr1 = [];
+        $('.ings tr').each(function (idx, element) {
             var $element = $(element);
-            arr.push($element.text());
-        }); 
-        var $recipeCategory = $('.recipeCategory_sub_R').first();
-        $recipeCategory.find('li').each(function (idx, element) {
-            var $element = $(element);
-            arr1.push({
-                name: trim($element.find('.category_s1 b').text()),
-                unit: trim($element.find('.category_s2').text())
+            arr.push({
+                name: trim($element.find('.name').text()),
+                unit: trim($element.find('.unit').text())
             });
         }); 
-        var summary = $('#block_txt1').text();
-        summary = summary.replace(/“/,'').replace(/”/,'');
-        var cookTime = '';
-        var cookTimeStr = '';
-        var $recipeCategory1 = $('.recipeCategory_sub_R').last();
-        $recipeCategory1.find('li').each(function (idx, element) {
+        $('.steps li .text').each(function (idx, element) {
             var $element = $(element);
-            if($element.find('.category_s2').text()==='耗时') {
-                cookTimeStr = $element.find('.category_s1 a').text();
-            }
-        });
-        if(cookTimeStr==='十分钟'){
-            cookTime = 10;
-        } else if(cookTimeStr==='廿分钟'){
-            cookTime = 20;
-        } else if(cookTimeStr==='半小时'){
-            cookTime = 30;
-        } else if(cookTimeStr==='三刻钟'){
-            cookTime = 45;
-        } else if(cookTimeStr==='一小时'){
-            cookTime = 60;
-        } else if(cookTimeStr==='数小时'){
-            cookTime = 120;
-        } else if(cookTimeStr==='一天'){
-            cookTime = 1440;
-        }
-        $('.recipeStep li .recipeStep_word').each(function (idx, element) {
-            var $element = $(element);
-            arr2.push($element.text());
+            arr1.push($element.text());
         }); 
         dataJson = {
             cover_url: 'https://foodcover.oss-cn-hangzhou.aliyuncs.com/'+fileName,
-            title: $('.recipe_De_title #recipe_title').text(),
-            summary: summary,
-            tags: arr,
-            category: '健康食谱',
-            cook_time: cookTime,
-            shicai: arr1,
-            steps: arr2,
-            tip: $('.mo').length>2?$('.recipeTip').first().text():'',
+            title: trim($('.page-title').text()),
+            summary: '',
+            shicai: arr,
+            steps: arr1,
+            tip: $('.tip').text(),
             create_time: Date.now()
         };
         MongoClient.connect(DB_CONN_STR, function(err, db) {
@@ -283,9 +246,24 @@ app.get('/shiliaodetail', function(req, res){
                 db.close();
                 return;
             } 
+            if(item.shicai.length>0) {
+                var reg = item.shicai.join('|');
 
-            res.json({code: successCode, msg: "", data: item});
-            db.close();
+                var collection1 = db.collection('recipe');
+                collection1.find({title: {$regex: reg}}, {steps: 0, tip: 0}).limit(10).toArray(function(err2, items){        
+                    if(items.length>0) {
+                        res.json({code: successCode, msg: "", data: item, recipeList: items});
+                    } else {
+                        res.json({code: successCode, msg: "", data: item});
+                    }
+                    
+                    //关闭数据库
+                    db.close();
+                });
+            } else {
+                res.json({code: successCode, msg: "", data: item});
+                db.close();
+            }
         });
     });
 });
