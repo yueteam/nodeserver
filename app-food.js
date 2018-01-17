@@ -162,7 +162,7 @@ app.get('/findfduser', function(req, res){
 // });
 app.get('/getrecipe', function(req, res){
     var id = req.query.id;
-    var route = 'http://www.xiachufang.com/recipe/' + id + '/';
+    var route = 'http://home.meishichina.com/recipe-' + id + '.html';
     res.header("Content-Type", "application/json; charset=utf-8");
     superagent.get(route)
     .charset('utf-8')
@@ -173,7 +173,8 @@ app.get('/getrecipe', function(req, res){
             return;
         }
         var $ = cheerio.load(sres.text);
-        var coverImg = $('.cover img').attr('src');
+        var coverImg = $('#recipe_De_imgBox img').attr('src');
+        coverImg = coverImg.replace(/@!p800/,'');
         var fileName = Date.now()+'.jpg';
         var filePath = './uploads/cover/'+fileName;
         request(coverImg).pipe(fs.createWriteStream(filePath))
@@ -186,25 +187,52 @@ app.get('/getrecipe', function(req, res){
         });
         var dataJson = {},
             arr = [],
-            arr1 = [];
-        $('.ings tr').each(function (idx, element) {
+            arr1 = [],
+            arr2 = [];
+        $('.recipeTip:eq(2) a').each(function (idx, element) {
             var $element = $(element);
-            arr.push({
-                name: trim($element.find('.name').text()),
-                unit: trim($element.find('.unit').text())
+            arr.push($element.text());
+        }); 
+        $('.recipeCategory_sub_R:first li').each(function (idx, element) {
+            var $element = $(element);
+            arr1.push({
+                name: trim($element.find('.category_s1 b').text()),
+                unit: trim($element.find('.category_s2').text())
             });
         }); 
-        $('.steps li .text').each(function (idx, element) {
+        var summary = $('#block_txt1').text();
+        summary = summary.replace(/“/,'').replace(/”/,'');
+        var cookTime = '';
+        var cookTimeStr = $('.recipeCategory_sub_R:last li:eq(2) .category_s1 a').text();
+        if(cookTimeStr==='十分钟'){
+            cookTime = 10;
+        } else if(cookTimeStr==='廿分钟'){
+            cookTime = 20;
+        } else if(cookTimeStr==='半小时'){
+            cookTime = 30;
+        } else if(cookTimeStr==='三刻钟'){
+            cookTime = 45;
+        } else if(cookTimeStr==='一小时'){
+            cookTime = 60;
+        } else if(cookTimeStr==='数小时'){
+            cookTime = 120;
+        } else if(cookTimeStr==='一天'){
+            cookTime = 1440;
+        }
+        $('.recipeStep li .recipeStep_word').each(function (idx, element) {
             var $element = $(element);
-            arr1.push($element.text());
+            arr2.push($element.text());
         }); 
         dataJson = {
             cover_url: 'https://foodcover.oss-cn-hangzhou.aliyuncs.com/'+fileName,
-            title: trim($('.page-title').text()),
-            summary: '',
-            shicai: arr,
-            steps: arr1,
-            tip: $('.tip').text(),
+            title: $('.recipe_title').text(),
+            summary: summary,
+            tags: arr,
+            category: '健康食谱',
+            cook_time: cookTime,
+            shicai: arr1,
+            steps: arr2,
+            tip: $('.recipeTip:eq(0)').text(),
             create_time: Date.now()
         };
         MongoClient.connect(DB_CONN_STR, function(err, db) {
