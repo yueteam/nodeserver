@@ -253,6 +253,44 @@ app.get('/shiliaodetail', function(req, res){
     });
 });
 
+app.get('/recipedetail', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var id = req.query.id;
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('recipe');
+        collection.findOne({_id: ObjectID(id)}, function(err1, item){        
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+
+            res.json({code: successCode, msg: "", data: item});
+            db.close();
+        });
+    });
+});
+
+app.get('/souxiangke', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var name = req.query.name;
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('xiangke');
+        collection.findOne({name: name}, function(err1, item){        
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+
+            res.json({code: successCode, msg: "", data: item});
+            db.close();
+        });
+    });
+});
+
 // app.get('/getnews2', function(req, res){
 //     res.header("Content-Type", "application/json; charset=utf-8");
 
@@ -313,25 +351,6 @@ app.get('/newsdetail', function(req, res){
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('news');
         collection.findOne({_id: ObjectID(id)}, function(err1, item){        
-            if(err1) {
-                res.json({code: failCode, data: err1}); 
-                db.close();
-                return;
-            } 
-
-            res.json({code: successCode, msg: "", data: item});
-            db.close();
-        });
-    });
-});
-
-app.get('/souxiangke', function(req, res){
-    res.header("Content-Type", "application/json; charset=utf-8");
-
-    var name = req.query.name;
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
-        var collection = db.collection('xiangke');
-        collection.findOne({name: name}, function(err1, item){        
             if(err1) {
                 res.json({code: failCode, data: err1}); 
                 db.close();
