@@ -126,40 +126,40 @@ app.get('/findfduser', function(req, res){
     });
 });
 
-app.get('/getgongxiao', function(req, res){
-    var id = req.query.id;
-    var route = 'http://www.meishichina.com/YuanLiao/gongxiao/' + id + '/';
-    res.header("Content-Type", "application/json; charset=utf-8");
-    superagent.get(route)
-    .charset('utf-8')
-    .end(function (err, sres) {
-        if (err) {
-            console.log('ERR: ' + err);
-            res.json({code: failCode, msg: err});
-            return;
-        }
-        var $ = cheerio.load(sres.text);
-        var dataJson = {},
-            shicai = [];
-        $('.tui_c ul li').each(function (idx, element) {
-            var $element = $(element),
-                $link = $element.find('a');
-            shicai.push($link.attr('title'));
-        }); 
-        dataJson = {
-            summary: $('.collect_txt').text(),
-            shicai: shicai
-        };
-        MongoClient.connect(DB_CONN_STR, function(err, db) {
-            var collection = db.collection('shiliao');
+// app.get('/getgongxiao', function(req, res){
+//     var id = req.query.id;
+//     var route = 'http://www.meishichina.com/YuanLiao/gongxiao/' + id + '/';
+//     res.header("Content-Type", "application/json; charset=utf-8");
+//     superagent.get(route)
+//     .charset('utf-8')
+//     .end(function (err, sres) {
+//         if (err) {
+//             console.log('ERR: ' + err);
+//             res.json({code: failCode, msg: err});
+//             return;
+//         }
+//         var $ = cheerio.load(sres.text);
+//         var dataJson = {},
+//             shicai = [];
+//         $('.tui_c ul li').each(function (idx, element) {
+//             var $element = $(element),
+//                 $link = $element.find('a');
+//             shicai.push($link.attr('title'));
+//         }); 
+//         dataJson = {
+//             summary: $('.collect_txt').text(),
+//             shicai: shicai
+//         };
+//         MongoClient.connect(DB_CONN_STR, function(err, db) {
+//             var collection = db.collection('shiliao');
 
-            collection.update({pinyin:id},{$set:dataJson}, function(error, result) { 
-                res.json({code: successCode, msg: "", data: result}); 
-                db.close();
-            });
-        }); 
-    });
-});
+//             collection.update({pinyin:id},{$set:dataJson}, function(error, result) { 
+//                 res.json({code: successCode, msg: "", data: result}); 
+//                 db.close();
+//             });
+//         }); 
+//     });
+// });
 app.get('/getrecipe', function(req, res){
     var id = req.query.id;
     var route = 'http://www.xiachufang.com/recipe/' + id + '/';
@@ -204,7 +204,8 @@ app.get('/getrecipe', function(req, res){
             summary: '',
             shicai: arr,
             steps: arr1,
-            tip: $('.tip').text()
+            tip: $('.tip').text(),
+            create_time: Date.now()
         };
         MongoClient.connect(DB_CONN_STR, function(err, db) {
             var collection = db.collection('recipe');
@@ -252,37 +253,37 @@ app.get('/shiliaodetail', function(req, res){
     });
 });
 
-app.get('/getnews2', function(req, res){
-    res.header("Content-Type", "application/json; charset=utf-8");
+// app.get('/getnews2', function(req, res){
+//     res.header("Content-Type", "application/json; charset=utf-8");
 
-    MongoClient.connect(DB_CONN_STR, function(err, db) { 
-        var collection = db.collection('news');
-        collection.insertMany([{
-            title: '吃3款早餐，减肥很简单',
-            summary: '其实如果不吃早餐的话，并不能减肥，反而可能还会增肥。那么怎么早餐怎么吃不仅一点也不会胖反而还能减肥呢？粥品是早餐的绝佳选择，以下小编推荐3款瘦身粥，让你快速瘦出苗条身材! ',
-            cover: {
-                cover_img: 'https://foodcover.oss-cn-hangzhou.aliyuncs.com/201801152206.jpg',
-                cover_width: '620',
-                cover_height: '480'
-            },
-            tag: '瘦身',
-            source: 'mstx',
-            rich_content: [
-                {
-                    "type" : "title",
-                    "content" : "豆浆红薯粥"
-                },{
-                    "type" : "text",
-                    "content" : "材料：大米少许、红薯1个、黄豆适量"
-                }
-            ],
-            create_time: 1516016906535
-        }], function(error, result) { 
-            res.json({code: successCode, msg: ""}); 
-            db.close();
-        });
-    });
-});
+//     MongoClient.connect(DB_CONN_STR, function(err, db) { 
+//         var collection = db.collection('news');
+//         collection.insertMany([{
+//             title: '吃3款早餐，减肥很简单',
+//             summary: '其实如果不吃早餐的话，并不能减肥，反而可能还会增肥。那么怎么早餐怎么吃不仅一点也不会胖反而还能减肥呢？粥品是早餐的绝佳选择，以下小编推荐3款瘦身粥，让你快速瘦出苗条身材! ',
+//             cover: {
+//                 cover_img: 'https://foodcover.oss-cn-hangzhou.aliyuncs.com/201801152206.jpg',
+//                 cover_width: '620',
+//                 cover_height: '480'
+//             },
+//             tag: '瘦身',
+//             source: 'mstx',
+//             rich_content: [
+//                 {
+//                     "type" : "title",
+//                     "content" : "豆浆红薯粥"
+//                 },{
+//                     "type" : "text",
+//                     "content" : "材料：大米少许、红薯1个、黄豆适量"
+//                 }
+//             ],
+//             create_time: 1516016906535
+//         }], function(error, result) { 
+//             res.json({code: successCode, msg: ""}); 
+//             db.close();
+//         });
+//     });
+// });
 
 app.get('/getnews', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
