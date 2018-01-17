@@ -194,7 +194,8 @@ app.get('/getrecipe', function(req, res){
             var $element = $(element);
             arr.push($element.text());
         }); 
-        $('.recipeCategory_sub_R:first li').each(function (idx, element) {
+        var $recipeCategory = $('.recipeCategory_sub_R').first();
+        $recipeCategory.find('li').each(function (idx, element) {
             var $element = $(element);
             arr1.push({
                 name: trim($element.find('.category_s1 b').text()),
@@ -204,7 +205,14 @@ app.get('/getrecipe', function(req, res){
         var summary = $('#block_txt1').text();
         summary = summary.replace(/“/,'').replace(/”/,'');
         var cookTime = '';
-        var cookTimeStr = $('.recipeCategory_sub_R:last li:eq(2) .category_s1 a').text();
+        var cookTimeStr = '';
+        var $recipeCategory1 = $('.recipeCategory_sub_R').last();
+        $recipeCategory1.find('li').each(function (idx, element) {
+            var $element = $(element);
+            if($element.find('.category_s2')==='耗时') {
+                cookTimeStr = $element.find('.category_s1 a').text();
+            }
+        });
         if(cookTimeStr==='十分钟'){
             cookTime = 10;
         } else if(cookTimeStr==='廿分钟'){
@@ -233,7 +241,7 @@ app.get('/getrecipe', function(req, res){
             cook_time: cookTime,
             shicai: arr1,
             steps: arr2,
-            tip: $('.recipeTip:first').text(),
+            tip: $('.mo').length>2?$('.recipeTip').first().text():'',
             create_time: Date.now()
         };
         MongoClient.connect(DB_CONN_STR, function(err, db) {
