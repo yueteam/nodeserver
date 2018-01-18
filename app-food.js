@@ -42,8 +42,20 @@ function isEmpty(obj){
     }
     return true;
 }
+
 function trim(str){  
   return str.replace(/^(\s|\u00A0)+/,'').replace(/(\s|\u00A0)+$/,'');  
+}
+
+function inArray(search, arr) {
+    var isExist = 0;
+    arr.forEach(function(item){
+        if(item.toString() === search){
+            isExist = 1;
+            return isExist;
+        }
+    });
+    return isExist;
 }
 
 /**
@@ -205,6 +217,7 @@ app.get('/getrecipe', function(req, res){
             shicai: arr,
             steps: arr1,
             tip: $('.tip').text(),
+            fork_users: [],
             create_time: Date.now()
         };
         MongoClient.connect(DB_CONN_STR, function(err, db) {
@@ -229,6 +242,36 @@ app.get('/gethomeinfo', function(req, res){
                 return;
             }
             res.json({code: successCode, msg: "", data: item});
+            db.close();
+        });
+    });
+});
+
+app.get('/meallist', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var pageNo = parseInt(req.query.pageNo);
+    var userId = req.query.userId;
+    var skipCount = (pageNo-1)*10;
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('recipe');
+        collection.find({category:"早餐"}, {shicai:0,steps:0,tip:0}).sort({'create_time':-1}).limit(10).skip(skipCount).toArray(function(err, items){        
+            if(items.length>0) {
+                var list = [];
+                items.forEach(function(item){
+                    var newItem = item;
+                    newItem.fork_count = item.fork_users.length;
+                    var forkUsers = item.fork_users;
+                    if(inArray(userId,forkUsers) === 1) {
+                        newItem.forked = true;
+                    }
+                    list.push(newItem);
+                });
+                res.json({code: successCode, msg: "", data: list});
+            } else {
+                res.json({code: failCode, msg: "没有更多了~"});
+            }
+            //关闭数据库
             db.close();
         });
     });
