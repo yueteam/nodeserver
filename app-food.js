@@ -276,13 +276,13 @@ app.get('/meallist', function(req, res){
         });
     });
 });
-app.get('/delrecipe', function(req, res){
+app.get('/uprecipe', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
     var id = req.query.id;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('recipe');
-        collection.deleteOne({_id: ObjectID(id)}, function(err1, item){        
+        collection.update({_id: ObjectID(id)},{$set:{create_time: Date.now()}} function(err1, item){        
             if(err1) {
                 res.json({code: failCode, data: err1}); 
                 db.close();
