@@ -250,7 +250,7 @@ app.get('/shiliaodetail', function(req, res){
                 var reg = item.shicai.join('|');
 
                 var collection1 = db.collection('recipe');
-                collection1.find({title: {$regex: reg}}, {steps: 0, tip: 0}).limit(10).toArray(function(err2, items){        
+                collection1.find({title: {$regex: reg}}, {steps: 0, tip: 0}).sort({'create_time':-1}).limit(20).toArray(function(err2, items){        
                     if(items.length>0) {
                         res.json({code: successCode, msg: "", data: item, recipeList: items});
                     } else {
