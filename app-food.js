@@ -354,7 +354,7 @@ app.get('/fork', function(req, res){
         recipeId = req.query.recipeId;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('recipe');
-        collection.update({_id: ObjectID(recipeId)}, {$addToSet: {fav_users: ObjectID(userId)}}, function(err1, result) {  
+        collection.update({_id: ObjectID(recipeId)}, {$addToSet: {fork_users: ObjectID(userId)}}, function(err1, result) {  
             if(err1) {
                 res.json({code: failCode, data: err1}); 
                 db.close();
@@ -372,7 +372,7 @@ app.get('/unfork', function(req, res){
         recipeId = req.query.recipeId;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('recipe');
-        collection.update({_id: ObjectID(recipeId)}, {$pull: {fav_users: ObjectID(userId)}}, function(err1, result) {  
+        collection.update({_id: ObjectID(recipeId)}, {$pull: {fork_users: ObjectID(userId)}}, function(err1, result) {  
             if(err1) {
                 res.json({code: failCode, data: err1}); 
                 db.close();
