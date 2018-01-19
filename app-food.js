@@ -347,6 +347,42 @@ app.post('/addrecipe', function(req, res){
         });
     });
 });
+app.get('/fork', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var userId = req.query.userId,
+        recipeId = req.query.recipeId;
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('recipe');
+        collection.update({_id: ObjectID(recipeId)}, {$addToSet: {fav_users: ObjectID(userId)}}, function(err1, result) {  
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: ""});
+            db.close();
+        });
+    });
+});
+app.get('/unfork', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var userId = req.query.userId,
+        recipeId = req.query.recipeId;
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('recipe');
+        collection.update({_id: ObjectID(recipeId)}, {$pull: {fav_users: ObjectID(userId)}}, function(err1, result) {  
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: ""});
+            db.close();
+        });
+    });
+});
 app.get('/uprecipe', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
@@ -814,44 +850,6 @@ app.get('/getwish', function(req, res){
                 res.json({code: failCode, msg: "没有更多了~"});
             }
             //关闭数据库
-            db.close();
-        });
-    });
-});
-
-app.get('/fork', function(req, res){
-    res.header("Content-Type", "application/json; charset=utf-8");
-
-    var userId = req.query.userId,
-        mealId = req.query.mealId;
-    MongoClient.connect(DB_CONN_STR1, function(err, db) {
-        var collection = db.collection('meal');
-        collection.update({_id: ObjectID(mealId)}, {$inc: {forkCount: 1}, $addToSet: {fork_users: ObjectID(userId)}}, function(err1, result) {  
-            if(err1) {
-                res.json({code: failCode, data: err1}); 
-                db.close();
-                return;
-            } 
-            res.json({code: successCode, msg: ""});
-            db.close();
-        });
-    });
-});
-
-app.get('/unfork', function(req, res){
-    res.header("Content-Type", "application/json; charset=utf-8");
-
-    var userId = req.query.userId,
-        mealId = req.query.mealId;
-    MongoClient.connect(DB_CONN_STR1, function(err, db) {
-        var collection = db.collection('meal');
-        collection.update({_id: ObjectID(mealId)}, {$inc: {forkCount: -1}, $pull: {fork_users: ObjectID(userId)}}, function(err1, result) {  
-            if(err1) {
-                res.json({code: failCode, data: err1}); 
-                db.close();
-                return;
-            } 
-            res.json({code: successCode, msg: ""});
             db.close();
         });
     });
