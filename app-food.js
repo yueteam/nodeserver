@@ -276,6 +276,77 @@ app.get('/meallist', function(req, res){
         });
     });
 });
+
+app.post('/uploadfdcover', upload.single('file'), function (req, res, next) {
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    // 文件路径
+    var filePath = './' + req.file.path;  
+    // 文件类型
+    var fileType = req.file.mimetype;
+    var lastName = '';
+    switch (fileType){
+        case 'image/png':
+            lastName = '.png';
+            break;
+        case 'image/jpeg':
+            lastName = '.jpg';
+            break;
+        default:
+            lastName = '.jpg';
+            break;
+    }
+    var userId = req.body.userId;
+    // 构建图片名
+    var fileName = userId + '_' + Date.now() + lastName;
+
+    co(function* () {
+        var result = yield client_food.put(fileName, filePath);
+
+        // 上传之后删除本地文件
+        fs.unlinkSync(filePath);
+
+        res.send(result.url.replace(/http:/,'https:'));  
+        db.close();
+    }).catch(function (err) {
+        console.log(err);
+    }); 
+})
+
+app.post('/addrecipe', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var now = Date.now();
+
+    var info = {
+        cover_url: req.body.coverImg,
+        title: req.body.title,
+        summary: req.body.desc,
+        cook_time: req.body.cookTime,
+        category: '早餐',
+        fork_users: [],
+        author: {
+            id: req.body.userId,
+            avatar_url: req.body.avatarUrl,
+            nick_name: req.body.nickName
+        },
+        create_time: now
+    };
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("recipe连接成功！");
+        var collection = db.collection('recipe');
+        collection.insert(info, function(err1, result) { 
+            //如果存在错误
+            if(err) {
+                console.log('Error:'+ err1);
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: "", data: result.insertedIds[0]}); 
+            db.close();
+        });
+    });
+});
 app.get('/uprecipe', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
@@ -366,38 +437,6 @@ app.get('/souxiangke', function(req, res){
         });
     });
 });
-
-// app.get('/getnews2', function(req, res){
-//     res.header("Content-Type", "application/json; charset=utf-8");
-
-//     MongoClient.connect(DB_CONN_STR, function(err, db) { 
-//         var collection = db.collection('news');
-//         collection.insertMany([{
-//             title: '吃3款早餐，减肥很简单',
-//             summary: '其实如果不吃早餐的话，并不能减肥，反而可能还会增肥。那么怎么早餐怎么吃不仅一点也不会胖反而还能减肥呢？粥品是早餐的绝佳选择，以下小编推荐3款瘦身粥，让你快速瘦出苗条身材! ',
-//             cover: {
-//                 cover_img: 'https://foodcover.oss-cn-hangzhou.aliyuncs.com/201801152206.jpg',
-//                 cover_width: '620',
-//                 cover_height: '480'
-//             },
-//             tag: '瘦身',
-//             source: 'mstx',
-//             rich_content: [
-//                 {
-//                     "type" : "title",
-//                     "content" : "豆浆红薯粥"
-//                 },{
-//                     "type" : "text",
-//                     "content" : "材料：大米少许、红薯1个、黄豆适量"
-//                 }
-//             ],
-//             create_time: 1516016906535
-//         }], function(error, result) { 
-//             res.json({code: successCode, msg: ""}); 
-//             db.close();
-//         });
-//     });
-// });
 
 app.get('/getnews', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
