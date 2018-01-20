@@ -347,6 +347,25 @@ app.post('/addrecipe', function(req, res){
         });
     });
 });
+app.post('/editrecipe', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var recipeId = req.body.id;
+    var shicai = JSON.parse(req.body.shicai);
+    var steps = JSON.parse(req.body.steps);
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('recipe');
+        collection.update({_id: ObjectID(recipeId)}, {$set:{shicai:shicai,steps:steps}}, function(err1, result) {  
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+            res.json({code: successCode, msg: ""});
+            db.close();
+        });
+    });
+});
 app.get('/fork', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
