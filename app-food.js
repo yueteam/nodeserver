@@ -23,6 +23,16 @@ var client_food = new OSS({
     accessKeySecret: 'OvuJdzBuziDOIQFRD4gbZXI1fDQ8qC',
     bucket: 'foodcover'
 });
+var COS = require('cos-nodejs-sdk-v5');
+var cos = new COS({
+    // 必选参数
+    SecretId: 'AKIDxhDUWID690bx2qMfgMluoRs3zhANezPY',
+    SecretKey: '0kFTQ7YCPPAhy6ze5HFyUlnbBWcT4QWM',
+    // 可选参数
+    FileParallelLimit: 3,    // 控制文件上传并发数
+    ChunkParallelLimit: 3,   // 控制单个文件下分片上传并发数
+    ChunkSize: 1024 * 1024,  // 控制分片大小，单位 B
+});
 // 引入json解析中间件
 var bodyParser = require('body-parser');
 // 添加json解析
@@ -300,17 +310,28 @@ app.post('/uploadfdcover', upload.single('file'), function (req, res, next) {
     // 构建图片名
     var fileName = userId + '_' + Date.now() + lastName;
 
-    co(function* () {
-        var result = yield client_food.put(fileName, filePath);
+    // co(function* () {
+    //     var result = yield client_food.put(fileName, filePath);
+
+    //     // 上传之后删除本地文件
+    //     fs.unlinkSync(filePath);
+
+    //     res.send(result.url.replace(/http:/,'https:')); 
+    // }).catch(function (err) {
+    //     console.log(err);
+    // }); 
+    cos.sliceUploadFile({
+        Bucket: 'zhishi-1255988328', 
+        Region: 'ap-shanghai',
+        Key: fileName, 
+        FilePath: filePath
+    }, function (err, data) {
+        console.log(err || data);
+        res.send(data);  
 
         // 上传之后删除本地文件
         fs.unlinkSync(filePath);
-
-        res.send(result.url.replace(/http:/,'https:'));  
-        db.close();
-    }).catch(function (err) {
-        console.log(err);
-    }); 
+    });
 })
 
 app.post('/addrecipe', function(req, res){
