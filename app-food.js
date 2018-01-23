@@ -626,7 +626,7 @@ app.get('/bfqrcode', function(req, res){
         path = req.query.path,
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
-    var filePath = './uploads/qrcode/shaiqrcode.jpg';
+    var filePath = './uploads/qrcode/shaiqrcode.png';
     request({ 
         method: 'POST', 
         url: 'https://api.weixin.qq.com/wxa/getwxacode?access_token=' + accessToken, 
@@ -635,7 +635,7 @@ app.get('/bfqrcode', function(req, res){
     .on('close', function() {
         co(function* () {
             var stream = fs.createReadStream(filePath);
-            var result = yield client.putStream('shaiqrcode.jpg', stream);
+            var result = yield client.putStream('shaiqrcode.png', stream);
             res.json({code: successCode, msg: "", data: result.url.replace(/http:/,'https:')});
             fs.unlinkSync(filePath);
         });
