@@ -96,7 +96,6 @@ app.get('/fdopenid', function(req, res){
     });
 
 });
-
 app.get('/addfduser', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var userInfo = {
@@ -587,7 +586,7 @@ app.get('/bfaccesstoken', function(req, res){
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('wx');
         var requestNewToken = function(){
-            superagent.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid'+breakfastWXInfo.appid+'&secret='+breakfastWXInfo.secret)
+            superagent.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='+breakfastWXInfo.appid+'&secret='+breakfastWXInfo.secret)
             .charset('utf-8')
             .end(function (err, sres) {
                 if (err) {
@@ -624,21 +623,19 @@ app.get('/bfaccesstoken', function(req, res){
 });
 app.get('/bfqrcode', function(req, res){
     var accessToken = req.query.accessToken,
-        scene = req.query.scene,
-        id = scene.split('=')[1],
         path = req.query.path,
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
-    var filePath = './uploads/qrcode/'+id+'.png';
+    var filePath = './uploads/qrcode/shaiqrcode.jpg';
     request({ 
         method: 'POST', 
-        url: 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' + accessToken, 
-        body: JSON.stringify({scene:scene,path:path,width:width}) 
+        url: 'https://api.weixin.qq.com/wxa/getwxacode?access_token=' + accessToken, 
+        body: JSON.stringify({path:path,width:width}) 
     }).pipe(fs.createWriteStream(filePath))
     .on('close', function() {
         co(function* () {
             var stream = fs.createReadStream(filePath);
-            var result = yield client.putStream(id+'.png', stream);
+            var result = yield client.putStream('shaiqrcode.jpg', stream);
             res.json({code: successCode, msg: "", data: result.url.replace(/http:/,'https:')});
             fs.unlinkSync(filePath);
         });
