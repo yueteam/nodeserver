@@ -326,7 +326,7 @@ app.post('/uploadfdcover', upload.single('file'), function (req, res, next) {
         Key: fileName, 
         FilePath: filePath
     }, function (err, data) {
-        console.log(err || data);
+        console.log(err || JSON.stringify(data));
         res.send(data);  
 
         // 上传之后删除本地文件
