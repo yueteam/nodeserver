@@ -327,7 +327,7 @@ app.post('/uploadfdcover', upload.single('file'), function (req, res, next) {
         FilePath: filePath
     }, function (err, data) {
         // console.log(err || JSON.stringify(data));
-        res.send('https://'+data.Location);  
+        res.send('https://zhishi-1255988328.picsh.myqcloud.com/'+fileName);  
 
         // 上传之后删除本地文件
         fs.unlinkSync(filePath);
@@ -345,6 +345,7 @@ app.post('/addrecipe', function(req, res){
         cook_time: req.body.cookTime,
         category: '早餐',
         fork_users: [],
+        author_id: req.body.userId,
         author: {
             id: req.body.userId,
             avatar_url: req.body.avatarUrl,
