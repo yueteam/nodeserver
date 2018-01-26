@@ -264,7 +264,7 @@ app.get('/meallist', function(req, res){
     var skipCount = (pageNo-1)*10;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('recipe');
-        collection.find({category:"早餐"}, {shicai:0,steps:0,tip:0}).sort({'create_time':-1}).limit(10).skip(skipCount).toArray(function(err, items){        
+        collection.find({}, {shicai:0,steps:0,tip:0}).sort({'create_time':-1}).limit(10).skip(skipCount).toArray(function(err, items){        
             if(items.length>0) {
                 var list = [];
                 items.forEach(function(item){
@@ -342,7 +342,7 @@ app.post('/addrecipe', function(req, res){
         title: req.body.title,
         summary: req.body.desc,
         cook_time: req.body.cookTime,
-        category: '早餐',
+        category: '美食',
         fork_users: [],
         author_id: req.body.userId,
         author: {
