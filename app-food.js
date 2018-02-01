@@ -113,7 +113,7 @@ app.get('/addfduser', function(req, res){
         //执行插入数据操作
         var collection = db.collection('user');
         collection.find({open_id: userInfo.open_id}).toArray(function(err, items){        
-            if(items.length>0) {
+            if(items.length > 0) {
                 res.json({code: 1, msg: "", data: items[0]});
 
                 //关闭数据库
@@ -136,6 +136,28 @@ app.get('/addfduser', function(req, res){
                     res.json({code: successCode, msg: "", data: result}); 
                     db.close();
                 });
+            }
+        });
+    });
+});
+app.get('/getuseravatar', function(req, res){
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var userId = req.query.id;
+        var collection = db.collection('user');
+        collection.findOne({open_id: userId}, function(err, item){        
+            if(item) {               
+                var fileName = userId + '.jpg';
+                var filePath = './uploads/avatar/' + fileName;
+                request(item.avatar_url).pipe(fs.createWriteStream(filePath))
+                .on('close', function() {
+                    co(function* () {
+                        var stream = fs.createReadStream(filePath);
+                        var result = yield client.putStream(fileName, stream);
+                        fs.unlinkSync(filePath);
+                    });
+                });
+                res.json({code: successCode, msg: ""}); 
+                db.close();
             }
         });
     });
