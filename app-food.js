@@ -156,6 +156,9 @@ app.get('/getuseravatar', function(req, res){
                         fs.unlinkSync(filePath);
                     });
                 });
+
+                res.json({code: successCode, msg: ""}); 
+                db.close();
             }
         });
     });
