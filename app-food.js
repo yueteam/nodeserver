@@ -122,7 +122,7 @@ app.get('/addfduser', function(req, res){
 
                 //插入数据
                 collection.insert(userInfo, function(error, result) { 
-                    var fileName = userInfo.open_id + '.jpg';
+                    var fileName = result.insertedIds[0] + '.jpg';
                     var filePath = './uploads/avatar/' + fileName;
                     request(userInfo.avatar_url).pipe(fs.createWriteStream(filePath))
                     .on('close', function() {
@@ -144,7 +144,7 @@ app.get('/getuseravatar', function(req, res){
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var userId = req.query.id;
         var collection = db.collection('user');
-        collection.findOne({open_id: userId}, function(err, item){        
+        collection.findOne({_id: ObjectID(userId)}, function(err, item){        
             if(item) {               
                 var fileName = userId + '.jpg';
                 var filePath = './uploads/avatar/' + fileName;
@@ -156,8 +156,6 @@ app.get('/getuseravatar', function(req, res){
                         fs.unlinkSync(filePath);
                     });
                 });
-                res.json({code: successCode, msg: ""}); 
-                db.close();
             }
         });
     });
@@ -595,11 +593,11 @@ app.get('/wishlist', function(req, res){
 
     var pageNo = parseInt(req.query.pageNo);
     var userId = req.query.userId;
-    var skipCount = (pageNo-1)*10;
+    var skipCount = (pageNo - 1) * 10;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('wish');
         collection.find({}, {shicai:0,steps:0,tip:0}).sort({'create_time':-1}).limit(10).skip(skipCount).toArray(function(err, items){        
-            if(items.length>0) {
+            if(items.length > 0) {
                 var list = [];
                 items.forEach(function(item){
                     var newItem = item;
