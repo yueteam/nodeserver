@@ -140,29 +140,29 @@ app.get('/addfduser', function(req, res){
         });
     });
 });
-app.get('/getuseravatar', function(req, res){
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
-        var userId = req.query.id;
-        var collection = db.collection('user');
-        collection.findOne({_id: ObjectID(userId)}, function(err, item){        
-            if(item) {               
-                var fileName = userId + '.jpg';
-                var filePath = './uploads/avatar/' + fileName;
-                request(item.avatar_url).pipe(fs.createWriteStream(filePath))
-                .on('close', function() {
-                    co(function* () {
-                        var stream = fs.createReadStream(filePath);
-                        var result = yield client.putStream(fileName, stream);
-                        fs.unlinkSync(filePath);
-                    });
-                });
+// app.get('/getuseravatar', function(req, res){
+//     MongoClient.connect(DB_CONN_STR, function(err, db) {
+//         var userId = req.query.id;
+//         var collection = db.collection('user');
+//         collection.findOne({_id: ObjectID(userId)}, function(err, item){        
+//             if(item) {               
+//                 var fileName = userId + '.jpg';
+//                 var filePath = './uploads/avatar/' + fileName;
+//                 request(item.avatar_url).pipe(fs.createWriteStream(filePath))
+//                 .on('close', function() {
+//                     co(function* () {
+//                         var stream = fs.createReadStream(filePath);
+//                         var result = yield client.putStream(fileName, stream);
+//                         fs.unlinkSync(filePath);
+//                     });
+//                 });
 
-                res.json({code: successCode, msg: ""}); 
-                db.close();
-            }
-        });
-    });
-});
+//                 res.json({code: successCode, msg: ""}); 
+//                 db.close();
+//             }
+//         });
+//     });
+// });
 
 app.get('/findfduser', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
@@ -371,7 +371,10 @@ app.get('/uprecipe', function(req, res){
     var id = req.query.id;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('recipe');
-        collection.update({_id: ObjectID(id)},{$set:{create_time: Date.now()}}, function(err1, item){        
+        var forkArr = [ObjectId("5a55e23cf248cb07dde095ae"),ObjectId("5a55e35df248cb07dde095af"),ObjectId("5a55e3a0f248cb07dde095b0"),ObjectId("5a55e4b8f248cb07dde095b1"),ObjectId("5a55e527f248cb07dde095b2"),ObjectId("5a55e58df248cb07dde095b3"),ObjectId("5a55e5bff248cb07dde095b4"),ObjectId("5a55e5e5f248cb07dde095b5"),ObjectId("5a55e61ef248cb07dde095b6"),ObjectId("5a55e624f248cb07dde095b7"),ObjectId("5a55e654f248cb07dde095b8"),ObjectId("5a55e68bf248cb07dde095b9"),ObjectId("5a55e6a5f248cb07dde095ba"),ObjectId("5a55e6d9f248cb07dde095bb"),ObjectId("5a55e710f248cb07dde095bc"),ObjectId("5a55e71af248cb07dde095bd"),ObjectId("5a55e76df248cb07dde095be"),ObjectId("5a55e76ef248cb07dde095bf"),ObjectId("5a55e785f248cb07dde095c0"),ObjectId("5a55e7dbf248cb07dde095c1"),ObjectId("5a55e7e2f248cb07dde095c2"),ObjectId("5a55e857f248cb07dde095c3"),ObjectId("5a55e8aaf248cb07dde095c4"),ObjectId("5a55e8aef248cb07dde095c5"),ObjectId("5a55e8c9f248cb07dde095c6"),ObjectId("5a55e90cf248cb07dde095c7"),ObjectId("5a55e92df248cb07dde095c8"),ObjectId("5a55e988f248cb07dde095c9"),ObjectId("5a55e9a5f248cb07dde095ca"),ObjectId("5a55ea37f248cb07dde095cb"),ObjectId("5a55ec15f248cb07dde095cd"),ObjectId("5a55ec71f248cb07dde095ce"),ObjectId("5a55ecadf248cb07dde095cf"),ObjectId("5a55ecbdf248cb07dde095d0"),ObjectId("5a55ed72f248cb07dde095d1"),ObjectId("5a55ee45f248cb07dde095d2"),ObjectId("5a55ee7ef248cb07dde095d3"),ObjectId("5a55ef71f248cb07dde095d4"),ObjectId("5a55f104f248cb07dde095d5"),ObjectId("5a55f10df248cb07dde095d6"),ObjectId("5a55f27df248cb07dde095d7"),ObjectId("5a55f2c7f248cb07dde095d8"),ObjectId("5a55f4b2f248cb07dde095d9"),ObjectId("5a55fc03f248cb07dde095da"),ObjectId("5a55fc86f248cb07dde095db"),ObjectId("5a55ff8ef248cb07dde095dc"),ObjectId("5a5602ccf248cb07dde095dd"),ObjectId("5a560636f248cb07dde095de"),ObjectId("5a560f97f248cb07dde095df"),ObjectId("5a5613b1f248cb07dde095e0"),ObjectId("5a56149af248cb07dde095e1"),ObjectId("5a5616b1f248cb07dde095e2"),ObjectId("5a561b51f248cb07dde095e3"),ObjectId("5a562489f248cb07dde095e4"),ObjectId("5a562676cb95993011184c5b"),ObjectId("5a56297fcb95993011184c5c"),ObjectId("5a562b0461453f0b51ae1ffb"),ObjectId("5a562d8061453f0b51ae1ffc"),ObjectId("5a563a3161453f0b51ae1ffd"),ObjectId("5a56455c61453f0b51ae1ffe"),ObjectId("5a569d0f61453f0b51ae1fff"),ObjectId("5a569faf61453f0b51ae2000"),ObjectId("5a56a3ca61453f0b51ae2001"),ObjectId("5a56c3ba61453f0b51ae2002"),ObjectId("5a56c4f161453f0b51ae2003"),ObjectId("5a5710bf61453f0b51ae2005"),ObjectId("5a57153261453f0b51ae2006"),ObjectId("5a57227161453f0b51ae2007"),ObjectId("5a5743aa61453f0b51ae2008"),ObjectId("5a57490f61453f0b51ae2009"),ObjectId("5a57493761453f0b51ae200a"),ObjectId("5a575c2561453f0b51ae200b"),ObjectId("5a57709861453f0b51ae200c"),ObjectId("5a5862ca3cf6913e6b30f5be"),ObjectId("5a58cc615fbc35086dd8bf74"),ObjectId("5a5980b49253cc21a60bc8c8"),ObjectId("5a5eb2acd3198d4269e2e454"),ObjectId("5a5ef4c5d3198d4269e2e455"),ObjectId("5a62e61333712218f89783fe"),ObjectId("5a63006a33712218f89783ff"),ObjectId("5a63030c33712218f8978400"),ObjectId("5a63046633712218f8978401"),ObjectId("5a632eef33712218f8978402"),ObjectId("5a6560186c41e6047e42a6d8"),ObjectId("5a6566766c41e6047e42a6d9"),ObjectId("5a6572dd6c41e6047e42a6da"),ObjectId("5a65794f6c41e6047e42a6db"),ObjectId("5a65f5726c41e6047e42a6dd"),ObjectId("5a667f356c41e6047e42a6de"),ObjectId("5a66a19e6c41e6047e42a6e4"),ObjectId("5a66b11a6c41e6047e42a6e5"),ObjectId("5a68119ed7ddd13d1275ccd5"),ObjectId("5a68844ad7ddd13d1275ccd9"),ObjectId("5a688760d7ddd13d1275ccda"),ObjectId("5a692bbed7ddd13d1275ccdc"),ObjectId("5a697d6dd7ddd13d1275ccde"),ObjectId("5a69d60bd7ddd13d1275ccdf"),ObjectId("5a6afeaad0b76416e3f364c1"),ObjectId("5a6b3571d0b76416e3f364c2")];
+        var order = Math.round(Math.random()*99);
+        var forkUser = forkArr[order];
+        collection.update({_id: ObjectID(id)}, {$set: {create_time: Date.now()}, $addToSet: {fork_users: forkUser}}, function(err1, item){        
             if(err1) {
                 res.json({code: failCode, data: err1}); 
                 db.close();
