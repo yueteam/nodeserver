@@ -604,18 +604,10 @@ app.get('/wishlist', function(req, res){
     var skipCount = (pageNo - 1) * 10;
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('wish');
-        collection.find({}, {shicai:0,steps:0,tip:0}).sort({'create_time':-1}).limit(10).skip(skipCount).toArray(function(err, items){        
+        collection.find({}, {nick_name:0}).sort({'create_time':-1}).limit(10).skip(skipCount).toArray(function(err, items){        
             if(items.length > 0) {
-                var list = [];
-                items.forEach(function(item){
-                    var newItem = item;
-                    newItem.fork_count = item.fork_users.length;
-                    var forkUsers = item.fork_users;
-                    if(inArray(userId,forkUsers) === 1) {
-                        newItem.forked = true;
-                    }
-                    list.push(newItem);
-                });
+                var list = items;
+                
                 res.json({code: successCode, msg: "", data: list});
             } else {
                 res.json({code: failCode, msg: "没有更多了~"});
