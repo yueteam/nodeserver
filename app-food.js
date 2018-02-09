@@ -68,6 +68,75 @@ function inArray(search, arr) {
 }
 
 /**
+ * [weather] 天气预报
+ *
+ */
+
+var weatherWXInfo = {
+        appid: 'wxa161643780b58159',
+        secret: '967d616ea68a37697c3a400d256e8cdd'
+    };
+
+app.get('/getweatherinfo', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var province = req.query.province,
+        city = req.query.city;
+
+    var nowdate = new Date(),
+        year = nowdate.getFullYear(),
+        month = nowdate.getMonth()+1,
+        date = nowdate.getDate(),
+        dateStr = year+'.'+month+'.'+date;
+    
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("weather连接成功！");
+        var collection = db.collection('weather');
+        collection.findOne({province: province, city: city, date: dateStr}, function(err, item){   
+            if(err) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            }
+
+            if(item) {
+                res.json({code: 1, msg: "", data: item});
+
+                //关闭数据库
+                db.close();
+            } else {    
+                superagent.get('http://m.hao123.com/hao123_api/a/tianqi/getTodayData?prov='+province+'&city='+city)
+                .charset('utf-8')
+                .end(function (err1, sres) {
+                    if (err1) {
+                        res.json({code: failCode, msg: err1});
+                        return;
+                    }
+                    var resJson = JSON.parse(sres.text);
+                    var insertJson = {
+                        province: province,
+                        city: city,
+                        date: dateStr,
+                        alarm: resJson.alarm,
+                        aqi: resJson.aqi,
+                        desc: resJson.desc,
+                        forecast24hours: resJson.forecast24hours,
+                        icon: resJson.icon,
+                        icon_full: resJson.icon_full,
+                        update: resJson.update
+                    }
+
+                    //插入数据
+                    collection.insert(insertJson, function(error, result) {                        
+                        res.json({code: successCode, msg: "", data: insertJson}); 
+                        db.close();
+                    });
+                });
+            }
+        });
+    });
+});
+
+/**
  * [breakfast] 健康知食
  * @type {Object}
  */
@@ -575,6 +644,9 @@ app.post('/newwish', function(req, res){
         user_id: userId,
         nick_name: req.body.nickName,
         covers: covers.split(','),
+        film_name: req.body.filmName,
+        actress: req.body.actress,
+        actor: req.body.actor,
         desc: req.body.desc,
         fav_users: [],
         create_time: Date.now()
