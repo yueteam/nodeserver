@@ -116,6 +116,8 @@ app.get('/getweatherinfo', function(req, res){
                     var $ = cheerio.load(sres.text);
 
                     var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide .timeLi').text());
+                    var wind = $('.n_wd .flfx').text();
+                    wind = wind.replace(/(\s|\u00A0)+/g,'').replace(/\r|\n|\t/g,'');
                     var insertJson = {
                         lat: lat,
                         lon: lon,
@@ -123,10 +125,9 @@ app.get('/getweatherinfo', function(req, res){
                         date: dateStr,
                         text: trim($('.n_wd h1 em').text()),
                         temp: trim($('.n_wd h1 span').text()),
-                        wind: trim($('.n_wd .flfx').text()),
+                        wind: wind,
                         humidity: trim($('.n_wd .xdsd').text())
                     };
-                    console.log('明日——————'+tomorrowIndex);
 
                     $('#hours72 .swiper-slide').each(function (idx, element) {
                         var $element = $(element),
@@ -134,6 +135,8 @@ app.get('/getweatherinfo', function(req, res){
 
                         var className = $element.find('.svnicon').attr('class');
                         var temp = $element.find('.tempLi').text().replace(/°/,'');
+
+                        console.log('id：'+idx+'，time：'+time+'，className：'+className+'，temp：'+temp);
                         if(idx < tomorrowIndex && time === '7时') {
                             insertJson.morningWeather = {
                                 code: className.split(' ')[2],
