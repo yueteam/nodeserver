@@ -116,56 +116,58 @@ app.get('/getweatherinfo', function(req, res){
                     var $ = cheerio.load(sres.text);
 
                     var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide-active .timeLi').text()),
-                        insertJson = {
-                            lat: lat,
-                            lon: lon,
-                            city: city,
-                            date: dateStr,
-                            text: trim($('.n_wd h1 em').text()),
-                            temp: trim($('.n_wd h1 span').text()),
-                            wind: trim($('.n_wd .flfx').text()),
-                            humidity: trim($('.n_wd .xdsd').text())
-                        };
+                    var insertJson = {
+                        lat: lat,
+                        lon: lon,
+                        city: city,
+                        date: dateStr,
+                        text: trim($('.n_wd h1 em').text()),
+                        temp: trim($('.n_wd h1 span').text()),
+                        wind: trim($('.n_wd .flfx').text()),
+                        humidity: trim($('.n_wd .xdsd').text())
+                    };
+                    console.log('明日——————'+tomorrowIndex);
 
                     $('#hours72 .swiper-slide').each(function (idx, element) {
                         var $element = $(element),
                             time = $element.find('.timeLi').text();
 
                         var className = $element.find('.svnicon').attr('class');
+                        var temp = $element.find('.tempLi').text().replace(/°/,'');
                         if(idx < tomorrowIndex && time === '7时') {
                             insertJson.morningWeather = {
                                 code: className.split(' ')[2],
-                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                                temp: temp
                             }
                         } else if(idx < tomorrowIndex && time === '12时') {
                             insertJson.dayWeather = {
                                 code: className.split(' ')[2],
-                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                                temp: temp
                             }
                         } else if(idx < tomorrowIndex && time === '18时') {
                             insertJson.eveningWeather = {
                                 code: className.split(' ')[2],
-                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                                temp: temp
                             }
                         } else if(idx < tomorrowIndex && time === '23时') {
                             insertJson.nightWeather = {
                                 code: className.split(' ')[2],
-                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                                temp: temp
                             }
                         } else if(idx > tomorrowIndex && time === '7时') {
                             insertJson.tomorrowMorningWeather = {
                                 code: className.split(' ')[2],
-                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                                temp: temp
                             }
                         } else if(idx > tomorrowIndex && time === '12时') {
                             insertJson.tomorrowDayWeather = {
                                 code: className.split(' ')[2],
-                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                                temp: temp
                             }
                         } else if(idx > tomorrowIndex && time === '18时') {
                             insertJson.tomorrowEveningWeather = {
                                 code: className.split(' ')[2],
-                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                                temp: temp
                             }
                         }  
                     });
