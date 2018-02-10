@@ -114,7 +114,8 @@ app.get('/getweatherinfo', function(req, res){
                     }
 
                     var $ = cheerio.load(sres.text);
-                    var tomorrowIndex = 100,
+
+                    var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide-active .timeLi').text()),
                         insertJson = {
                             lat: lat,
                             lon: lon,
@@ -129,10 +130,8 @@ app.get('/getweatherinfo', function(req, res){
                     $('#hours72 .swiper-slide').each(function (idx, element) {
                         var $element = $(element),
                             time = $element.find('.timeLi').text();
-                        if(time.indexOf('明天') > -1) {
-                            tomorrowIndex = idx;
-                        }
-                        let className = $element.find('.svnicon').attr('class');
+
+                        var className = $element.find('.svnicon').attr('class');
                         if(idx < tomorrowIndex && time === '7时') {
                             insertJson.morningWeather = {
                                 code: className.split(' ')[2],
