@@ -131,43 +131,42 @@ app.get('/getweatherinfo', function(req, res){
 
                     $('#hours72 .swiper-slide').each(function (idx, element) {
                         var $element = $(element),
-                            time = $element.find('.timeLi').text();
+                            time = parseInt($element.find('.timeLi').text());
 
                         var className = $element.find('.svnicon').attr('class');
                         var temp = $element.find('.tempLi').text().replace(/°/,'');
 
-                        console.log('id：'+idx+'，time：'+time+'，className：'+className+'，temp：'+temp);
-                        if(idx < tomorrowIndex && time === '7时') {
+                        if(idx < tomorrowIndex && time === 7) {
                             insertJson.morningWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx < tomorrowIndex && time === '12时') {
+                        } else if(idx < tomorrowIndex && time === 12) {
                             insertJson.dayWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx < tomorrowIndex && time === '18时') {
+                        } else if(idx < tomorrowIndex && time === 18) {
                             insertJson.eveningWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx < tomorrowIndex && time === '23时') {
+                        } else if(idx < tomorrowIndex && time === 23) {
                             insertJson.nightWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx > tomorrowIndex && time === '7时') {
+                        } else if(idx > tomorrowIndex && time === 7) {
                             insertJson.tomorrowMorningWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx > tomorrowIndex && time === '12时') {
+                        } else if(idx > tomorrowIndex && time === 12) {
                             insertJson.tomorrowDayWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx > tomorrowIndex && time === '18时') {
+                        } else if(idx > tomorrowIndex && time === 18) {
                             insertJson.tomorrowEveningWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
