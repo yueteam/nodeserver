@@ -79,19 +79,20 @@ var weatherWXInfo = {
 
 app.get('/getweatherinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var province = req.query.province,
+    var lat = req.query.lat,
+        lon = req.query.lon,
         city = req.query.city;
 
     var nowdate = new Date(),
         year = nowdate.getFullYear(),
         month = nowdate.getMonth()+1,
         date = nowdate.getDate(),
-        dateStr = year+'.'+month+'.'+date;
+        dateStr = year+'/'+month+'/'+date;
     
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("weather连接成功！");
         var collection = db.collection('weather');
-        collection.findOne({province: province, city: city, date: dateStr}, function(err, item){   
+        collection.findOne({city: city, date: dateStr}, function(err, item){   
             if(err) {
                 res.json({code: failCode, data: err1}); 
                 db.close();
@@ -104,26 +105,71 @@ app.get('/getweatherinfo', function(req, res){
                 //关闭数据库
                 db.close();
             } else {    
-                superagent.get('http://m.hao123.com/hao123_api/a/tianqi/getTodayData?prov='+province+'&city='+city)
+                superagent.get('http://m.weather.com.cn/d/town/index?lat='+lat+'&lon='+lon)
                 .charset('utf-8')
                 .end(function (err1, sres) {
                     if (err1) {
                         res.json({code: failCode, msg: err1});
                         return;
                     }
-                    var resJson = JSON.parse(sres.text);
-                    var insertJson = {
-                        province: province,
-                        city: city,
-                        date: dateStr,
-                        alarm: resJson.alarm,
-                        aqi: resJson.aqi,
-                        desc: resJson.desc,
-                        forecast24hours: resJson.forecast24hours,
-                        icon: resJson.icon,
-                        icon_full: resJson.icon_full,
-                        update: resJson.update
-                    }
+
+                    var $ = cheerio.load(sres.text);
+                    var tomorrowIndex = 100,
+                        insertJson = {
+                            lat: lat,
+                            lon: lon,
+                            city: city,
+                            date: dateStr,
+                            text: trim($('.n_wd h1 em').text()),
+                            temp: trim($('.n_wd h1 span').text()),
+                            wind: trim($('.n_wd .flfx').text()),
+                            humidity: trim($('.n_wd .xdsd').text())
+                        };
+
+                    $('#hours72 .swiper-slide').each(function (idx, element) {
+                        var $element = $(element),
+                            time = $element.find('.timeLi').text();
+                        if(time.indexOf('明天') > -1) {
+                            tomorrowIndex = idx;
+                        }
+                        let className = $element.find('.svnicon').attr('class');
+                        if(idx < tomorrowIndex && time === '7时') {
+                            insertJson.morningWeather = {
+                                code: className.split(' ')[2],
+                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                            }
+                        } else if(idx < tomorrowIndex && time === '12时') {
+                            insertJson.dayWeather = {
+                                code: className.split(' ')[2],
+                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                            }
+                        } else if(idx < tomorrowIndex && time === '18时') {
+                            insertJson.eveningWeather = {
+                                code: className.split(' ')[2],
+                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                            }
+                        } else if(idx < tomorrowIndex && time === '23时') {
+                            insertJson.nightWeather = {
+                                code: className.split(' ')[2],
+                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                            }
+                        } else if(idx > tomorrowIndex && time === '7时') {
+                            insertJson.tomorrowMorningWeather = {
+                                code: className.split(' ')[2],
+                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                            }
+                        } else if(idx > tomorrowIndex && time === '12时') {
+                            insertJson.tomorrowDayWeather = {
+                                code: className.split(' ')[2],
+                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                            }
+                        } else if(idx > tomorrowIndex && time === '18时') {
+                            insertJson.tomorrowEveningWeather = {
+                                code: className.split(' ')[2],
+                                temp: $element.find('.tempLi').text().replace(/°/,'')
+                            }
+                        }  
+                    });
 
                     //插入数据
                     collection.insert(insertJson, function(error, result) {                        
