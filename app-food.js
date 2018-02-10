@@ -115,7 +115,7 @@ app.get('/getweatherinfo', function(req, res){
 
                     var $ = cheerio.load(sres.text);
 
-                    var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide-active .timeLi').text());
+                    var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide .timeLi').text());
                     var insertJson = {
                         lat: lat,
                         lon: lon,
