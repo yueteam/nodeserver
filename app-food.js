@@ -79,8 +79,9 @@ var weatherWXInfo = {
 
 app.get('/getweatherinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var city = req.query.city,
-        code = req.query.code;
+    var lat = req.query.lat,
+        lon = req.query.lon,
+        city = req.query.city;
 
     var nowdate = new Date(),
         year = nowdate.getFullYear(),
@@ -104,7 +105,7 @@ app.get('/getweatherinfo', function(req, res){
                 //关闭数据库
                 db.close();
             } else {    
-                superagent.get('http://m.weather.com.cn/mweather/'+code+'.shtml')
+                superagent.get('http://m.weather.com.cn/d/town/index?lat='+lat+'&lon='+lon)
                 .charset('utf-8')
                 .end(function (err1, sres) {
                     if (err1) {
@@ -114,10 +115,12 @@ app.get('/getweatherinfo', function(req, res){
 
                     var $ = cheerio.load(sres.text);
 
-                    // var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide .timeLi').text());
+                    var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide .timeLi').text());
                     var wind = $('.n_wd .flfx').text();
                     wind = wind.replace(/(\s|\u00A0)+/g,'').replace(/\r|\n|\t/g,'');
                     var insertJson = {
+                        lat: lat,
+                        lon: lon,
                         city: city,
                         date: dateStr,
                         text: trim($('.n_wd h1 em').text()),
@@ -128,8 +131,8 @@ app.get('/getweatherinfo', function(req, res){
 
                     $('#hours72 .swiper-slide').each(function (idx, element) {
                         var $element = $(element),
-                            isTomorrow = parseInt($element.find('.timeLi span').text()) > date ? true : false,
-                            time = parseInt($element.find('.timeLi b').text());
+                            isTomorrow = idx > tomorrowIndex ? true : false,
+                            time = parseInt($element.find('.timeLi').text());
 
                         var className = $element.find('.svnicon').attr('class');
                         var temp = $element.find('.tempLi').text().replace(/°/,'');
