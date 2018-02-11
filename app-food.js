@@ -79,9 +79,8 @@ var weatherWXInfo = {
 
 app.get('/getweatherinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var lat = req.query.lat,
-        lon = req.query.lon,
-        city = req.query.city;
+    var city = req.query.city,
+        code = req.query.code;
 
     var nowdate = new Date(),
         year = nowdate.getFullYear(),
@@ -105,7 +104,7 @@ app.get('/getweatherinfo', function(req, res){
                 //关闭数据库
                 db.close();
             } else {    
-                superagent.get('http://m.weather.com.cn/d/town/index?lat='+lat+'&lon='+lon)
+                superagent.get('http://m.weather.com.cn/mweather/'+code+'.shtml')
                 .charset('utf-8')
                 .end(function (err1, sres) {
                     if (err1) {
@@ -119,8 +118,6 @@ app.get('/getweatherinfo', function(req, res){
                     var wind = $('.n_wd .flfx').text();
                     wind = wind.replace(/(\s|\u00A0)+/g,'').replace(/\r|\n|\t/g,'');
                     var insertJson = {
-                        lat: lat,
-                        lon: lon,
                         city: city,
                         date: dateStr,
                         text: trim($('.n_wd h1 em').text()),
