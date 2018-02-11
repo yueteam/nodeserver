@@ -114,7 +114,7 @@ app.get('/getweatherinfo', function(req, res){
 
                     var $ = cheerio.load(sres.text);
 
-                    var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide .timeLi').text());
+                    // var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide .timeLi').text());
                     var wind = $('.n_wd .flfx').text();
                     wind = wind.replace(/(\s|\u00A0)+/g,'').replace(/\r|\n|\t/g,'');
                     var insertJson = {
@@ -128,42 +128,43 @@ app.get('/getweatherinfo', function(req, res){
 
                     $('#hours72 .swiper-slide').each(function (idx, element) {
                         var $element = $(element),
-                            time = parseInt($element.find('.timeLi').text());
+                            isTomorrow = parseInt($element.find('.timeLi span').text()) > date ? true : false,
+                            time = parseInt($element.find('.timeLi b').text());
 
                         var className = $element.find('.svnicon').attr('class');
                         var temp = $element.find('.tempLi').text().replace(/°/,'');
 
-                        if(idx < tomorrowIndex && time === 7) {
+                        if(!isTomorrow && time === 7) {
                             insertJson.morningWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx < tomorrowIndex && time === 12) {
+                        } else if(!isTomorrow && time === 12) {
                             insertJson.dayWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx < tomorrowIndex && time === 18) {
+                        } else if(!isTomorrow && time === 18) {
                             insertJson.eveningWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx < tomorrowIndex && time === 23) {
+                        } else if(!isTomorrow && time === 23) {
                             insertJson.nightWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx > tomorrowIndex && time === 7) {
+                        } else if(isTomorrow && time === 7) {
                             insertJson.tomorrowMorningWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx > tomorrowIndex && time === 12) {
+                        } else if(isTomorrow && time === 12) {
                             insertJson.tomorrowDayWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
                             }
-                        } else if(idx > tomorrowIndex && time === 18) {
+                        } else if(isTomorrow && time === 18) {
                             insertJson.tomorrowEveningWeather = {
                                 code: className.split(' ')[2],
                                 temp: temp
