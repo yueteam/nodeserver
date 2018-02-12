@@ -132,12 +132,14 @@ app.get('/getweatherinfo', function(req, res){
                         nightWeather: {}
                     };
 
+                    var weatherArr = {"暴雨":"10","大暴雨":"11","特大暴雨":"12","阵雪":"13","小雪":"14","中雪":"15","大雪":"16","暴雪":"17","雾":"18","冻雨":"19","沙尘暴":"20","小到中雨":"21","中到大雨":"22","大到暴雨":"23","暴雨到大暴雨":"24","大暴雨到特大暴雨":"25","小到中雪":"26","中到大雪":"27","大到暴雪":"28","浮尘":"29","扬沙":"30","强沙尘暴":"31","霾":"53","":"99","晴":"00","多云":"01","阴":"02","阵雨":"03","雷阵雨":"04","雷阵雨伴有冰雹":"05","雨夹雪":"06","小雨":"07","中雨":"08","大雨":"09"};
+
                     $('.t .clearfix li').each(function(idx, element) {
                         var $element = $(element),
                             title = $element.find('h1').text(),
-                            bigClass = $element.find('big').attr('class'),
-                            weaCode = bigClass.substr(6),
+                            // bigClass = $element.find('big').attr('class'),
                             weaText = $element.find('.wea').attr('title'),
+                            weaCode = weatherArr[weaText],
                             temp = $element.find('.tem span').text(),
                             $win = $element.find('.win span'),
                             wind = [$win.attr('title'), $win.text()],
@@ -151,8 +153,8 @@ app.get('/getweatherinfo', function(req, res){
                                 insertJson.dayWeather = {
                                     time: 'day',
                                     timeText: '白天',
-                                    weaCode: weaCode,
-                                    digitalCode: parseInt(weaCode.substr(1)),
+                                    weaCode: 'd'+weaCode,
+                                    digitalCode: parseInt(weaCode),
                                     weaText: weaText,
                                     temp: temp,
                                     wind: wind,
@@ -165,8 +167,8 @@ app.get('/getweatherinfo', function(req, res){
                                 insertJson.nightWeather = {
                                     time: 'night',
                                     timeText: '晚上',
-                                    weaCode: weaCode,
-                                    digitalCode: parseInt(weaCode.substr(1)),
+                                    weaCode: 'n'+weaCode,
+                                    digitalCode: parseInt(weaCode),
                                     weaText: weaText,
                                     temp: temp,
                                     wind: wind,
@@ -182,8 +184,8 @@ app.get('/getweatherinfo', function(req, res){
                             insertJson.nightWeather = {
                                 time: 'night',
                                 timeText: '晚上',
-                                weaCode: weaCode,
-                                digitalCode: parseInt(weaCode.substr(1)),
+                                weaCode: 'n'+weaCode,
+                                digitalCode: parseInt(weaCode),
                                 weaText: weaText,
                                 temp: temp,
                                 wind: wind,
