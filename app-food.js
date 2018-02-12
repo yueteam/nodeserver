@@ -135,7 +135,7 @@ app.get('/getweatherinfo', function(req, res){
                     $('.t .clearfix li').each(function(idx, element) {
                         var $element = $(element),
                             bigClass = $element.find('.jpg80').attr('class'),
-                            weaCode = bigClass.substr(6),
+                            weaCode = 'd00',
                             weaText = $element.find('.wea').attr('title'),
                             temp = $element.find('.tem span').text(),
                             $win = $element.find('.win span'),
