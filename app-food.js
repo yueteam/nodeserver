@@ -105,7 +105,7 @@ app.get('/getweatherinfo', function(req, res){
                 //关闭数据库
                 db.close();
             } else {    
-                superagent.get('http://m.weather.com.cn/d/town/index?lat='+lat+'&lon='+lon)
+                superagent.get('http://www.weather.com.cn/weather1d/101210101.shtml')
                 .charset('utf-8')
                 .end(function (err1, sres) {
                     if (err1) {
@@ -115,71 +115,75 @@ app.get('/getweatherinfo', function(req, res){
 
                     var $ = cheerio.load(sres.text);
 
-                    var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide .timeLi').text());
-                    var wind = $('.n_wd .flfx').text();
-                    wind = wind.replace(/(\s|\u00A0)+/g,'').replace(/\r|\n|\t/g,'');
-                    var insertJson = {
-                        lat: lat,
-                        lon: lon,
-                        city: city,
-                        date: dateStr,
-                        text: trim($('.n_wd h1 em').text()),
-                        temp: trim($('.n_wd h1 span').text()),
-                        wind: wind,
-                        humidity: trim($('.n_wd .xdsd').text())
-                    };
+                    var asd = $('.skypop h3').text();
+                    res.json({code: successCode, msg: "", data: {asd:asd}}); 
+                    db.close();
 
-                    $('#hours72 .swiper-slide').each(function (idx, element) {
-                        var $element = $(element),
-                            isTomorrow = idx > tomorrowIndex ? true : false,
-                            time = parseInt($element.find('.timeLi').text());
+                    // var tomorrowIndex = 24 - parseInt($('#hours72 .swiper-slide .timeLi').text());
+                    // var wind = $('.n_wd .flfx').text();
+                    // wind = wind.replace(/(\s|\u00A0)+/g,'').replace(/\r|\n|\t/g,'');
+                    // var insertJson = {
+                    //     lat: lat,
+                    //     lon: lon,
+                    //     city: city,
+                    //     date: dateStr,
+                    //     text: trim($('.n_wd h1 em').text()),
+                    //     temp: trim($('.n_wd h1 span').text()),
+                    //     wind: wind,
+                    //     humidity: trim($('.n_wd .xdsd').text())
+                    // };
 
-                        var className = $element.find('.svnicon').attr('class');
-                        var temp = $element.find('.tempLi').text().replace(/°/,'');
+                    // $('#hours72 .swiper-slide').each(function (idx, element) {
+                    //     var $element = $(element),
+                    //         isTomorrow = idx > tomorrowIndex ? true : false,
+                    //         time = parseInt($element.find('.timeLi').text());
 
-                        if(!isTomorrow && time === 7) {
-                            insertJson.morningWeather = {
-                                code: className.split(' ')[2],
-                                temp: temp
-                            }
-                        } else if(!isTomorrow && time === 12) {
-                            insertJson.dayWeather = {
-                                code: className.split(' ')[2],
-                                temp: temp
-                            }
-                        } else if(!isTomorrow && time === 18) {
-                            insertJson.eveningWeather = {
-                                code: className.split(' ')[2],
-                                temp: temp
-                            }
-                        } else if(!isTomorrow && time === 23) {
-                            insertJson.nightWeather = {
-                                code: className.split(' ')[2],
-                                temp: temp
-                            }
-                        } else if(isTomorrow && time === 7) {
-                            insertJson.tomorrowMorningWeather = {
-                                code: className.split(' ')[2],
-                                temp: temp
-                            }
-                        } else if(isTomorrow && time === 12) {
-                            insertJson.tomorrowDayWeather = {
-                                code: className.split(' ')[2],
-                                temp: temp
-                            }
-                        } else if(isTomorrow && time === 18) {
-                            insertJson.tomorrowEveningWeather = {
-                                code: className.split(' ')[2],
-                                temp: temp
-                            }
-                        }  
-                    });
+                    //     var className = $element.find('.svnicon').attr('class');
+                    //     var temp = $element.find('.tempLi').text().replace(/°/,'');
 
-                    //插入数据
-                    collection.insert(insertJson, function(error, result) {                        
-                        res.json({code: successCode, msg: "", data: insertJson}); 
-                        db.close();
-                    });
+                    //     if(!isTomorrow && time === 7) {
+                    //         insertJson.morningWeather = {
+                    //             code: className.split(' ')[2],
+                    //             temp: temp
+                    //         }
+                    //     } else if(!isTomorrow && time === 12) {
+                    //         insertJson.dayWeather = {
+                    //             code: className.split(' ')[2],
+                    //             temp: temp
+                    //         }
+                    //     } else if(!isTomorrow && time === 18) {
+                    //         insertJson.eveningWeather = {
+                    //             code: className.split(' ')[2],
+                    //             temp: temp
+                    //         }
+                    //     } else if(!isTomorrow && time === 23) {
+                    //         insertJson.nightWeather = {
+                    //             code: className.split(' ')[2],
+                    //             temp: temp
+                    //         }
+                    //     } else if(isTomorrow && time === 7) {
+                    //         insertJson.tomorrowMorningWeather = {
+                    //             code: className.split(' ')[2],
+                    //             temp: temp
+                    //         }
+                    //     } else if(isTomorrow && time === 12) {
+                    //         insertJson.tomorrowDayWeather = {
+                    //             code: className.split(' ')[2],
+                    //             temp: temp
+                    //         }
+                    //     } else if(isTomorrow && time === 18) {
+                    //         insertJson.tomorrowEveningWeather = {
+                    //             code: className.split(' ')[2],
+                    //             temp: temp
+                    //         }
+                    //     }  
+                    // });
+
+                    // //插入数据
+                    // collection.insert(insertJson, function(error, result) {                        
+                    //     res.json({code: successCode, msg: "", data: insertJson}); 
+                    //     db.close();
+                    // });
                 });
             }
         });
