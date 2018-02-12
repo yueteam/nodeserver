@@ -135,7 +135,7 @@ app.get('/getweatherinfo', function(req, res){
                     $('.t .clearfix li').each(function(idx, element) {
                         var $element = $(element),
                             bigClass = $element.find('.jpg80').attr('class'),
-                            weaCode = bigClass || 'd00',
+                            weaCode = bigClass.substr(6),
                             weaText = $element.find('.wea').attr('title'),
                             temp = $element.find('.tem span').text(),
                             $win = $element.find('.win span'),
@@ -173,10 +173,10 @@ app.get('/getweatherinfo', function(req, res){
                         }
                     });
 
-                    $('.curve_livezs .wpic .png40').each(function(idx, element) {
+                    $('#curve .wpic .png40').each(function(idx, element) {
                         var $element = $(element),
                             cls = $element.attr('class'),
-                            weaCode = cls[1],
+                            weaCode = cls.substr(6,3),
                             digitalCode = parseInt(weaCode.substr(1)),
                             weaText = $element.attr('title');
 
@@ -190,7 +190,7 @@ app.get('/getweatherinfo', function(req, res){
                             insertJson.eveningWeather.weaText = weaText;
                         }
                     });     
-                    $('.curve_livezs .tem em').each(function(idx, element) {
+                    $('#curve .tem em').each(function(idx, element) {
                         var $element = $(element),
                             temp = $element.text();
                         temp = temp.replace(/℃/,'');
@@ -201,7 +201,7 @@ app.get('/getweatherinfo', function(req, res){
                             insertJson.eveningWeather.temp = temp;
                         }
                     });   
-                    $('.curve_livezs .winf em').each(function(idx, element) {
+                    $('#curve .winf em').each(function(idx, element) {
                         var $element = $(element),
                             winf = $element.text();
 
@@ -211,7 +211,7 @@ app.get('/getweatherinfo', function(req, res){
                             insertJson.eveningWeather.wind = [winf];
                         }
                     });  
-                    $('.curve_livezs .winl em').each(function(idx, element) {
+                    $('#curve .winl em').each(function(idx, element) {
                         var $element = $(element),
                             winl = $element.text();
 
