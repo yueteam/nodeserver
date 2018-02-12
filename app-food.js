@@ -173,6 +173,8 @@ app.get('/getweatherinfo', function(req, res){
                         }
                     });
 
+                    var asd = $('#curve').next('script').text();
+                    console.log(asd);
                     $('#curve .wpic .png40').each(function(idx, element) {
                         var $element = $(element),
                             cls = $element.attr('class'),
