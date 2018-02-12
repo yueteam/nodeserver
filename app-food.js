@@ -134,8 +134,9 @@ app.get('/getweatherinfo', function(req, res){
 
                     $('.t .clearfix li').each(function(idx, element) {
                         var $element = $(element),
-                            bigClass = $element.find('.jpg80').attr('class'),
-                            weaCode = 'd00',
+                            title = $element.find('h1').text(),
+                            bigClass = $element.find('big').attr('class'),
+                            weaCode = bigClass.substr(6),
                             weaText = $element.find('.wea').attr('title'),
                             temp = $element.find('.tem span').text(),
                             $win = $element.find('.win span'),
@@ -143,20 +144,38 @@ app.get('/getweatherinfo', function(req, res){
                             sky = $element.find('.sky .txt')[0] ? $element.find('.sky .txt').text() : '';
 
                         if(idx === 0) {
-                            if($element.find('.sunUp span')[0]) {
-                                insertJson.morningWeather.sunUp = $element.find('.sunUp span').text();
+                            if(title.indexOf('白天') > -1) {
+                                if($element.find('.sunUp span')[0]) {
+                                    insertJson.morningWeather.sunUp = $element.find('.sunUp span').text();
+                                }
+                                insertJson.dayWeather = {
+                                    time: 'day',
+                                    timeText: '白天',
+                                    weaCode: weaCode,
+                                    digitalCode: parseInt(weaCode.substr(1)),
+                                    weaText: weaText,
+                                    temp: temp,
+                                    wind: wind,
+                                    sky: sky
+                                }
+                            } else {
+                                if($element.find('.sunDown span')[0]) {
+                                    insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
+                                }
+                                insertJson.nightWeather = {
+                                    time: 'night',
+                                    timeText: '晚上',
+                                    weaCode: weaCode,
+                                    digitalCode: parseInt(weaCode.substr(1)),
+                                    weaText: weaText,
+                                    temp: temp,
+                                    wind: wind,
+                                    sky: sky
+                                }
                             }
-                            insertJson.dayWeather = {
-                                time: 'day',
-                                timeText: '白天',
-                                weaCode: weaCode,
-                                digitalCode: parseInt(weaCode.substr(1)),
-                                weaText: weaText,
-                                temp: temp,
-                                wind: wind,
-                                sky: sky
-                            }
-                        } else {
+                        }  
+
+                        if(idx === 1 && title.indexOf('夜间') > -1) {
                             if($element.find('.sunDown span')[0]) {
                                 insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
                             }
@@ -173,56 +192,28 @@ app.get('/getweatherinfo', function(req, res){
                         }
                     });
 
-                    var asd = $('#curve').next('script').text();
-                    console.log(asd);
-                    $('#curve .wpic .png40').each(function(idx, element) {
-                        var $element = $(element),
-                            cls = $element.attr('class'),
-                            weaCode = cls.substr(6,3),
-                            digitalCode = parseInt(weaCode.substr(1)),
-                            weaText = $element.attr('title');
+                    if(new Date().getHours() < 18) {
+                        var hour3dataText = $('#curve').next('script').text(),
+                            hour3dataStr = hour3dataText.split('=')[1],
+                            hour3data = JSON.parse(hour3dataStr),
+                            hour3data1d =  hour3data['1d'],
+                            morningData = hour3data1d[0],
+                            eveningData = hour3data1d[2],
+                            morningDataArr = morningData.split(','),
+                            eveningDataArr = eveningData.split(',');
 
-                        if(idx === 0) {
-                            insertJson.morningWeather.weaCode = weaCode;
-                            insertJson.morningWeather.digitalCode = digitalCode;
-                            insertJson.morningWeather.weaText = weaText;
-                        } else if(idx === 3) {
-                            insertJson.eveningWeather.weaCode = weaCode;
-                            insertJson.eveningWeather.digitalCode = digitalCode;
-                            insertJson.eveningWeather.weaText = weaText;
-                        }
-                    });     
-                    $('#curve .tem em').each(function(idx, element) {
-                        var $element = $(element),
-                            temp = $element.text();
-                        temp = temp.replace(/℃/,'');
-
-                        if(idx === 0) {
-                            insertJson.morningWeather.temp = temp;
-                        } else if(idx === 3) {
-                            insertJson.eveningWeather.temp = temp;
-                        }
-                    });   
-                    $('#curve .winf em').each(function(idx, element) {
-                        var $element = $(element),
-                            winf = $element.text();
-
-                        if(idx === 0) {
-                            insertJson.morningWeather.wind = [winf];
-                        } else if(idx === 3) {
-                            insertJson.eveningWeather.wind = [winf];
-                        }
-                    });  
-                    $('#curve .winl em').each(function(idx, element) {
-                        var $element = $(element),
-                            winl = $element.text();
-
-                        if(idx === 0) {
-                            insertJson.morningWeather.wind.push(winl);
-                        } else if(idx === 3) {
-                            insertJson.eveningWeather.wind.push(winl);
-                        }
-                    });            
+                        insertJson.morningWeather.weaCode = morningDataArr[1];
+                        insertJson.morningWeather.digitalCode = parseInt(morningDataArr[1].substr(1));
+                        insertJson.morningWeather.weaText = morningDataArr[2];
+                        insertJson.morningWeather.temp = morningDataArr[3].replace(/℃/,'');
+                        insertJson.morningWeather.wind = [morningDataArr[4], morningDataArr[5]];
+                       
+                        insertJson.eveningWeather.weaCode = eveningWeather[1];
+                        insertJson.eveningWeather.digitalCode = parseInt(eveningWeather[1].substr(1));
+                        insertJson.eveningWeather.weaText = eveningWeather[2];
+                        insertJson.eveningWeather.temp = eveningWeather[3].replace(/℃/,'');
+                        insertJson.eveningWeather.wind = [eveningWeather[4], eveningWeather[5]];
+                    }               
 
                     //插入数据
                     collection.insert(insertJson, function(error, result) {                        
