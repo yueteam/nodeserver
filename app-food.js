@@ -180,7 +180,7 @@ app.get('/getweatherinfo', function(req, res){
                                 }
                             }
                         } else {
-                            console.log(title);
+                            console.log($win.text());
                             if(title.indexOf('夜间') > -1) {
                                 if($element.find('.sunDown span')[0]) {
                                     insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
