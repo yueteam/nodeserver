@@ -180,7 +180,6 @@ app.get('/getweatherinfo', function(req, res){
                                 }
                             }
                         } else {
-                            console.log($win.text());
                             if(title.indexOf('夜间') > -1) {
                                 if($element.find('.sunDown span')[0]) {
                                     insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
@@ -205,21 +204,29 @@ app.get('/getweatherinfo', function(req, res){
                             hour3data = JSON.parse(hour3dataStr),
                             hour3data1d =  hour3data['1d'],
                             morningData = hour3data1d[0],
-                            eveningData = hour3data1d[2],
+                            dayData = hour3data1d[2],
+                            eveningData = hour3data1d[3],
+                            nightData = hour3data1d[5],
                             morningDataArr = morningData.split(','),
-                            eveningDataArr = eveningData.split(',');
+                            dayDataArr = dayData.split(','),
+                            eveningDataArr = eveningData.split(','),
+                            nightDataArr = nightData.split(',');
 
                         insertJson.morningWeather.weaCode = morningDataArr[1];
                         insertJson.morningWeather.digitalCode = parseInt(morningDataArr[1].substr(1));
                         insertJson.morningWeather.weaText = morningDataArr[2];
                         insertJson.morningWeather.temp = morningDataArr[3].replace(/℃/,'');
                         insertJson.morningWeather.wind = [morningDataArr[4], morningDataArr[5]];
+
+                        insertJson.dayWeather.wind = [dayDataArr[4], dayDataArr[5]];
                        
                         insertJson.eveningWeather.weaCode = eveningDataArr[1];
                         insertJson.eveningWeather.digitalCode = parseInt(eveningDataArr[1].substr(1));
                         insertJson.eveningWeather.weaText = eveningDataArr[2];
                         insertJson.eveningWeather.temp = eveningDataArr[3].replace(/℃/,'');
                         insertJson.eveningWeather.wind = [eveningDataArr[4], eveningDataArr[5]];
+
+                        insertJson.nightWeather.wind = [nightDataArr[4], nightDataArr[5]];
                     }               
 
                     //插入数据
