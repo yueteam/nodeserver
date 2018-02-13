@@ -102,7 +102,7 @@ app.get('/getforecast', function(req, res){
                 //关闭数据库
                 db.close();
             } else {  
-                superagent.get('https://free-api.heweather.com/s6/weather/forecast?location='+city+'&key=ef7860519dfb4062825fb1034fcb6690')
+                superagent.get('https://free-api.heweather.com/s6/weather/forecast?location='+encodeURIComponent(city)+'&key=ef7860519dfb4062825fb1034fcb6690')
                 .charset('utf-8')
                 .end(function (err1, sres) {
                     if (err1) {
