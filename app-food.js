@@ -210,11 +210,11 @@ app.get('/getweatherinfo', function(req, res){
                         insertJson.morningWeather.temp = morningDataArr[3].replace(/℃/,'');
                         insertJson.morningWeather.wind = [morningDataArr[4], morningDataArr[5]];
                        
-                        insertJson.eveningWeather.weaCode = eveningWeather[1];
-                        insertJson.eveningWeather.digitalCode = parseInt(eveningWeather[1].substr(1));
-                        insertJson.eveningWeather.weaText = eveningWeather[2];
-                        insertJson.eveningWeather.temp = eveningWeather[3].replace(/℃/,'');
-                        insertJson.eveningWeather.wind = [eveningWeather[4], eveningWeather[5]];
+                        insertJson.eveningWeather.weaCode = eveningDataArr[1];
+                        insertJson.eveningWeather.digitalCode = parseInt(eveningDataArr[1].substr(1));
+                        insertJson.eveningWeather.weaText = eveningDataArr[2];
+                        insertJson.eveningWeather.temp = eveningDataArr[3].replace(/℃/,'');
+                        insertJson.eveningWeather.wind = [eveningDataArr[4], eveningDataArr[5]];
                     }               
 
                     //插入数据
