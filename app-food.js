@@ -77,6 +77,58 @@ var weatherWXInfo = {
         secret: '967d616ea68a37697c3a400d256e8cdd'
     };
 
+app.get('/getforecast', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var city = req.query.city;
+    var nowdate = new Date(),
+        year = nowdate.getFullYear(),
+        month = nowdate.getMonth()+1,
+        date = nowdate.getDate(),
+        dateStr = year+'/'+month+'/'+date;
+
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("forecast连接成功！");
+        var collection = db.collection('forecast');
+        collection.findOne({city: city, date: dateStr}, function(err, item){   
+            if(err) {
+                res.json({code: failCode, data: err}); 
+                db.close();
+                return;
+            }
+
+            if(item) {
+                res.json({code: 1, msg: "", data: item.daily_forecast});
+
+                //关闭数据库
+                db.close();
+            } else {  
+                superagent.get('https://free-api.heweather.com/s6/weather/forecast?location='+city+'&key=ef7860519dfb4062825fb1034fcb6690')
+                .charset('utf-8')
+                .end(function (err1, sres) {
+                    if (err1) {
+                        res.json({code: failCode, msg: err1});
+                        return;
+                    }
+
+                    var dataJson = JSON.parse(sres.text),
+                        weatherJson = dataJson.HeWeather6[0];
+
+                    if(weatherJson.status === 'ok' && weatherJson.daily_forecast) {
+                        weatherJson.city = city;
+                        weatherJson.date = dateStr;
+
+                        //插入数据
+                        collection.insert(weatherJson, function(error, result) {                        
+                            res.json({code: successCode, msg: "", data: weatherJson.daily_forecast}); 
+                            db.close();
+                        });
+                    }
+                });
+            }
+        });
+    });                          
+});
+
 app.get('/getweatherinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     // var lat = req.query.lat,
@@ -99,7 +151,7 @@ app.get('/getweatherinfo', function(req, res){
         var collection = db.collection('weather');
         collection.findOne({city: city, date: dateStr}, function(err, item){   
             if(err) {
-                res.json({code: failCode, data: err1}); 
+                res.json({code: failCode, data: err}); 
                 db.close();
                 return;
             }
