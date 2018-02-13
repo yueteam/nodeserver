@@ -79,16 +79,20 @@ var weatherWXInfo = {
 
 app.get('/getweatherinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var lat = req.query.lat,
-        lon = req.query.lon,
-        city = req.query.city,
+    // var lat = req.query.lat,
+    //     lon = req.query.lon,
+    var city = req.query.city,
         code = req.query.code;
 
     var nowdate = new Date(),
         year = nowdate.getFullYear(),
         month = nowdate.getMonth()+1,
         date = nowdate.getDate(),
-        dateStr = year+'/'+month+'/'+date;
+        hour = nowdate.getHours();
+    if(hour >= 0 && hour < 6) {
+        date = date - 1;
+    }
+    var dateStr = year+'/'+month+'/'+date;
     
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("weather连接成功！");
@@ -175,21 +179,22 @@ app.get('/getweatherinfo', function(req, res){
                                     sky: sky
                                 }
                             }
-                        }  
-
-                        if(idx === 1 && title.indexOf('夜间') > -1) {
-                            if($element.find('.sunDown span')[0]) {
-                                insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
-                            }
-                            insertJson.nightWeather = {
-                                time: 'night',
-                                timeText: '晚上',
-                                weaCode: 'n'+weaCode,
-                                digitalCode: parseInt(weaCode),
-                                weaText: weaText,
-                                temp: temp,
-                                wind: wind,
-                                sky: sky
+                        } else {
+                            console.log(title);
+                            if(title.indexOf('夜间') > -1) {
+                                if($element.find('.sunDown span')[0]) {
+                                    insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
+                                }
+                                insertJson.nightWeather = {
+                                    time: 'night',
+                                    timeText: '晚上',
+                                    weaCode: 'n'+weaCode,
+                                    digitalCode: parseInt(weaCode),
+                                    weaText: weaText,
+                                    temp: temp,
+                                    wind: wind,
+                                    sky: sky
+                                }
                             }
                         }
                     });
