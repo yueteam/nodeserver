@@ -509,7 +509,7 @@ app.post('/addrecipe', function(req, res){
         title: req.body.title,
         summary: req.body.desc,
         cook_time: req.body.cookTime,
-        category: '美食',
+        category: '年夜饭',
         fork_users: [],
         author_id: req.body.userId,
         author: {
