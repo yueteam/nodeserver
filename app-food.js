@@ -81,17 +81,17 @@ app.get('/getforecast', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var city = req.query.city;
     var nowdate = new Date(),
-        year = nowdate.getFullYear(),
+        date1 = nowdate.getDate(),
+        hour = nowdate.getHours();
+
+    if(hour >= 0 && hour < 6) {
+        nowdate.setDate(date1 - 1);
+    }
+
+    var year = nowdate.getFullYear(),
         month = nowdate.getMonth()+1,
         date = nowdate.getDate(),
-        hour = nowdate.getHours();
-    if(hour >= 0 && hour < 6) {
-        var newdate = nowdate.setDate(date - 1);
-        year = newdate.getFullYear();
-        month = newdate.getMonth()+1;
-        date = newdate.getDate();
-    }
-    var dateStr = year+'/'+month+'/'+date;
+        dateStr = year+'/'+month+'/'+date;
 
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("forecast连接成功！");
@@ -144,17 +144,17 @@ app.get('/getweatherinfo', function(req, res){
         code = req.query.code;
 
     var nowdate = new Date(),
-        year = nowdate.getFullYear(),
+        date1 = nowdate.getDate(),
+        hour = nowdate.getHours();
+
+    if(hour >= 0 && hour < 6) {
+        nowdate.setDate(date1 - 1);
+    }
+
+    var year = nowdate.getFullYear(),
         month = nowdate.getMonth()+1,
         date = nowdate.getDate(),
-        hour = nowdate.getHours();
-    if(hour >= 0 && hour < 6) {
-        var newdate = nowdate.setDate(date - 1);
-        year = newdate.getFullYear();
-        month = newdate.getMonth()+1;
-        date = newdate.getDate();
-    }
-    var dateStr = year+'/'+month+'/'+date;
+        dateStr = year+'/'+month+'/'+date;
     
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("weather连接成功！");
