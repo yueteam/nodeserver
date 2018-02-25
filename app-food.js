@@ -87,8 +87,8 @@ app.get('/getforecast', function(req, res){
         hour = nowdate.getHours();
     if(hour >= 0 && hour < 6) {
         var newdate = nowdate.setDate(date - 1);
-        year = newdate.getFullYear(),
-        month = newdate.getMonth()+1,
+        year = newdate.getFullYear();
+        month = newdate.getMonth()+1;
         date = newdate.getDate();
     }
     var dateStr = year+'/'+month+'/'+date;
@@ -150,8 +150,8 @@ app.get('/getweatherinfo', function(req, res){
         hour = nowdate.getHours();
     if(hour >= 0 && hour < 6) {
         var newdate = nowdate.setDate(date - 1);
-        year = newdate.getFullYear(),
-        month = newdate.getMonth()+1,
+        year = newdate.getFullYear();
+        month = newdate.getMonth()+1;
         date = newdate.getDate();
     }
     var dateStr = year+'/'+month+'/'+date;
