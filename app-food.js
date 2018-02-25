@@ -84,7 +84,14 @@ app.get('/getforecast', function(req, res){
         year = nowdate.getFullYear(),
         month = nowdate.getMonth()+1,
         date = nowdate.getDate(),
-        dateStr = year+'/'+month+'/'+date;
+        hour = nowdate.getHours();
+    if(hour >= 0 && hour < 6) {
+        var newdate = nowdate.setDate(date - 1);
+        year = newdate.getFullYear(),
+        month = newdate.getMonth()+1,
+        date = newdate.getDate();
+    }
+    var dateStr = year+'/'+month+'/'+date;
 
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("forecast连接成功！");
@@ -142,7 +149,10 @@ app.get('/getweatherinfo', function(req, res){
         date = nowdate.getDate(),
         hour = nowdate.getHours();
     if(hour >= 0 && hour < 6) {
-        date = date - 1;
+        var newdate = nowdate.setDate(date - 1);
+        year = newdate.getFullYear(),
+        month = newdate.getMonth()+1,
+        date = newdate.getDate();
     }
     var dateStr = year+'/'+month+'/'+date;
     
