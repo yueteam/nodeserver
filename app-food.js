@@ -77,6 +77,68 @@ var weatherWXInfo = {
         secret: '967d616ea68a37697c3a400d256e8cdd'
     };
 
+app.get('/openid', function(req, res){
+    var code = req.query.code;
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    superagent.get('https://api.weixin.qq.com/sns/jscode2session?appid='+weatherWXInfo.appid+'&secret='+weatherWXInfo.secret+'&js_code='+code+'&grant_type=authorization_code')
+    .charset('utf-8')
+    .end(function (err, sres) {
+        if (err) {
+            res.json({code: failCode, msg: err});
+            return;
+        }
+        var openId = JSON.parse(sres.text).openid;
+        res.json({code: successCode, msg: "", data: openId});        
+    });
+
+});
+app.get('/adduser', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var userInfo = {
+        open_id: req.query.openId,
+        nick_name: req.query.nickName,
+        gender: Number(req.query.gender),
+        language: req.query.language,
+        city: req.query.city,
+        province: req.query.province,
+        country: req.query.country,
+        avatar_url: req.query.avatarUrl,
+        create_time: Date.now()
+    };
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        
+        //执行插入数据操作
+        var collection = db.collection('wuser');
+        collection.find({open_id: userInfo.open_id}).toArray(function(err, items){        
+            if(items.length > 0) {
+                res.json({code: 1, msg: "", data: items[0]});
+
+                //关闭数据库
+                db.close();
+            } else {
+
+                //插入数据
+                collection.insert(userInfo, function(error, result) { 
+                    var fileName = result.insertedIds[0] + '.jpg';
+                    var filePath = './uploads/avatar/' + fileName;
+                    request(userInfo.avatar_url).pipe(fs.createWriteStream(filePath))
+                    .on('close', function() {
+                        co(function* () {
+                            var stream = fs.createReadStream(filePath);
+                            var result = yield client.putStream(fileName, stream);
+                            fs.unlinkSync(filePath);
+                        });
+                    });
+
+                    res.json({code: successCode, msg: "", data: result}); 
+                    db.close();
+                });
+            }
+        });
+    });
+});
+
 app.get('/getforecast', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var city = req.query.city;
