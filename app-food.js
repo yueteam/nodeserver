@@ -42,6 +42,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var DB_CONN_STR = 'mongodb://localhost:27017/food';
+var DB_CONN_STR1 = 'mongodb://localhost:27017/wish';
 
 const successCode = 0, failCode = -1;
 
@@ -106,10 +107,10 @@ app.get('/adduser', function(req, res){
         avatar_url: req.query.avatarUrl,
         create_time: Date.now()
     };
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
         
         //执行插入数据操作
-        var collection = db.collection('wuser');
+        var collection = db.collection('user');
         collection.find({open_id: userInfo.open_id}).toArray(function(err, items){        
             if(items.length > 0) {
                 res.json({code: 1, msg: "", data: items[0]});
@@ -796,10 +797,6 @@ app.get('/newsdetail', function(req, res){
     });
 });
 
-/**
- * [breakfast] 人人许愿
- * @type {Object}
- */
 app.get('/fdaccesstoken', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
        
@@ -866,20 +863,16 @@ app.get('/fdqrcode', function(req, res){
 app.post('/newwish', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var userId = req.body.userId;
-    var covers = req.body.covers;
+    var now = Date.now();
 
     var wishInfo = {
         user_id: userId,
         nick_name: req.body.nickName,
-        covers: covers.split(','),
-        film_name: req.body.filmName,
-        actress: req.body.actress,
-        actor: req.body.actor,
-        desc: req.body.desc,
+        wish: req.body.wish,
         fav_users: [],
-        create_time: Date.now()
+        create_time: now
     };
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
         console.log("wish连接成功！");
         var collection = db.collection('wish');
         collection.insert(wishInfo, function(err, result) { 
@@ -902,7 +895,7 @@ app.get('/wishlist', function(req, res){
     var pageNo = parseInt(req.query.pageNo);
     var userId = req.query.userId;
     var skipCount = (pageNo - 1) * 10;
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('wish');
         collection.find({}, {nick_name:0}).sort({'create_time':-1}).limit(10).skip(skipCount).toArray(function(err, items){        
             if(items.length > 0) {
@@ -923,7 +916,7 @@ app.get('/fav', function(req, res){
 
     var userId = req.query.userId,
         wishId = req.query.wishId;
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('wish');
         collection.update({_id: ObjectID(wishId)}, {$addToSet: {fav_users: ObjectID(userId)}}, function(err1, result) {  
             if(err1) {
@@ -941,7 +934,7 @@ app.get('/unfav', function(req, res){
 
     var userId = req.query.userId,
         wishId = req.query.wishId;
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('wish');
         collection.update({_id: ObjectID(wishId)}, {$pull: {fav_users: ObjectID(userId)}}, function(err1, result) {  
             if(err1) {
@@ -960,7 +953,7 @@ app.get('/wishdetail', function(req, res){
 
     var id = req.query.id;
     var userId = req.query.userId;
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('wish');
         collection.findOne({_id: ObjectID(id)}, function(err1, item){        
             if(err1) {
