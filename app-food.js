@@ -797,13 +797,13 @@ app.get('/newsdetail', function(req, res){
     });
 });
 
-app.get('/fdaccesstoken', function(req, res){
+app.get('/accesstoken', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
        
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('wx');
         var requestNewToken = function(){
-            superagent.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='+foodWXInfo.appid+'&secret='+foodWXInfo.secret)
+            superagent.get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='+weatherWXInfo.appid+'&secret='+weatherWXInfo.secret)
             .charset('utf-8')
             .end(function (err, sres) {
                 if (err) {
@@ -827,7 +827,7 @@ app.get('/fdaccesstoken', function(req, res){
             if(items.length>0) {
                 var now = Date.now();
                 if(now < items[0].expires_time) {
-                    res.json({code: successCode, msg: "", data: items[0].access_token}); 
+                    res.json({code: 1, msg: "", data: items[0].access_token}); 
                     db.close();
                 } else {
                     requestNewToken();
@@ -839,12 +839,13 @@ app.get('/fdaccesstoken', function(req, res){
     });
 });
 
-app.get('/fdqrcode', function(req, res){
+app.get('/qrcode', function(req, res){
     var accessToken = req.query.accessToken,
         path = req.query.path,
+        id = req.query.id,
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
-    var filePath = './uploads/qrcode/shaiqrcode.png';
+    var filePath = './uploads/qrcode/qrcode_'+id+'.png';
     request({ 
         method: 'POST', 
         url: 'https://api.weixin.qq.com/wxa/getwxacode?access_token=' + accessToken, 
@@ -871,6 +872,7 @@ app.post('/newwish', function(req, res){
         wish: req.body.wish,
         planet: req.body.planet,
         fav_users: [],
+        comments: [],
         create_time: now
     };
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
@@ -885,6 +887,25 @@ app.post('/newwish', function(req, res){
                 return;
             } 
             res.json({code: successCode, msg: "", data: result.insertedIds[0]}); 
+            db.close();
+        });
+    });
+});
+
+app.get('/wishdetail', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    var id = req.query.id;
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        var collection = db.collection('wish');
+        collection.findOne({_id: ObjectID(id)}, function(err1, item){        
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            } 
+
+            res.json({code: successCode, msg: "", data: item});
             db.close();
         });
     });
@@ -944,26 +965,6 @@ app.get('/unfav', function(req, res){
                 return;
             } 
             res.json({code: successCode, msg: ""});
-            db.close();
-        });
-    });
-});
-
-app.get('/wishdetail', function(req, res){
-    res.header("Content-Type", "application/json; charset=utf-8");
-
-    var id = req.query.id;
-    var userId = req.query.userId;
-    MongoClient.connect(DB_CONN_STR1, function(err, db) {
-        var collection = db.collection('wish');
-        collection.findOne({_id: ObjectID(id)}, function(err1, item){        
-            if(err1) {
-                res.json({code: failCode, data: err1}); 
-                db.close();
-                return;
-            } 
-
-            res.json({code: successCode, msg: "", data: item});
             db.close();
         });
     });
