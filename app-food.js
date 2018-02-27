@@ -865,7 +865,14 @@ app.get('/qrcode', function(req, res){
             if(err) {
                 res.json({code: failCode, data: err}); 
             } else {
-                res.json({code: successCode, msg: "", data: data}); 
+                var qrcodeUrl = 'https://zhishi-1255988328.picsh.myqcloud.com/'+fileName;
+                res.json({code: successCode, msg: "", data: qrcodeUrl}); 
+                MongoClient.connect(DB_CONN_STR1, function(err, db) {
+                    var collection = db.collection('wish');
+                    collection.update({_id: ObjectID(id)}, {$set: {qrcode_url: qrcodeUrl}},  function(err1, item){                        
+                        db.close();
+                    });
+                });
             }
 
             // 上传之后删除本地文件
