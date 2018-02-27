@@ -852,8 +852,9 @@ app.get('/qrcode', function(req, res){
         url: 'https://api.weixin.qq.com/wxa/getwxacode?access_token=' + accessToken, 
         body: JSON.stringify({path:path,width:width}) 
     }).pipe(fs.createWriteStream(filePath))
-    .on('end', function() {
+    .on('close', function() {
         var stat = fs.statSync(filePath);
+        console.log('图片大小'+stat.size);
         cos.putObject({
             Bucket: 'zhishi-1255988328', 
             Region: 'ap-shanghai',
