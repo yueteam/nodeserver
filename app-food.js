@@ -869,6 +869,7 @@ app.post('/newwish', function(req, res){
         user_id: userId,
         nick_name: req.body.nickName,
         wish: req.body.wish,
+        planet: req.body.planet,
         fav_users: [],
         create_time: now
     };
@@ -962,7 +963,7 @@ app.get('/wishdetail', function(req, res){
                 return;
             } 
 
-            res.json({code: successCode, msg: "", data: newItem});
+            res.json({code: successCode, msg: "", data: item});
             db.close();
         });
     });
