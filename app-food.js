@@ -841,21 +841,33 @@ app.get('/accesstoken', function(req, res){
 
 app.get('/qrcode', function(req, res){
     var accessToken = req.query.accessToken,
-        path = req.query.path,
         id = req.query.id,
+        path = 'pages/detail/detail?id='+id,
         width = Number(req.query.width);
     res.header("Content-Type", "application/json; charset=utf-8");
-    var filePath = './uploads/qrcode/qrcode_'+id+'.png';
+    var fileName = 'qrcode_'+id+'.png';
+    var filePath = './uploads/qrcode/'+fileName;
     request({ 
         method: 'POST', 
         url: 'https://api.weixin.qq.com/wxa/getwxacode?access_token=' + accessToken, 
         body: JSON.stringify({path:path,width:width}) 
     }).pipe(fs.createWriteStream(filePath))
-    .on('close', function() {
-        co(function* () {
-            var stream = fs.createReadStream(filePath);
-            var result = yield client.putStream('shaiqrcode.png', stream);
-            res.json({code: successCode, msg: "", data: result.url.replace(/http:/,'https:')});
+    .on('end', function() {
+        var stat = fs.statSync(filePath);
+        cos.putObject({
+            Bucket: 'zhishi-1255988328', 
+            Region: 'ap-shanghai',
+            Key: fileName, 
+            ContentLength: stat.size,
+            Body: fs.createReadStream(filePath)
+        }, function (err, data) { 
+            if(err) {
+                res.json({code: failCode, data: err}); 
+            } else {
+                res.json({code: successCode, msg: "", data: data}); 
+            }
+
+            // 上传之后删除本地文件
             fs.unlinkSync(filePath);
         });
     });
