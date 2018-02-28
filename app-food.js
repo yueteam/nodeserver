@@ -284,9 +284,12 @@ app.get('/getweatherinfo', function(req, res){
                     }
 
                     var $ = cheerio.load(sres.text);
+                    var updateTime = $('.ctop .time').text();
+                    updateTime = updateTime.substr(0,5);
                     var insertJson = {
                         city: city,
                         date: dateStr,
+                        updateTime: updateTime,
                         morningWeather: {
                             time: 'morning',
                             timeText: '早晨',
