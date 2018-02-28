@@ -220,7 +220,7 @@ app.get('/getweatherinfo', function(req, res){
         date = nowdate.getDate(),
         dateStr = year+'/'+month+'/'+date;
 
-    var weatherArr = {"暴雨":"10","大暴雨":"11","特大暴雨":"12","阵雪":"13","小雪":"14","中雪":"15","大雪":"16","暴雪":"17","雾":"18","冻雨":"19","沙尘暴":"20","小到中雨":"21","中到大雨":"22","大到暴雨":"23","暴雨到大暴雨":"24","大暴雨到特大暴雨":"25","小到中雪":"26","中到大雪":"27","大到暴雪":"28","浮尘":"29","扬沙":"30","强沙尘暴":"31","霾":"53","":"99","晴":"00","晴朗":"00","晴朗无云":"00","晴间多云":"00","大部分地区晴朗":"00","大部地区晴朗":"00","多云":"01","大部多云":"01","大部分地区多云":"01","局部多云":"01","阴":"02","阵雨":"03","雷阵雨":"04","雷阵雨伴有冰雹":"05","雨夹雪":"06","雨":"07","小雨":"07","中雨":"08","大雨":"09"};
+    var weatherArr = {"暴雨":"10","大暴雨":"11","特大暴雨":"12","阵雪":"13","小雪":"14","中雪":"15","大雪":"16","暴雪":"17","雾":"18","冻雨":"19","沙尘暴":"20","小到中雨":"21","中到大雨":"22","大到暴雨":"23","暴雨到大暴雨":"24","大暴雨到特大暴雨":"25","小到中雪":"26","中到大雪":"27","大到暴雪":"28","浮尘":"29","扬沙":"30","强沙尘暴":"31","霾":"53","":"99","晴":"00","晴朗":"00","晴朗无云":"00","晴间多云":"00","大部晴朗":"00","多云":"01","大部多云":"01","局部多云":"01","阴":"02","阵雨":"03","雷阵雨":"04","雷阵雨伴有冰雹":"05","雨夹雪":"06","雨":"07","小雨":"07","中雨":"08","大雨":"09"};
     
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("weather连接成功！");
@@ -250,11 +250,15 @@ app.get('/getweatherinfo', function(req, res){
                         var $ = cheerio.load(sres.text);
                         var newItem = item,
                             newWeaText = $('#dp0-phrase').text(),
+                            newWeaText = newWeaText.replace(/分地区/,'').replace(/地区/,''),
                             newWeaCode = weatherArr[newWeaText] || '00',
                             newTemp = $('#daypart-0 .today-daypart-temp span').text(),
+                            newTemp = newTemp.replace(/°/,''),
                             newWeaText1 = $('#dp1-phrase').text(),
+                            newWeaText1 = newWeaText1.replace(/分地区/,'').replace(/地区/,''),
                             newWeaCode1 = weatherArr[newWeaText1] || '00',
-                            newTemp1 = $('#daypart-1 .today-daypart-temp span').text();
+                            newTemp1 = $('#daypart-1 .today-daypart-temp span').text(),
+                            newTemp1 = newTemp1.replace(/°/,'');
 
                         newItem.correct = 1;
                         newItem.updateTime = $('.today_nowcard-timestamp span').last().text();
