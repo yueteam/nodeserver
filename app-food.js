@@ -249,6 +249,7 @@ app.get('/getweatherinfo', function(req, res){
 
                         var $ = cheerio.load(sres.text);
                         var newItem = item,
+                            weaTitle = $('#dp0-daypartName').text(),
                             newWeaText = $('#dp0-phrase').text(),
                             newWeaText = newWeaText.replace(/分地区/,'').replace(/地区/,''),
                             newWeaCode = weatherArr[newWeaText] || '00',
@@ -262,14 +263,21 @@ app.get('/getweatherinfo', function(req, res){
 
                         newItem.correct = 1;
                         newItem.updateTime = $('.today_nowcard-timestamp span').last().text();
-                        newItem.dayWeather.weaText = newWeaText;
-                        newItem.dayWeather.weaCode = 'd'+newWeaCode;
-                        newItem.dayWeather.digitalCode = parseInt(newWeaCode);
-                        newItem.dayWeather.temp = newTemp;
-                        newItem.nightWeather.weaText = newWeaText1;
-                        newItem.nightWeather.weaCode = 'n'+newWeaCode1;
-                        newItem.nightWeather.digitalCode = parseInt(newWeaCode1);
-                        newItem.nightWeather.temp = newTemp1;
+                        if(weaTitle === '今天白天') {
+                            newItem.dayWeather.weaText = newWeaText;
+                            newItem.dayWeather.weaCode = 'd'+newWeaCode;
+                            newItem.dayWeather.digitalCode = parseInt(newWeaCode);
+                            newItem.dayWeather.temp = newTemp;
+                            newItem.nightWeather.weaText = newWeaText1;
+                            newItem.nightWeather.weaCode = 'n'+newWeaCode1;
+                            newItem.nightWeather.digitalCode = parseInt(newWeaCode1);
+                            newItem.nightWeather.temp = newTemp1;
+                        } else {
+                            newItem.nightWeather.weaText = newWeaText;
+                            newItem.nightWeather.weaCode = 'n'+newWeaCode;
+                            newItem.nightWeather.digitalCode = parseInt(newWeaCode);
+                            newItem.nightWeather.temp = newTemp;
+                        }
 
                         //插入数据
                         collection.update({_id: ObjectID(newItem._id)}, {$set:{correct:1,updateTime:newItem.updateTime,dayWeather:newItem.dayWeather,nightWeather:newItem.nightWeather}}, function(error, result) {                        
