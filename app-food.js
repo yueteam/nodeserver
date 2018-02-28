@@ -236,7 +236,7 @@ app.get('/getweatherinfo', function(req, res){
                 if(city==='杭州' && item.correct) {
                     res.json({code: 1, msg: "", data: item});
                 } else {
-                    superagent.get('https://weather.com/zh-CN/weather/hourbyhour/l/40639bc67e3f94d7b526b1f193abd84e915495768500bc80d878d14cd10d8338')
+                    superagent.get('https://weather.com/zh-CN/weather/today/l/40639bc67e3f94d7b526b1f193abd84e915495768500bc80d878d14cd10d8338')
                     .charset('utf-8')
                     .end(function (err1, sres) {
                         if (err1) {
