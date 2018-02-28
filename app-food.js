@@ -235,6 +235,9 @@ app.get('/getweatherinfo', function(req, res){
             if(item) {
                 if(city==='杭州' && item.correct) {
                     res.json({code: 1, msg: "", data: item});
+
+                    //关闭数据库
+                    db.close();
                 } else {
                     superagent.get('https://weather.com/zh-CN/weather/today/l/40639bc67e3f94d7b526b1f193abd84e915495768500bc80d878d14cd10d8338')
                     .charset('utf-8')
@@ -248,10 +251,10 @@ app.get('/getweatherinfo', function(req, res){
                         var newItem = item,
                             newWeaText = $('#dp0-phrase').text(),
                             newWeaCode = weatherArr[newWeaText] || '00',
-                            newTemp = $('#dp0-phrase .today-daypart-temp span').text(),
+                            newTemp = $('#daypart-0 .today-daypart-temp span').text(),
                             newWeaText1 = $('#dp1-phrase').text(),
                             newWeaCode1 = weatherArr[newWeaText1] || '00',
-                            newTemp1 = $('#dp1-phrase .today-daypart-temp span').text();
+                            newTemp1 = $('#daypart-1 .today-daypart-temp span').text();
 
                         newItem.correct = 1;
                         newItem.updateTime = $('.today_nowcard-timestamp span').last().text();
@@ -260,7 +263,7 @@ app.get('/getweatherinfo', function(req, res){
                         newItem.dayWeather.digitalCode = parseInt(newWeaCode);
                         newItem.dayWeather.temp = newTemp;
                         newItem.nightWeather.weaText = newWeaText1;
-                        newItem.nightWeather.weaCode = 'd'+newWeaCode1;
+                        newItem.nightWeather.weaCode = 'n'+newWeaCode1;
                         newItem.nightWeather.digitalCode = parseInt(newWeaCode1);
                         newItem.nightWeather.temp = newTemp1;
 
@@ -271,9 +274,6 @@ app.get('/getweatherinfo', function(req, res){
                         });
                     });
                 }
-
-                //关闭数据库
-                db.close();
             } else {  
                 superagent.get('http://www.weather.com.cn/weather1d/'+code+'.shtml')
                 .charset('utf-8')
