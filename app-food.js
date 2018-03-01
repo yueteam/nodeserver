@@ -296,8 +296,7 @@ app.get('/getweatherinfo', function(req, res){
                     }
 
                     var $ = cheerio.load(sres.text);
-                    var updateTime = $('.ctop .time').text();
-                    updateTime = updateTime.substr(0,5);
+                    var updateTime = $('#update_time').val();
                     var insertJson = {
                         city: city,
                         date: dateStr,
@@ -943,6 +942,7 @@ app.post('/newwish', function(req, res){
         user_id: userId,
         nick_name: req.body.nickName,
         wish: req.body.wish,
+        city: req.body.city,
         planet: req.body.planet,
         fav_users: [],
         comments: [],
