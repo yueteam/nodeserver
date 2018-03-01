@@ -233,7 +233,7 @@ app.get('/getweatherinfo', function(req, res){
             }
 
             if(item) {
-                if(city==='杭州' && item.correct) {
+                if(city!=='杭州' || (city==='杭州' && item.correct)) {
                     res.json({code: 1, msg: "", data: item});
 
                     //关闭数据库
