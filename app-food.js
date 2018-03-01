@@ -348,7 +348,7 @@ app.get('/getweatherinfo', function(req, res){
                                 insertJson.nightWeather = {
                                     time: 'night',
                                     timeText: '晚上',
-                                    weaCode: 'n'+weaCode,
+                                    weaCode: 'n00',
                                     digitalCode: parseInt(weaCode),
                                     weaText: weaText,
                                     temp: temp,
