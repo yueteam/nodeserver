@@ -357,7 +357,7 @@ app.get('/getweatherinfo', function(req, res){
                                 insertJson.nightWeather = {
                                     time: 'night',
                                     timeText: '晚上',
-                                    weaCode: 'n00',
+                                    weaCode: 'n'+weaCode,
                                     digitalCode: parseInt(weaCode),
                                     weaText: weaText,
                                     temp: temp,
@@ -365,7 +365,7 @@ app.get('/getweatherinfo', function(req, res){
                                     sky: sky
                                 }
                             }
-                        } else {
+                        } else if(idx === 1) {
                             if(title.indexOf('夜间') > -1) {
                                 if($element.find('.sunDown span')[0]) {
                                     insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
@@ -1028,7 +1028,7 @@ app.get('/fav', function(req, res){
                 db.close();
                 return;
             } 
-            res.json({code: successCode, msg: ""});
+            res.json({code: successCode, msg: "", data: result});
             db.close();
         });
     });
