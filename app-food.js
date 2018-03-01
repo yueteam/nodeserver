@@ -209,7 +209,8 @@ app.get('/getweatherinfo', function(req, res){
 
     var nowdate = new Date(),
         date1 = nowdate.getDate(),
-        hour = nowdate.getHours();
+        hour = nowdate.getHours(),
+        minute = nowdate.getMinutes();
 
     if(hour >= 0 && hour < 6) {
         nowdate.setDate(date1 - 1);
@@ -232,7 +233,15 @@ app.get('/getweatherinfo', function(req, res){
                 return;
             }
 
+            var updated = false;
             if(item) {
+                var lastUpdateTime = item.updateTime;
+                var nowTimeNum = parseInt(hour) + parseInt(minute)*0.01;
+                if((lastUpdateTime === '07:30' && nowTimeNum < 11.3) || (lastUpdateTime === '11:30' && nowTimeNum < 18) || lastUpdateTime === '18:00') {
+                    updated = true;
+                }
+            }
+            if(updated) {
                 // if(city!=='杭州' || (city==='杭州' && item.correct)) {
                     res.json({code: 1, msg: "", data: item});
 
