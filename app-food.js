@@ -241,60 +241,13 @@ app.get('/getweatherinfo', function(req, res){
                     updated = true;
                 }
             }
+
             if(updated) {
-                // if(city!=='杭州' || (city==='杭州' && item.correct)) {
                     res.json({code: 1, msg: "", data: item});
 
                     //关闭数据库
                     db.close();
-                // } else {
-                //     superagent.get('https://weather.com/zh-CN/weather/today/l/40639bc67e3f94d7b526b1f193abd84e915495768500bc80d878d14cd10d8338')
-                //     .charset('utf-8')
-                //     .end(function (err1, sres) {
-                //         if (err1) {
-                //             res.json({code: failCode, msg: err1});
-                //             return;
-                //         }
 
-                //         var $ = cheerio.load(sres.text);
-                //         var newItem = item,
-                //             weaTitle = $('#dp0-daypartName').text(),
-                //             newWeaText = $('#dp0-phrase').text(),
-                //             newWeaText = newWeaText.replace(/分地区/,'').replace(/地区/,''),
-                //             newWeaCode = weatherArr[newWeaText] || '00',
-                //             newTemp = $('#daypart-0 .today-daypart-temp span').text(),
-                //             newTemp = newTemp.replace(/°/,''),
-                //             newWeaText1 = $('#dp1-phrase').text(),
-                //             newWeaText1 = newWeaText1.replace(/分地区/,'').replace(/地区/,''),
-                //             newWeaCode1 = weatherArr[newWeaText1] || '00',
-                //             newTemp1 = $('#daypart-1 .today-daypart-temp span').text(),
-                //             newTemp1 = newTemp1.replace(/°/,'');
-
-                //         newItem.correct = 1;
-                //         newItem.updateTime = $('.today_nowcard-timestamp span').last().text();
-                //         if(weaTitle === '今天白天') {
-                //             newItem.dayWeather.weaText = newWeaText;
-                //             newItem.dayWeather.weaCode = 'd'+newWeaCode;
-                //             newItem.dayWeather.digitalCode = parseInt(newWeaCode);
-                //             newItem.dayWeather.temp = newTemp;
-                //             newItem.nightWeather.weaText = newWeaText1;
-                //             newItem.nightWeather.weaCode = 'n'+newWeaCode1;
-                //             newItem.nightWeather.digitalCode = parseInt(newWeaCode1);
-                //             newItem.nightWeather.temp = newTemp1;
-                //         } else {
-                //             newItem.nightWeather.weaText = newWeaText;
-                //             newItem.nightWeather.weaCode = 'n'+newWeaCode;
-                //             newItem.nightWeather.digitalCode = parseInt(newWeaCode);
-                //             newItem.nightWeather.temp = newTemp;
-                //         }
-
-                //         //插入数据
-                //         collection.update({_id: ObjectID(newItem._id)}, {$set:{correct:1,updateTime:newItem.updateTime,dayWeather:newItem.dayWeather,nightWeather:newItem.nightWeather}}, function(error, result) {                        
-                //             res.json({code: successCode, msg: "", data: newItem}); 
-                //             db.close();
-                //         });
-                //     });
-                // }
             } else {  
                 superagent.get('http://www.weather.com.cn/weather1d/'+code+'.shtml')
                 .charset('utf-8')
@@ -327,7 +280,6 @@ app.get('/getweatherinfo', function(req, res){
                     $('.t .clearfix li').each(function(idx, element) {
                         var $element = $(element),
                             title = $element.find('h1').text(),
-                            // bigClass = $element.find('big').attr('class'),
                             weaText = $element.find('.wea').attr('title'),
                             weaCode = weatherArr[weaText],
                             temp = $element.find('.tem span').text(),
