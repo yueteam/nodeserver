@@ -908,7 +908,7 @@ app.post('/newwish', function(req, res){
         nick_name: req.body.nickName,
         wish: req.body.wish,
         city: req.body.city,
-        planet: req.body.planet,
+        planet: 'unknown',
         fav_users: [],
         comments: [],
         create_time: now
