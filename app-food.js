@@ -900,15 +900,14 @@ app.get('/qrcode', function(req, res){
 
 app.post('/newwish', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var userId = req.body.userId;
     var now = Date.now();
 
     var wishInfo = {
-        user_id: userId,
+        user_id: req.body.userId,
         nick_name: req.body.nickName,
         wish: req.body.wish,
         city: req.body.city,
-        planet: 'unknown',
+        planet: req.body.planet,
         fav_users: [],
         comments: [],
         create_time: now
