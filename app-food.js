@@ -278,59 +278,61 @@ app.get('/getweatherinfo', function(req, res){
                     };
 
                     $('.t .clearfix li').each(function(idx, element) {
-                        var $element = $(element),
-                            title = $element.find('h1').text(),
-                            weaText = $element.find('.wea').attr('title'),
-                            weaCode = weatherArr[weaText],
-                            temp = $element.find('.tem span').text(),
-                            $win = $element.find('.win span'),
-                            wind = [$win.attr('title'), $win.text()],
-                            sky = $element.find('.sky .txt')[0] ? $element.find('.sky .txt').text() : '';
+                        var $element = $(element);
+                        if($element.find('h1')[0]) {
+                            var title = $element.find('h1').text(),
+                                weaText = $element.find('.wea').attr('title'),
+                                weaCode = weatherArr[weaText],
+                                temp = $element.find('.tem span').text(),
+                                $win = $element.find('.win span'),
+                                wind = [$win.attr('title'), $win.text()],
+                                sky = $element.find('.sky .txt')[0] ? $element.find('.sky .txt').text() : '';
 
-                        if(idx === 0) {
-                            if(title.indexOf('白天') > -1) {
-                                if($element.find('.sunUp span')[0]) {
-                                    insertJson.morningWeather.sunUp = $element.find('.sunUp span').text();
-                                }
-                                insertJson.dayWeather = {
-                                    time: 'day',
-                                    timeText: '白天',
-                                    weaCode: 'd'+weaCode,
-                                    digitalCode: parseInt(weaCode),
-                                    weaText: weaText,
-                                    temp: temp,
-                                    wind: wind,
-                                    sky: sky
+                            if(idx === 0) {
+                                if(title.indexOf('白天') > -1) {
+                                    if($element.find('.sunUp span')[0]) {
+                                        insertJson.morningWeather.sunUp = $element.find('.sunUp span').text();
+                                    }
+                                    insertJson.dayWeather = {
+                                        time: 'day',
+                                        timeText: '白天',
+                                        weaCode: 'd'+weaCode,
+                                        digitalCode: parseInt(weaCode),
+                                        weaText: weaText,
+                                        temp: temp,
+                                        wind: wind,
+                                        sky: sky
+                                    }
+                                } else {
+                                    if($element.find('.sunDown span')[0]) {
+                                        insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
+                                    }
+                                    insertJson.nightWeather = {
+                                        time: 'night',
+                                        timeText: '晚上',
+                                        weaCode: 'n'+weaCode,
+                                        digitalCode: parseInt(weaCode),
+                                        weaText: weaText,
+                                        temp: temp,
+                                        wind: wind,
+                                        sky: sky
+                                    }
                                 }
                             } else {
-                                if($element.find('.sunDown span')[0]) {
-                                    insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
-                                }
-                                insertJson.nightWeather = {
-                                    time: 'night',
-                                    timeText: '晚上',
-                                    weaCode: 'n'+weaCode,
-                                    digitalCode: parseInt(weaCode),
-                                    weaText: weaText,
-                                    temp: temp,
-                                    wind: wind,
-                                    sky: sky
-                                }
-                            }
-                        } else if(idx === 1) {
-                            if(title.indexOf('夜间') > -1) {
-                                if($element.find('.sunDown span')[0]) {
-                                    insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
-                                }
-                                insertJson.nightWeather = {
-                                    time: 'night',
-                                    timeText: '晚上',
-                                    weaCode: 'n'+weaCode,
-                                    digitalCode: parseInt(weaCode),
-                                    weaText: weaText,
-                                    temp: temp,
-                                    wind: wind,
-                                    sky: sky
+                                if(title.indexOf('夜间') > -1) {
+                                    if($element.find('.sunDown span')[0]) {
+                                        insertJson.eveningWeather.sunDown = $element.find('.sunDown span').text();
+                                    }
+                                    insertJson.nightWeather = {
+                                        time: 'night',
+                                        timeText: '晚上',
+                                        weaCode: 'n'+weaCode,
+                                        digitalCode: parseInt(weaCode),
+                                        weaText: weaText,
+                                        temp: temp,
+                                        wind: wind,
+                                        sky: sky
+                                    }
                                 }
                             }
                         }
