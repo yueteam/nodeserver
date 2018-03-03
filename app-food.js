@@ -123,14 +123,16 @@ app.get('/adduser', function(req, res){
                 collection.insert(userInfo, function(error, result) { 
                     var fileName = result.insertedIds[0] + '.jpg';
                     var filePath = './uploads/avatar/' + fileName;
-                    request(userInfo.avatar_url).pipe(fs.createWriteStream(filePath))
-                    .on('close', function() {
-                        co(function* () {
-                            var stream = fs.createReadStream(filePath);
-                            var result = yield client.putStream(fileName, stream);
-                            fs.unlinkSync(filePath);
+                    if(userInfo.avatar_url) {
+                        request(userInfo.avatar_url).pipe(fs.createWriteStream(filePath))
+                        .on('close', function() {
+                            co(function* () {
+                                var stream = fs.createReadStream(filePath);
+                                var result = yield client.putStream(fileName, stream);
+                                fs.unlinkSync(filePath);
+                            });
                         });
-                    });
+                    }
 
                     res.json({code: successCode, msg: "", data: result}); 
                     db.close();
