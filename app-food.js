@@ -94,6 +94,7 @@ app.get('/openid', function(req, res){
     });
 
 });
+
 app.get('/adduser', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var userInfo = {
@@ -169,7 +170,7 @@ app.get('/getforecast', function(req, res){
             }
 
             if(item) {
-                res.json({code: 1, msg: "", data: item.daily_forecast});
+                res.json({code: 1, msg: "", data: item.daily_forecast, update: item.update});
 
                 //关闭数据库
                 db.close();
@@ -188,10 +189,11 @@ app.get('/getforecast', function(req, res){
                     if(weatherJson.status === 'ok' && weatherJson.daily_forecast) {
                         weatherJson.city = city;
                         weatherJson.date = dateStr;
+                        weatherJson.create_time = Date.now();
 
                         //插入数据
                         collection.insert(weatherJson, function(error, result) {                        
-                            res.json({code: successCode, msg: "", data: weatherJson.daily_forecast}); 
+                            res.json({code: successCode, msg: "", data: weatherJson.daily_forecast, update: weatherJson.update}); 
                             db.close();
                         });
                     }
@@ -247,10 +249,10 @@ app.get('/getweatherinfo', function(req, res){
             }
 
             if(updated) {
-                    res.json({code: 1, msg: "", data: item});
+                res.json({code: 1, msg: "", data: item});
 
-                    //关闭数据库
-                    db.close();
+                //关闭数据库
+                db.close();
 
             } else {  
                 superagent.get('http://www.weather.com.cn/weather1d/'+code+'.shtml')
@@ -278,7 +280,8 @@ app.get('/getweatherinfo', function(req, res){
                             timeText: '傍晚',
                             sunDown: ''
                         },
-                        nightWeather: {}
+                        nightWeather: {},
+                        create_time: Date.now()
                     };
 
                     $('.t .clearfix li').each(function(idx, element) {
@@ -382,6 +385,38 @@ app.get('/getweatherinfo', function(req, res){
             }
         });
     });
+});
+
+app.get('/getair', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var id = req.query.id;
+
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('weather');
+         
+        superagent.get('https://free-api.heweather.com/s6/air/now?location='+encodeURIComponent(city)+'&key=ef7860519dfb4062825fb1034fcb6690')
+        .charset('utf-8')
+        .end(function (err1, sres) {
+            if (err1) {
+                res.json({code: failCode, msg: err1});
+                return;
+            }
+
+            var dataJson = JSON.parse(sres.text),
+                airJson = dataJson.HeWeather6[0];
+
+            if(airJson.status === 'ok' && airJson.air_now_city) {
+                var airData = {
+                    air_now_city: airJson.air_now_city,
+                    update: airJson.update
+                };
+                collection.update({_id: ObjectID(id)}, {$set:{air: airData}}, function(error, result) {                        
+                    res.json({code: successCode, msg: "", data: airData}); 
+                    db.close();
+                });
+            }
+        });
+    });                          
 });
 
 /**
@@ -601,7 +636,7 @@ app.post('/addrecipe', function(req, res){
         title: req.body.title,
         summary: req.body.desc,
         cook_time: req.body.cookTime,
-        category: '年夜饭',
+        category: '月子餐',
         fork_users: [],
         author_id: req.body.userId,
         author: {
