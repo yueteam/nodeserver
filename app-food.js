@@ -390,7 +390,8 @@ app.get('/getweatherinfo', function(req, res){
 
 app.get('/getair', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
-    var id = req.query.id;
+    var id = req.query.id,
+        city = req.query.city;
 
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('weather');
