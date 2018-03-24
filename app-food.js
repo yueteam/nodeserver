@@ -230,7 +230,7 @@ app.get('/getweatherinfo', function(req, res){
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         console.log("weather连接成功！");
         var collection = db.collection('weather');
-        collection.findOne({city: city, date: dateStr}, function(err, item){   
+        collection.find({city: city, date: dateStr}).sort({'create_time':-1}).limit(1).toArray(function(err, items){  
             if(err) {
                 res.json({code: failCode, data: err}); 
                 db.close();
@@ -238,13 +238,14 @@ app.get('/getweatherinfo', function(req, res){
             }
 
             var updated = false;
-            if(item) {
+            if(items.length > 0) {
+                var item = items[0];
                 var lastUpdateTime = item.updateTime;
                 var nowTimeNum = parseInt(hour) + parseInt(minute)*0.01;
                 if((lastUpdateTime === '07:30' && nowTimeNum < 11.3) || (lastUpdateTime === '11:30' && nowTimeNum < 18) || lastUpdateTime === '18:00') {
                     updated = true;
                 } else {
-                    collection.remove({city: city, date: dateStr});
+                    // collection.remove({city: city, date: dateStr});
                 }
             }
 
