@@ -170,10 +170,37 @@ app.get('/getforecast', function(req, res){
             }
 
             if(item) {
-                res.json({code: 1, msg: "", data: item.daily_forecast, update: item.update});
+                let nowTime = Date.now();
+                var loc = item.update.loc;
+                loc = loc.replace(/-/g, '/');
+                var locTime = new Date(loc).getTime();
+                if(nowTime - locTime > 2*60*60*1000) {
+                    superagent.get('https://free-api.heweather.com/s6/weather/forecast?location='+encodeURIComponent(city)+'&key=ef7860519dfb4062825fb1034fcb6690')
+                    .charset('utf-8')
+                    .end(function (err1, sres) {
+                        if (err1) {
+                            res.json({code: failCode, msg: err1});
+                            return;
+                        }
 
-                //关闭数据库
-                db.close();
+                        var dataJson = JSON.parse(sres.text),
+                            weatherJson = dataJson.HeWeather6[0];
+
+                        if(weatherJson.status === 'ok' && weatherJson.daily_forecast) {
+
+                            //更新数据
+                            collection.update({_id: item._id}, {$set: {daily_forecast: weatherJson.daily_forecast, update: weatherJson.update}}, function(error, result) {                        
+                                res.json({code: successCode, msg: "", data: weatherJson.daily_forecast, update: weatherJson.update}); 
+                                db.close();
+                            });
+                        }
+                    });
+                } else {
+                    res.json({code: 1, msg: "", data: item.daily_forecast, update: item.update});
+
+                    //关闭数据库
+                    db.close();
+                }
             } else {  
                 superagent.get('https://free-api.heweather.com/s6/weather/forecast?location='+encodeURIComponent(city)+'&key=ef7860519dfb4062825fb1034fcb6690')
                 .charset('utf-8')
