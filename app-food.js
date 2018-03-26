@@ -174,7 +174,7 @@ app.get('/getforecast', function(req, res){
                 var loc = item.update.loc;
                 loc = loc.replace(/-/g, '/');
                 var locTime = new Date(loc).getTime();
-                if(nowTime - locTime > 2*60*60*1000) {
+                if(nowTime - locTime > 3*60*60*1000) {
                     superagent.get('https://free-api.heweather.com/s6/weather/forecast?location='+encodeURIComponent(city)+'&key=ef7860519dfb4062825fb1034fcb6690')
                     .charset('utf-8')
                     .end(function (err1, sres) {
