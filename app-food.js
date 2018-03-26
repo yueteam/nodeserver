@@ -448,6 +448,39 @@ app.get('/getair', function(req, res){
     });                          
 });
 
+app.get('/getnow', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var id = req.query.id,
+        city = req.query.city;
+
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        var collection = db.collection('weather');
+         
+        superagent.get('https://free-api.heweather.com/s6/weather/now?location='+encodeURIComponent(city)+'&key=ef7860519dfb4062825fb1034fcb6690')
+        .charset('utf-8')
+        .end(function (err1, sres) {
+            if (err1) {
+                res.json({code: failCode, msg: err1});
+                return;
+            }
+
+            var dataJson = JSON.parse(sres.text),
+                nowJson = dataJson.HeWeather6[0];
+
+            if(nowJson.status === 'ok' && nowJson.now) {
+                var nowData = {
+                    now: nowJson.now,
+                    update: nowJson.update
+                };
+                collection.update({_id: ObjectID(id)}, {$set:{nowWeather: nowData}}, function(error, result) {                        
+                    res.json({code: successCode, msg: "", data: nowData}); 
+                    db.close();
+                });
+            }
+        });
+    });                          
+});
+
 /**
  * [breakfast] 健康知食
  * @type {Object}
