@@ -269,7 +269,7 @@ app.get('/getweatherinfo', function(req, res){
                 var item = items[0];
                 var lastUpdateTime = item.updateTime;
                 var nowTimeNum = parseInt(hour) + parseInt(minute)*0.01;
-                if((lastUpdateTime === '05:30' && nowTimeNum < 7.3) || (lastUpdateTime === '07:30' && nowTimeNum < 11.3) || (lastUpdateTime === '11:30' && nowTimeNum < 18) || lastUpdateTime === '18:00') {
+                if((lastUpdateTime === '05:30' && nowTimeNum < 7.35) || (lastUpdateTime === '07:30' && nowTimeNum < 11.35) || (lastUpdateTime === '11:30' && nowTimeNum < 18.05) || lastUpdateTime === '18:00') {
                     updated = true;
                 } else {
                     // collection.remove({city: city, date: dateStr});
