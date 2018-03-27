@@ -481,6 +481,23 @@ app.get('/getnow', function(req, res){
     });                          
 });
 
+app.get('/getsoundconfig', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        var collection = db.collection('sound');
+        collection.findOne({_id: ObjectId('5ab9f3fa8f465b275bd77fcd')}, function(err1, item){ 
+            if(err1) {
+                res.json({code: failCode, data: err1}); 
+                db.close();
+                return;
+            }
+            res.json({code: successCode, msg: "", data: item});
+            db.close();
+        });
+    });
+});
+
 /**
  * [breakfast] 健康知食
  * @type {Object}
