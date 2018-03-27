@@ -481,7 +481,7 @@ app.get('/getnow', function(req, res){
     });                          
 });
 
-app.get('/getsoundconfig', function(req, res){
+app.get('/getsound', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
