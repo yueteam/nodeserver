@@ -247,6 +247,11 @@ app.get('/getweatherinfo', function(req, res){
         nowdate.setDate(date1 - 1);
     }
 
+    var nightMode = false;
+    if((hour >= 18 && hour <= 23) || (hour >= 0 && hour < 6)) {
+        nightMode = true;
+    }
+
     var year = nowdate.getFullYear(),
         month = nowdate.getMonth()+1,
         date = nowdate.getDate(),
@@ -297,6 +302,7 @@ app.get('/getweatherinfo', function(req, res){
                         city: city,
                         date: dateStr,
                         updateTime: updateTime,
+                        nightMode: nightMode,
                         morningWeather: {
                             time: 'morning',
                             timeText: '早晨',
@@ -344,7 +350,7 @@ app.get('/getweatherinfo', function(req, res){
                                     }
                                     insertJson.nightWeather = {
                                         time: 'night',
-                                        timeText: '晚上',
+                                        timeText: '夜间',
                                         weaCode: 'n'+weaCode,
                                         digitalCode: parseInt(weaCode),
                                         weaText: weaText,
@@ -360,7 +366,7 @@ app.get('/getweatherinfo', function(req, res){
                                     }
                                     insertJson.nightWeather = {
                                         time: 'night',
-                                        timeText: '晚上',
+                                        timeText: '夜间',
                                         weaCode: 'n'+weaCode,
                                         digitalCode: parseInt(weaCode),
                                         weaText: weaText,
