@@ -72,7 +72,7 @@ function inArray(search, arr) {
  * [weather] 天气预报
  *
  */
-
+var weatherKey = '38c28df6f387474c977cbb17a7b20fa4';
 var weatherWXInfo = {
         appid: 'wxa161643780b58159',
         secret: '967d616ea68a37697c3a400d256e8cdd'
@@ -175,7 +175,7 @@ app.get('/getforecast', function(req, res){
                 loc = loc.replace(/-/g, '/');
                 var locTime = new Date(loc).getTime();
                 if(nowTime - locTime > 3*60*60*1000) {
-                    superagent.get('https://free-api.heweather.com/s6/weather/forecast?location='+encodeURIComponent(city)+'&key=ef7860519dfb4062825fb1034fcb6690')
+                    superagent.get('https://free-api.heweather.com/s6/weather/forecast?location='+encodeURIComponent(city)+'&key='+weatherKey)
                     .charset('utf-8')
                     .end(function (err1, sres) {
                         if (err1) {
@@ -202,7 +202,7 @@ app.get('/getforecast', function(req, res){
                     db.close();
                 }
             } else {  
-                superagent.get('https://free-api.heweather.com/s6/weather/forecast?location='+encodeURIComponent(city)+'&key=ef7860519dfb4062825fb1034fcb6690')
+                superagent.get('https://free-api.heweather.com/s6/weather/forecast?location='+encodeURIComponent(city)+'&key='+weatherKey)
                 .charset('utf-8')
                 .end(function (err1, sres) {
                     if (err1) {
@@ -429,7 +429,7 @@ app.get('/getair', function(req, res){
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('weather');
          
-        superagent.get('https://free-api.heweather.com/s6/air/now?location='+encodeURIComponent(city)+'&key=ef7860519dfb4062825fb1034fcb6690')
+        superagent.get('https://free-api.heweather.com/s6/air/now?location='+encodeURIComponent(city)+'&key='+weatherKey)
         .charset('utf-8')
         .end(function (err1, sres) {
             if (err1) {
@@ -462,7 +462,7 @@ app.get('/getnow', function(req, res){
     MongoClient.connect(DB_CONN_STR, function(err, db) {
         var collection = db.collection('weather');
          
-        superagent.get('https://free-api.heweather.com/s6/weather/now?location='+encodeURIComponent(city)+'&key=ef7860519dfb4062825fb1034fcb6690')
+        superagent.get('https://free-api.heweather.com/s6/weather/now?location='+encodeURIComponent(city)+'&key='+weatherKey)
         .charset('utf-8')
         .end(function (err1, sres) {
             if (err1) {
