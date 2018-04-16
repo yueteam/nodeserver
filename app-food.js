@@ -150,7 +150,14 @@ app.get('/getweather', function(req, res){
         year = nowdate.getFullYear(),
         month = nowdate.getMonth()+1,
         date = nowdate.getDate(),
-        dateStr = year+'/'+month+'/'+date;
+        hour = nowdate.getHours();
+        
+    var dateStr = year+'/'+month+'/'+date;
+
+    var nightMode = false;
+    if((hour >= 18 && hour <= 23) || (hour >= 0 && hour < 6)) {
+        nightMode = true;
+    }
 
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
         console.log("weather连接成功！");
@@ -182,13 +189,13 @@ app.get('/getweather', function(req, res){
 
                             //更新数据
                             collection.update({_id: item._id}, {$set: {now: weatherJson.now, daily_forecast: weatherJson.daily_forecast, hourly: weatherJson.hourly, update: weatherJson.update}}, function(error, result) {                        
-                                res.json({code: successCode, msg: "", now: weatherJson.now, daily: weatherJson.daily_forecast[0], hourly: weatherJson.hourly}); 
+                                res.json({code: successCode, msg: "", nightMode: nightMode, now: weatherJson.now, daily: weatherJson.daily_forecast[0], hourly: weatherJson.hourly}); 
                                 db.close();
                             });
                         }
                     });
                 } else {
-                    res.json({code: 1, msg: "", now: item.now, daily: item.daily_forecast[0], hourly: item.hourly});
+                    res.json({code: 1, msg: "", nightMode: nightMode, air: item.air||'', now: item.now, daily: item.daily_forecast[0], hourly: item.hourly});
 
                     //关闭数据库
                     db.close();
@@ -212,7 +219,7 @@ app.get('/getweather', function(req, res){
 
                         //插入数据
                         collection.insert(weatherJson, function(error, result) {                        
-                            res.json({code: successCode, msg: "", now: weatherJson.now, daily: weatherJson.daily_forecast[0], hourly: weatherJson.hourly}); 
+                            res.json({code: successCode, msg: "", nightMode: nightMode, now: weatherJson.now, daily: weatherJson.daily_forecast[0], hourly: weatherJson.hourly}); 
                             db.close();
                         });
                     }
@@ -312,8 +319,6 @@ app.get('/getforecast', function(req, res){
 app.get('/getweatherinfo', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
-    // var lat = req.query.lat,
-    //     lon = req.query.lon,
     var city = req.query.city,
         code = req.query.code;
 
@@ -505,7 +510,7 @@ app.get('/getair', function(req, res){
     var id = req.query.id,
         city = req.query.city;
 
-    MongoClient.connect(DB_CONN_STR, function(err, db) {
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('weather');
          
         superagent.get('https://free-api.heweather.com/s6/air/now?location='+encodeURIComponent(city)+'&key='+weatherKey)
@@ -515,11 +520,10 @@ app.get('/getair', function(req, res){
                 res.json({code: failCode, msg: err1});
                 return;
             }
-
             var dataJson = JSON.parse(sres.text),
                 airJson = dataJson.HeWeather6[0];
 
-            if(airJson.status === 'ok' && airJson.air_now_city) {
+            if(airJson.status === 'ok') {
                 var airData = {
                     air_now_city: airJson.air_now_city,
                     update: airJson.update
