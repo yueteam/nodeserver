@@ -189,13 +189,13 @@ app.get('/getweather', function(req, res){
 
                             //更新数据
                             collection.update({_id: item._id}, {$set: {now: weatherJson.now, daily_forecast: weatherJson.daily_forecast, hourly: weatherJson.hourly, update: weatherJson.update}}, function(error, result) {                        
-                                res.json({code: successCode, msg: "", nightMode: nightMode, now: weatherJson.now, daily: weatherJson.daily_forecast[0], hourly: weatherJson.hourly}); 
+                                res.json({code: successCode, msg: "", data: {id: item._id, nightMode: nightMode, update: weatherJson.update, now: weatherJson.now, daily: weatherJson.daily_forecast[0], hourly: weatherJson.hourly}}); 
                                 db.close();
                             });
                         }
                     });
                 } else {
-                    res.json({code: 1, msg: "", nightMode: nightMode, air: item.air||'', now: item.now, daily: item.daily_forecast[0], hourly: item.hourly});
+                    res.json({code: 1, msg: "", data: {id: item._id, nightMode: nightMode, update: item.update, air: item.air||'', now: item.now, daily: item.daily_forecast[0], hourly: item.hourly}});
 
                     //关闭数据库
                     db.close();
@@ -219,7 +219,7 @@ app.get('/getweather', function(req, res){
 
                         //插入数据
                         collection.insert(weatherJson, function(error, result) {                        
-                            res.json({code: successCode, msg: "", nightMode: nightMode, now: weatherJson.now, daily: weatherJson.daily_forecast[0], hourly: weatherJson.hourly}); 
+                            res.json({code: successCode, msg: "", data: {id: result.insertedIds[0], nightMode: nightMode, update: weatherJson.update, now: weatherJson.now, daily: weatherJson.daily_forecast[0], hourly: weatherJson.hourly}}); 
                             db.close();
                         });
                     }
