@@ -143,6 +143,85 @@ app.get('/adduser', function(req, res){
     });
 });
 
+app.get('/getweather', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var city = req.query.city;
+    var nowdate = new Date(),
+        year = nowdate.getFullYear(),
+        month = nowdate.getMonth()+1,
+        date = nowdate.getDate(),
+        dateStr = year+'/'+month+'/'+date;
+
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        console.log("weather连接成功！");
+        var collection = db.collection('weather');
+        collection.findOne({city: city, date: dateStr}, function(err, item){   
+            if(err) {
+                res.json({code: failCode, data: err}); 
+                db.close();
+                return;
+            }
+
+            if(item) {
+                let nowTime = Date.now();
+                var loc = item.update.loc;
+                loc = loc.replace(/-/g, '/');
+                var locTime = new Date(loc).getTime();
+                if(nowTime - locTime > 1.07*60*60*1000) {
+                    superagent.get('https://free-api.heweather.com/s6/weather?location='+encodeURIComponent(city)+'&key='+weatherKey)
+                    .charset('utf-8')
+                    .end(function (err1, sres) {
+                        if (err1) {
+                            res.json({code: failCode, msg: err1});
+                            return;
+                        }
+                        var dataJson = JSON.parse(sres.text),
+                            weatherJson = dataJson.HeWeather6[0];
+
+                        if(weatherJson.status === 'ok') {
+
+                            //更新数据
+                            collection.update({_id: item._id}, {$set: {now: weatherJson.now, daily_forecast: weatherJson.daily_forecast, hourly: weatherJson.hourly, update: weatherJson.update}}, function(error, result) {                        
+                                res.json({code: successCode, msg: "", now: weatherJson.now, daily: weatherJson.daily_forecast[0], hourly: weatherJson.hourly}); 
+                                db.close();
+                            });
+                        }
+                    });
+                } else {
+                    res.json({code: 1, msg: "", now: item.now, daily: item.daily_forecast[0], hourly: item.hourly});
+
+                    //关闭数据库
+                    db.close();
+                }
+            } else {  
+                superagent.get('https://free-api.heweather.com/s6/weather?location='+encodeURIComponent(city)+'&key='+weatherKey)
+                .charset('utf-8')
+                .end(function (err1, sres) {
+                    if (err1) {
+                        res.json({code: failCode, msg: err1});
+                        return;
+                    }
+
+                    var dataJson = JSON.parse(sres.text),
+                        weatherJson = dataJson.HeWeather6[0];
+
+                    if(weatherJson.status === 'ok') {
+                        weatherJson.city = city;
+                        weatherJson.date = dateStr;
+                        weatherJson.create_time = Date.now();
+
+                        //插入数据
+                        collection.insert(weatherJson, function(error, result) {                        
+                            res.json({code: successCode, msg: "", now: weatherJson.now, daily: weatherJson.daily_forecast[0], hourly: weatherJson.hourly}); 
+                            db.close();
+                        });
+                    }
+                });
+            }
+        });
+    });                          
+});
+
 app.get('/getforecast', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
     var city = req.query.city;
