@@ -150,14 +150,10 @@ app.get('/getweather', function(req, res){
         year = nowdate.getFullYear(),
         month = nowdate.getMonth()+1,
         date = nowdate.getDate(),
-        hour = nowdate.getHours();
+        hm = nowdate.getHours()+0.01*nowdate.getMinutes();
         
     var dateStr = year+'/'+month+'/'+date;
-
     var nightMode = false;
-    if((hour >= 18 && hour <= 23) || (hour >= 0 && hour < 6)) {
-        nightMode = true;
-    }
 
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
         console.log("weather连接成功！");
@@ -185,7 +181,14 @@ app.get('/getweather', function(req, res){
                         var dataJson = JSON.parse(sres.text),
                             weatherJson = dataJson.HeWeather6[0];
 
-                        if(weatherJson.status === 'ok') {
+                        if(weatherJson.status === 'ok') {    
+                            var sr = weatherJson.daily_forecast[0].sr,
+                                srNum = Number(sr.replace(/:/,'.')),
+                                ss = weatherJson.daily_forecast[0].ss,
+                                ssNum = Number(ss.replace(/:/,'.'));                   
+                            if(hm > ssNum || hour < srNum) {
+                                nightMode = true;
+                            }
 
                             //更新数据
                             collection.update({_id: item._id}, {$set: {now: weatherJson.now, daily_forecast: weatherJson.daily_forecast, hourly: weatherJson.hourly, update: weatherJson.update}}, function(error, result) {                        
@@ -195,6 +198,13 @@ app.get('/getweather', function(req, res){
                         }
                     });
                 } else {
+                    var sr = item.daily_forecast[0].sr,
+                        srNum = Number(sr.replace(/:/,'.')),
+                        ss = item.daily_forecast[0].ss,
+                        ssNum = Number(ss.replace(/:/,'.'));                   
+                    if(hm > ssNum || hour < srNum) {
+                        nightMode = true;
+                    }
                     res.json({code: 1, msg: "", data: {id: item._id, nightMode: nightMode, update: item.update, air: item.air||'', now: item.now, daily: item.daily_forecast[0], hourly: item.hourly}});
 
                     //关闭数据库
@@ -216,6 +226,13 @@ app.get('/getweather', function(req, res){
                         weatherJson.city = city;
                         weatherJson.date = dateStr;
                         weatherJson.create_time = Date.now();
+                        var sr = weatherJson.daily_forecast[0].sr,
+                            srNum = Number(sr.replace(/:/,'.')),
+                            ss = weatherJson.daily_forecast[0].ss,
+                            ssNum = Number(ss.replace(/:/,'.'));                   
+                        if(hm > ssNum || hour < srNum) {
+                            nightMode = true;
+                        }
 
                         //插入数据
                         collection.insert(weatherJson, function(error, result) {                        
