@@ -186,7 +186,7 @@ app.get('/getweather', function(req, res){
                                 srNum = Number(sr.replace(/:/,'.')),
                                 ss = weatherJson.daily_forecast[0].ss,
                                 ssNum = Number(ss.replace(/:/,'.'));                   
-                            if(hm > ssNum || hour < srNum) {
+                            if(hm > ssNum || hm < srNum) {
                                 nightMode = true;
                             }
 
@@ -202,7 +202,7 @@ app.get('/getweather', function(req, res){
                         srNum = Number(sr.replace(/:/,'.')),
                         ss = item.daily_forecast[0].ss,
                         ssNum = Number(ss.replace(/:/,'.'));                   
-                    if(hm > ssNum || hour < srNum) {
+                    if(hm > ssNum || hm < srNum) {
                         nightMode = true;
                     }
                     res.json({code: 1, msg: "", data: {id: item._id, nightMode: nightMode, update: item.update, air: item.air||'', now: item.now, daily: item.daily_forecast[0], hourly: item.hourly}});
@@ -230,7 +230,7 @@ app.get('/getweather', function(req, res){
                             srNum = Number(sr.replace(/:/,'.')),
                             ss = weatherJson.daily_forecast[0].ss,
                             ssNum = Number(ss.replace(/:/,'.'));                   
-                        if(hm > ssNum || hour < srNum) {
+                        if(hm > ssNum || hm < srNum) {
                             nightMode = true;
                         }
 
