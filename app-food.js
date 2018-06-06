@@ -938,14 +938,14 @@ app.get('/gethotwish', function(req, res){
 
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('wish');
-        collection.aggregate([{$unwind:"$fav_users"}, {$group:{_id:{wish_id:"$_id",nick_name:"$nick_name",avatar_url:"$avatar_url",words:"$words"},total_fork:{$sum:1}}}, {$sort:{total_fork:-1}}, {$limit:10}], function(err1, result) {
+        collection.aggregate([{$unwind:"$fav_users"}, {$group:{_id:{wish_id:"$_id",user_id:"$user_id",nick_name:"$nick_name",wish:"$wish"},total_fork:{$sum:1}}}, {$sort:{total_fork:-1}}, {$limit:10}], function(err1, result) {
             var list = [];
             result.forEach(function(item){
                 var newItem = {
                     id: item._id.wish_id,
                     nickName: item._id.nick_name,
-                    avatarUrl: item._id.avatar_url,
-                    words: item._id.words.split('\n'),
+                    avatarUrl: 'https://yueavatar.oss-cn-hangzhou.aliyuncs.com/'+item._id.user_id+'.jpg!x200',
+                    words: item._id.wish.split('\n'),
                     favCount: item.total_fork
                 }
                 list.push(newItem);
@@ -968,6 +968,14 @@ app.get('/wishlist', function(req, res){
             if(items.length > 0) {
                 var list = items;
 
+                list.forEach(function(item){
+                    item.words = item.wish.split('\n');
+                    item.fav_count = item.fav_users.length;
+                    var favUsers = item.fav_users;
+                    if(inArray(userId,favUsers) === 1) {
+                        item.faved = true;
+                    }
+                });
                 res.json({code: successCode, msg: "", data: list});
             } else {
                 res.json({code: failCode, msg: "没有更多了~"});
