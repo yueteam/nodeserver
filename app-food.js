@@ -933,6 +933,29 @@ app.get('/wishdetail', function(req, res){
     });
 });
 
+app.get('/gethotwish', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        var collection = db.collection('wish');
+        collection.aggregate([{$unwind:"$fav_users"}, {$group:{_id:{wish_id:"$_id",nick_name:"$nick_name",avatar_url:"$avatar_url",words:"$words"},total_fork:{$sum:1}}}, {$sort:{total_fork:-1}}, {$limit:10}], function(err1, result) {
+            var list = [];
+            result.forEach(function(item){
+                var newItem = {
+                    id: item._id.wish_id,
+                    nickName: item._id.nick_name,
+                    avatarUrl: item._id.avatar_url,
+                    words: item._id.words.split('\n'),
+                    favCount: item.total_fork
+                }
+                list.push(newItem);
+            });
+            res.json({code: successCode, msg: "", data: list});
+            db.close();
+        });
+    });
+});
+
 app.get('/wishlist', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
@@ -941,7 +964,7 @@ app.get('/wishlist', function(req, res){
     var skipCount = (pageNo - 1) * 10;
     MongoClient.connect(DB_CONN_STR1, function(err, db) {
         var collection = db.collection('wish');
-        collection.find({}, {nick_name:0}).sort({'create_time':-1}).limit(10).skip(skipCount).toArray(function(err, items){
+        collection.find({}, {planet:0}).sort({'create_time':-1}).limit(10).skip(skipCount).toArray(function(err, items){
             if(items.length > 0) {
                 var list = items;
 
