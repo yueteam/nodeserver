@@ -800,6 +800,24 @@ app.get('/adduser', function(req, res){
     });
 });
 
+app.get('/finduser', function(req, res){
+    res.header("Content-Type", "application/json; charset=utf-8");
+    var userId = req.query.id;
+    MongoClient.connect(DB_CONN_STR1, function(err, db) {
+        console.log("finduser连接成功！");
+        var collection = db.collection('user');
+        collection.findOne({_id: ObjectID(userId)}, function(err1, item){
+            if(err1) {
+                res.json({code: failCode, data: err1});
+                db.close();
+                return;
+            }
+            res.json({code: successCode, msg: "", data: item});
+            db.close();
+        });
+    });
+});
+
 app.get('/accesstoken', function(req, res){
     res.header("Content-Type", "application/json; charset=utf-8");
 
@@ -892,6 +910,7 @@ app.post('/newwish', function(req, res){
         user_id: req.body.userId,
         nick_name: req.body.nickName,
         wish: req.body.wish,
+        wish_img: req.body.wishImg,
         city: req.body.city,
         fav_users: [],
         comments: [],
@@ -971,10 +990,10 @@ app.get('/wishlist', function(req, res){
                 list.forEach(function(item){
                     item.words = item.wish.split('\n');
                     item.fav_count = item.fav_users.length;
-                    var favUsers = item.fav_users;
-                    if(inArray(userId,favUsers) === 1) {
-                        item.faved = true;
-                    }
+                    // var favUsers = item.fav_users;
+                    // if(inArray(userId,favUsers) === 1) {
+                    //     item.faved = true;
+                    // }
                 });
                 res.json({code: successCode, msg: "", data: list});
             } else {
